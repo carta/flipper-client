@@ -9,10 +9,10 @@ from . import decorators
 
 
 __all__ = [
-    CachedFeatureFlagStore,
-    ConsulFeatureFlagStore,
-    decorators,
-    FeatureFlagClient,
-    MemoryFeatureFlagStore,
-    RedisFeatureFlagStore,
+    'CachedFeatureFlagStore',
+    'ConsulFeatureFlagStore',
+    'decorators',
+    'FeatureFlagClient',
+    'MemoryFeatureFlagStore',
+    'RedisFeatureFlagStore',
 ]
