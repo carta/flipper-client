@@ -246,4 +246,4 @@ Pull requests welcome.
 
 # Development
 
-Clone the repo and run `pip install -e .` to get the environment set up. Test are run with the `pytest` command.
+Clone the repo and run `pip install -e .[dev]` to get the environment set up. Test are run with the `pytest` command.

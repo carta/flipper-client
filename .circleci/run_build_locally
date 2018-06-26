@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+
+COMMIT_HASH=${COMMIT_HASH:-$(git rev-parse HEAD)}
+BRANCH_NAME=${BRANCH_NAME:-$(git rev-parse --abbrev-ref HEAD)}
+
+curl -v --user ${CIRCLE_TOKEN}: \
+    --request POST \
+    --form revision=$COMMIT_HASH \
+    --form config=@/Users/adamsavitzky/code/flipper-client/.circleci/config.yml \
+    --form notify=false \
+        https://circleci.com/api/v1.1/project/gh/carta/flipper-client/tree/$BRANCH_NAME
