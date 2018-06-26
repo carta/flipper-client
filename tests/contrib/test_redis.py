@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import fakeredis
 
-from ff_client import RedisFeatureFlagStore
+from flipper import RedisFeatureFlagStore
 
 
 class BaseTest(unittest.TestCase):

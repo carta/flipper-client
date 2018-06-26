@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import MagicMock
 from uuid import uuid4
 
-from ff_client import CachedFeatureFlagStore, MemoryFeatureFlagStore
+from flipper import CachedFeatureFlagStore, MemoryFeatureFlagStore
 
 
 class BaseTest(unittest.TestCase):

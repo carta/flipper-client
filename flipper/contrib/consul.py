@@ -2,8 +2,6 @@ import logging
 from typing import Optional, Tuple
 import threading
 
-from gevent.threadpool import ThreadPool
-
 from .store import AbstractFeatureFlagStore
 
 

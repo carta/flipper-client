@@ -6,7 +6,7 @@ from .client import FeatureFlagClient
 def is_enabled(
     flags: FeatureFlagClient,
     feature_name: str,
-    redirect=Optional[Callable]=None
+    redirect: Optional[Callable]=None
 ):
     def decorator(fn):
         def wrapper(*args, **kwargs):

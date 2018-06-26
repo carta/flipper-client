@@ -1,7 +1,7 @@
 import unittest
 from uuid import uuid4
 
-from ff_client import MemoryFeatureFlagStore
+from flipper import MemoryFeatureFlagStore
 
 
 class BaseTest(unittest.TestCase):

@@ -1,8 +1,8 @@
 import unittest
 from uuid import uuid4
 
-from ff_client import FeatureFlagClient, MemoryFeatureFlagStore
-from ff_client.flag import FeatureFlag
+from flipper import FeatureFlagClient, MemoryFeatureFlagStore
+from flipper.flag import FeatureFlag
 
 
 class BaseTest(unittest.TestCase):

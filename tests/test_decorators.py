@@ -2,8 +2,8 @@ import unittest
 from unittest.mock import MagicMock 
 from uuid import uuid4
 
-from ff_client import decorators, FeatureFlagClient, MemoryFeatureFlagStore
-from ff_client.flag import FeatureFlag
+from flipper import decorators, FeatureFlagClient, MemoryFeatureFlagStore
+from flipper.flag import FeatureFlag
 
 
 class BaseTest(unittest.TestCase):
