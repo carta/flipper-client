@@ -155,7 +155,7 @@ def old_horse_sound(request):
     return HttpResponse('Neigh')
 ```
 
-# Intitialization
+# Initialization
 
 flipper is designed to provide a common interface that is agnostic to the storage backend you choose. To create a client simply import the `FeatureFlagClient` class and your storage backend of choice.
 
