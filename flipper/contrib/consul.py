@@ -37,11 +37,11 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
         for item in data:
             self._set_value(item['Key'], item['Value'])
 
-    def _set_value(self, key: str, value: str):
-        self._cache[key] = self._deserialize(value)
+    def _set_is_enabled(self, key: str, is_enabled: str):
+        self._cache[key] = self._deserialize(is_enabled)
 
-    def create(self, feature_name: str, default: Optional[bool]=False):
-        self.set(feature_name, default)
+    def create(self, feature_name: str, is_enabled: Optional[bool]=False):
+        self.set(feature_name, is_enabled)
 
     def get(self, feature_name: str, default: Optional[bool]=False) -> bool:
         return self._cache.get(self._make_key(feature_name), default)
@@ -49,12 +49,12 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
     def _make_key(self, feature_name: str) -> str:
         return '/'.join([self.base_key, feature_name])
 
-    def set(self, feature_name: str, value: bool):
+    def set(self, feature_name: str, is_enabled: bool):
         self._consul.kv.put(
             self._make_key(feature_name),
-            self._serialize(value),
+            self._serialize(is_enabled),
         )
-        self._set_value(feature_name, value)
+        self._set_is_enabled(feature_name, is_enabled)
 
     def _serialize(self, value: bool) -> str:
         return b'1' if value is True else b'0'

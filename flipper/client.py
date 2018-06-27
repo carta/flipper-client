@@ -9,8 +9,8 @@ class FeatureFlagClient:
     def is_enabled(self, feature_name, **kwargs):
         return self.get(feature_name).is_enabled()
 
-    def create(self, feature_name: str, default=False) -> FeatureFlag:
-        self._store.create(feature_name, default=default)
+    def create(self, feature_name: str, is_enabled=False) -> FeatureFlag:
+        self._store.create(feature_name, is_enabled=is_enabled)
         return self.get(feature_name)
 
     def get(self, feature_name: str) -> FeatureFlag:

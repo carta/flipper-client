@@ -15,10 +15,10 @@ class BaseTest(unittest.TestCase):
 
 
 class TestCreate(BaseTest):
-    def test_value_is_true_when_created_with_default_true(self):
+    def test_value_is_true_when_created_with_is_enabled_true(self):
         feature_name = self.txt()
 
-        self.fast.create(feature_name, default=True)
+        self.fast.create(feature_name, is_enabled=True)
 
         self.assertTrue(self.fast.get(feature_name))
 
@@ -42,7 +42,7 @@ class TestCreate(BaseTest):
     def test_value_in_fast_matches_value_in_slow_when_feature_enabled(self):
         feature_name = self.txt()
 
-        self.fast.create(feature_name, default=True)
+        self.fast.create(feature_name, is_enabled=True)
 
         self.assertEqual(
             self.fast.get(feature_name),
@@ -64,7 +64,7 @@ class TestGet(BaseTest):
     def test_returns_true_when_value_in_slow_store_is_true(self):
         feature_name = self.txt()
 
-        self.slow.create(feature_name, default=True)
+        self.slow.create(feature_name, is_enabled=True)
 
         self.assertTrue(self.fast.get(feature_name))
 
@@ -95,7 +95,7 @@ class TestGet(BaseTest):
 
         fast = CachedFeatureFlagStore(self.slow, expiration=100)
 
-        fast.create(feature_name, default=True)
+        fast.create(feature_name, is_enabled=True)
 
         fast.get(feature_name)
 
@@ -106,7 +106,7 @@ class TestGet(BaseTest):
 
         fast = CachedFeatureFlagStore(self.slow, expiration=-10)
 
-        fast.create(feature_name, default=True)
+        fast.create(feature_name, is_enabled=True)
         fast.get(feature_name)
 
         self.slow.set(feature_name, False)

@@ -40,9 +40,9 @@ Example:
 features.is_enabled(MY_FEATURE)
 ```
 
-**`create(feature_name: str, default: bool=False) -> FeatureFlag`**
+**`create(feature_name: str, is_enabled: bool=False) -> FeatureFlag`**
 
-Create a new feature flag and optionally set value (default is false/disabled)
+Create a new feature flag and optionally set value (is_enabled is false/disabled)
 
 Example:
 
@@ -308,13 +308,13 @@ class FeatureFlagStoreServer(object):
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
-    def create(self, feature_name, enabled):
+    def create(self, feature_name, is_enabled):
         pass
     def delete(self, feature_name):
         pass
     def get(self, feature_name):
         return True
-    def set(self, feature_name, enabled):
+    def set(self, feature_name, is_enabled):
         pass
 
 if __name__ == '__main__':

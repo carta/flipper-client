@@ -7,8 +7,8 @@ class ThriftRPCFeatureFlagStore(AbstractFeatureFlagStore):
     def __init__(self, client):
         self._client = client
 
-    def create(self, feature_name: str, default: Optional[bool]=False):
-        return self._client.Create(feature_name, default)
+    def create(self, feature_name: str, is_enabled: Optional[bool]=False):
+        return self._client.Create(feature_name, is_enabled)
 
     def get(self, feature_name: str, default: Optional[bool]=False) -> bool:
         return self._client.Get(feature_name, default)

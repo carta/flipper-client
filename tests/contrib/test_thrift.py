@@ -24,19 +24,19 @@ class BaseTest(unittest.TestCase):
 
 
 class TestCreate(BaseTest):
-    def test_value_is_true_when_created_with_default_true(self):
+    def test_value_is_true_when_created_with_is_enabled_true(self):
         self.configure_mock(self.client.Get, True)
 
         feature_name = self.txt()
 
-        self.store.create(feature_name, default=True)
+        self.store.create(feature_name, is_enabled=True)
 
         self.assertTrue(self.store.get(feature_name))
 
-    def test_value_is_true_when_created_with_default_false(self):
+    def test_value_is_true_when_created_with_is_enabled_false(self):
         feature_name = self.txt()
 
-        self.store.create(feature_name, default=False)
+        self.store.create(feature_name, is_enabled=False)
 
         self.assertFalse(self.store.get(feature_name))
 
@@ -50,7 +50,7 @@ class TestCreate(BaseTest):
     def test_calls_rpc_client_with_correct_args(self):
         feature_name = self.txt()
 
-        self.store.create(feature_name, default=True)
+        self.store.create(feature_name, is_enabled=True)
 
         self.client.Create.assert_called_once_with(feature_name, True)
 
@@ -59,7 +59,7 @@ class TestGet(BaseTest):
     def test_calls_rpc_client_with_correct_args(self):
         feature_name = self.txt()
 
-        self.store.create(feature_name, default=True)
+        self.store.create(feature_name, is_enabled=True)
         self.store.get(feature_name, default=True)
 
         self.client.Get.assert_called_once_with(feature_name, True)

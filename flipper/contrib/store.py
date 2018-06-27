@@ -4,7 +4,7 @@ from typing import Optional
 
 class AbstractFeatureFlagStore(metaclass=ABCMeta):
     @abstractmethod
-    def create(self, feature_name: str, default: Optional[bool]=False):
+    def create(self, feature_name: str, is_enabled: Optional[bool]=False):
         pass
 
     @abstractmethod
@@ -12,7 +12,7 @@ class AbstractFeatureFlagStore(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def set(self, feature_name: str, value: bool):
+    def set(self, feature_name: str, is_enabled: bool):
         pass
 
     @abstractmethod

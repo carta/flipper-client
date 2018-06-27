@@ -57,7 +57,7 @@ class TestCreate(BaseTest):
     def test_flag_can_be_enabled_on_create(self):
         feature_name = self.txt()
 
-        self.client.create(feature_name, default=True)
+        self.client.create(feature_name, is_enabled=True)
 
         self.assertTrue(self.client.is_enabled(feature_name))
 

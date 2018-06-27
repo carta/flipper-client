@@ -24,10 +24,10 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] [-s[sl]] [-novalidate] [-ca_certs certs] [-keyfile keyfile] [-certfile certfile] function [arg1 [arg2...]]')
     print('')
     print('Functions:')
-    print('  void Create(string feature_name, bool enabled)')
+    print('  void Create(string feature_name, bool is_enabled)')
     print('  void Delete(string feature_name)')
     print('  bool Get(string feature_name)')
-    print('  bool Set(string feature_name, bool enabled)')
+    print('  bool Set(string feature_name, bool is_enabled)')
     print('')
     sys.exit(0)
 
