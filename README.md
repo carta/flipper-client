@@ -1,3 +1,9 @@
+Flipper
+=======
+![Circle CI Status](https://circleci.com/gh/carta/flipper-client/tree/master.svg?style=shield&circle-token=e401445db3e99e8fac7555bd9ba5040e6a2eb4bd)
+
+Flipper is Carta's feature flagging tool. This is the client library.
+
 # Quickstart
 
 `pip install flipper`
