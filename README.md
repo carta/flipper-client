@@ -170,6 +170,7 @@ Out of the box, we support the following backends:
 - `MemoryFeatureFlagStore` (an in-memory store useful for development and tests)
 - `ConsulFeatureFlagStore` (Requires a running consul cluster. Provides the lowest latency of all the options)
 - `RedisFeatureFlagStore` (Requires a running redis cluster. Can be combined with `CachedFeatureFlagStore` to reduce average latency.)
+- `ThriftRPCFeatureFlagStore` (Requires a server that implements the `FeatureFlagStore` thrift service)
 
 
 ## Usage with in-memory backend
@@ -244,6 +245,87 @@ cache = CachedFeatureFlagStore(redis, expiration=30)
 client = FeatureFlagClient(cache)
 ```
 
+## Usage with a Thrift RPC server
+
+If you would like to manage feature flags with a custom service that is possible by using the `ThriftRPCFeatureFlagStore` backend. To do this, you will need to implement the `FeatureFlagStore` service defined in `thrift/feature_flag_store.thrift`. Then when you intialize the `ThriftRPCFeatureFlagStore` you will need to pass an instance of a compatible thrift client.
+
+First, install the `thrift` package:
+
+```
+pip install thrift
+```
+
+Example:
+
+```python
+from flipper import FeatureFlagClient, ThriftRPCFeatureFlagStore
+from flipper_thrift.python.feature_flag_store import (
+    FeatureFlagStore as TFeatureFlagStore
+)
+from thrift import Thrift
+from thrift.transport import TSocket
+from thrift.transport import TTransport
+from thrift.protocol import TBinaryProtocol
+
+
+transport = TSocket.TSocket('localhost', 9090)
+transport = TTransport.TBufferedTransport(transport)
+protocol = TBinaryProtocol.TBinaryProtocol(transport)
+
+thrift_client = TFeatureFlagStore.Client(protocol)
+
+transport.open()
+
+store = ThriftRPCFeatureFlagStore(thrift_client)
+client = FeatureFlagClient(store)
+```
+
+*Note: this can also be optimized with the `CachedFeatureFlagStore`. See the redis examples above.*
+
+You will also be required to implement the server, like so:
+
+```python
+import re
+
+from flipper_thrift.python.feature_flag_store import (
+    FeatureFlagStore as TFeatureFlagStore
+)
+from thrift.transport import TSocket
+from thrift.transport import TTransport
+from thrift.protocol import TBinaryProtocol
+from thrift.server import TServer
+
+
+class FeatureFlagStoreServer(object):
+    # Convert TitleCased calls like .Get() to snake_case calls like .get()
+    def __getattribute__(self, attr):
+        try:
+            return object.__getattribute__(self, attr)
+        except AttributeError:
+            return object.__getattribute__(self, self._convert_case(attr))
+
+    def _convert_case(self, name):
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+    def create(self, feature_name, enabled):
+        pass
+    def delete(self, feature_name):
+        pass
+    def get(self, feature_name):
+        return True
+    def set(self, feature_name, enabled):
+        pass
+
+if __name__ == '__main__':
+    server = FeatureFlagStoreServer()
+    processor = TFeatureFlagStore.Processor(server)
+    transport = TSocket.TServerSocket(host='127.0.0.1', port=9090)
+    tfactory = TTransport.TBufferedTransportFactory()
+    pfactory = TBinaryProtocol.TBinaryProtocolFactory()
+    TServer.TSimpleServer(processor, transport, tfactory, pfactory)
+```
+
 # Creating a custom backend
 
 Don't see the backend you like? You can easily implement your own. If you define a class that implements the `AbstractFeatureFlagStore` interface, located in `flipper.contrib.store` then you can pass an instance of it to the `FeatureFlagClient` constructor.
@@ -253,3 +335,14 @@ Pull requests welcome.
 # Development
 
 Clone the repo and run `pip install -e .[dev]` to get the environment set up. Test are run with the `pytest` command.
+
+
+## Building thrift files
+
+First, [install the thrift compiler](https://thrift.apache.org/tutorial/). On mac, the easiest way is to use homebrew:
+
+```
+brew install thrift
+```
+
+Then simply run `make thrift`. Remember to commit the results of the compilation step.

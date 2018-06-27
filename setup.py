@@ -12,7 +12,7 @@ requirements = [
 setup(
     name='flipper',
     version='0.0.1',
-    packages=['flipper'],
+    packages=['flipper', 'flipper_thrift'],
     license='MIT',
     long_description=open('README.md').read(),
     install_requires=requirements,
@@ -20,6 +20,7 @@ setup(
         'dev': [
             'pytest~=3.6.2',
             'ipython',
+            'thrift',
         ],
     },
 )
