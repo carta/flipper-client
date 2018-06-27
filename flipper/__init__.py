@@ -4,6 +4,7 @@ from .contrib import (
     ConsulFeatureFlagStore,
     MemoryFeatureFlagStore,
     RedisFeatureFlagStore,
+    ThriftRPCFeatureFlagStore,
 )
 from . import decorators
 
@@ -15,4 +16,5 @@ __all__ = [
     'FeatureFlagClient',
     'MemoryFeatureFlagStore',
     'RedisFeatureFlagStore',
+    'ThriftRPCFeatureFlagStore',
 ]
