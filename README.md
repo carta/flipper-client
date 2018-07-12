@@ -40,9 +40,11 @@ Example:
 features.is_enabled(MY_FEATURE)
 ```
 
-**`create(feature_name: str, is_enabled: bool=False) -> FeatureFlag`**
+**`create(feature_name: str, is_enabled: bool=False, client_data: dict=None) -> FeatureFlag`**
 
-Create a new feature flag and optionally set value (is_enabled is false/disabled)
+Create a new feature flag and optionally set value (is_enabled is false/disabled).
+
+For advanced implementations, you can also specify user-defined key-value pairs as a `dict` via the client_data keyword argument. These values should be json serializable and will be stored in the metadata section of the flag object.
 
 Example:
 
