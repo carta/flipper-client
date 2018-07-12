@@ -4,6 +4,7 @@ from uuid import uuid4
 import fakeredis
 
 from flipper import RedisFeatureFlagStore
+from flipper.contrib.storage import FeatureFlagStoreItem
 
 
 class BaseTest(unittest.TestCase):
@@ -16,26 +17,26 @@ class BaseTest(unittest.TestCase):
 
 
 class TestCreate(BaseTest):
-    def test_value_is_true_when_created_with_is_enabled_true(self):
+    def test_is_enabled_is_true_when_created_with_is_enabled_true(self):
         feature_name = self.txt()
 
         self.store.create(feature_name, is_enabled=True)
 
-        self.assertTrue(self.store.get(feature_name))
+        self.assertTrue(self.store.get(feature_name).is_enabled())
 
-    def test_value_is_true_when_created_with_default_false(self):
+    def test_is_enabled_is_true_when_created_with_default_false(self):
         feature_name = self.txt()
 
         self.store.create(feature_name, is_enabled=False)
 
-        self.assertFalse(self.store.get(feature_name))
+        self.assertFalse(self.store.get(feature_name).is_enabled())
 
-    def test_value_is_false_when_created_with_default(self):
+    def test_is_enabled_is_false_when_created_with_default(self):
         feature_name = self.txt()
 
         self.store.create(feature_name)
 
-        self.assertFalse(self.store.get(feature_name))
+        self.assertFalse(self.store.get(feature_name).is_enabled())
 
     def test_sets_correct_value_in_redis_with_is_enabled_true(self):
         feature_name = self.txt()
@@ -44,7 +45,9 @@ class TestCreate(BaseTest):
 
         key = '/'.join([self.store.base_key, feature_name])
 
-        self.assertEqual(b'1', self.redis.get(key))
+        self.assertTrue(
+            FeatureFlagStoreItem.deserialize(self.redis.get(key)).is_enabled()
+        )
 
     def test_sets_correct_value_in_redis_with_is_enabled_false(self):
         feature_name = self.txt()
@@ -53,7 +56,9 @@ class TestCreate(BaseTest):
 
         key = '/'.join([self.store.base_key, feature_name])
 
-        self.assertEqual(b'0', self.redis.get(key))
+        self.assertFalse(
+            FeatureFlagStoreItem.deserialize(self.redis.get(key)).is_enabled()
+        )
 
     def test_sets_correct_value_in_redis_with_default(self):
         feature_name = self.txt()
@@ -62,7 +67,9 @@ class TestCreate(BaseTest):
 
         key = '/'.join([self.store.base_key, feature_name])
 
-        self.assertEqual(b'0', self.redis.get(key))
+        self.assertFalse(
+            FeatureFlagStoreItem.deserialize(self.redis.get(key)).is_enabled()
+        )
 
 
 class TestGet(BaseTest):
@@ -77,7 +84,7 @@ class TestSet(BaseTest):
 
         self.store.set(feature_name, True)
 
-        self.assertTrue(self.store.get(feature_name))
+        self.assertTrue(self.store.get(feature_name).is_enabled())
 
     def test_sets_correct_value_when_false(self):
         feature_name = self.txt()
@@ -86,7 +93,7 @@ class TestSet(BaseTest):
 
         self.store.set(feature_name, False)
 
-        self.assertFalse(self.store.get(feature_name))
+        self.assertFalse(self.store.get(feature_name).is_enabled())
 
     def test_sets_correct_value_in_redis_when_true(self):
         feature_name = self.txt()
@@ -96,7 +103,9 @@ class TestSet(BaseTest):
 
         key = '/'.join([self.store.base_key, feature_name])
 
-        self.assertEqual(b'1', self.redis.get(key))
+        self.assertTrue(
+            FeatureFlagStoreItem.deserialize(self.redis.get(key)).is_enabled()
+        )
 
     def test_sets_correct_value_in_redis_when_false(self):
         feature_name = self.txt()
@@ -106,14 +115,16 @@ class TestSet(BaseTest):
 
         key = '/'.join([self.store.base_key, feature_name])
 
-        self.assertEqual(b'0', self.redis.get(key))
+        self.assertFalse(
+            FeatureFlagStoreItem.deserialize(self.redis.get(key)).is_enabled()
+        )
 
     def test_sets_correct_value_when_not_created(self):
         feature_name = self.txt()
 
         self.store.set(feature_name, True)
 
-        self.assertTrue(self.store.get(feature_name))
+        self.assertTrue(self.store.get(feature_name).is_enabled())
 
 
 class TestDelete(BaseTest):
@@ -125,14 +136,14 @@ class TestDelete(BaseTest):
         self.store.set(feature_name, True)
         self.store.delete(feature_name)
 
-        self.assertFalse(self.store.get(feature_name))
+        self.assertIsNone(self.store.get(feature_name))
 
     def test_does_not_raise_when_deleting_key_that_does_not_exist(self):
         feature_name = self.txt()
 
         self.store.delete(feature_name)
 
-        self.assertFalse(self.store.get(feature_name))
+        self.assertIsNone(self.store.get(feature_name))
 
     def test_deletes_value_from_redis(self):
         feature_name = self.txt()

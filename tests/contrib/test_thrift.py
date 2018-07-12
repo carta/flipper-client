@@ -1,8 +1,14 @@
+from datetime import datetime
 import unittest
 from unittest.mock import MagicMock
 from uuid import uuid4
 
 from flipper import ThriftRPCFeatureFlagStore
+from flipper.contrib.util.date import now
+from flipper_thrift.python.feature_flag_store.ttypes import (
+    FeatureFlagStoreItem as TFeatureFlagStoreItem,
+    FeatureFlagStoreMeta as TFeatureFlagStoreMeta,
+)
 
 
 class BaseTest(unittest.TestCase):
@@ -10,7 +16,14 @@ class BaseTest(unittest.TestCase):
         class FakeThriftClient:
             Create = MagicMock()
             Delete = MagicMock()
-            Get = MagicMock(return_value=False)
+            Get = MagicMock(return_value=TFeatureFlagStoreItem(
+                feature_name=self.txt(),
+                is_enabled=False,
+                meta=TFeatureFlagStoreMeta(
+                    created_date=now(),
+                    client_data='{}',
+                ),
+            ))
             Set = MagicMock()
 
         self.client = FakeThriftClient()
@@ -25,34 +38,41 @@ class BaseTest(unittest.TestCase):
 
 class TestCreate(BaseTest):
     def test_value_is_true_when_created_with_is_enabled_true(self):
-        self.configure_mock(self.client.Get, True)
-
         feature_name = self.txt()
+
+        self.configure_mock(self.client.Get, TFeatureFlagStoreItem(
+            feature_name=feature_name,
+            is_enabled=True,
+            meta=TFeatureFlagStoreMeta(
+                created_date=now(),
+                client_data='{}',
+            ),
+        ))
 
         self.store.create(feature_name, is_enabled=True)
 
-        self.assertTrue(self.store.get(feature_name))
+        self.assertTrue(self.store.get(feature_name).is_enabled())
 
-    def test_value_is_true_when_created_with_is_enabled_false(self):
+    def test_value_is_false_when_created_with_is_enabled_false(self):
         feature_name = self.txt()
 
         self.store.create(feature_name, is_enabled=False)
 
-        self.assertFalse(self.store.get(feature_name))
+        self.assertFalse(self.store.get(feature_name).is_enabled())
 
     def test_value_is_false_when_created_with_default(self):
         feature_name = self.txt()
 
         self.store.create(feature_name)
 
-        self.assertFalse(self.store.get(feature_name))
+        self.assertFalse(self.store.get(feature_name).is_enabled())
 
     def test_calls_rpc_client_with_correct_args(self):
         feature_name = self.txt()
 
         self.store.create(feature_name, is_enabled=True)
 
-        self.client.Create.assert_called_once_with(feature_name, True)
+        self.client.Create.assert_called_once_with(feature_name, True, None)
 
 
 class TestGet(BaseTest):
@@ -60,9 +80,9 @@ class TestGet(BaseTest):
         feature_name = self.txt()
 
         self.store.create(feature_name, is_enabled=True)
-        self.store.get(feature_name, default=True)
+        self.store.get(feature_name)
 
-        self.client.Get.assert_called_once_with(feature_name, True)
+        self.client.Get.assert_called_once_with(feature_name)
 
 
 class TestSet(BaseTest):
@@ -72,7 +92,7 @@ class TestSet(BaseTest):
         self.store.create(feature_name)
         self.store.set(feature_name, True)
 
-        self.client.Set.assert_called_once_with(feature_name, True)
+        self.client.Set.assert_called_once_with(feature_name, True, None)
 
 
 

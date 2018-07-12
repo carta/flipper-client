@@ -1,4 +1,6 @@
-from .contrib.store import AbstractFeatureFlagStore
+from typing import Optional
+
+from .contrib.interface import AbstractFeatureFlagStore
 from .flag import FeatureFlag
 
 
@@ -6,11 +8,18 @@ class FeatureFlagClient:
     def __init__(self, store: AbstractFeatureFlagStore):
         self._store = store
 
-    def is_enabled(self, feature_name, **kwargs):
-        return self.get(feature_name).is_enabled()
+    def is_enabled(self, feature_name: str, **kwargs) -> bool:
+        return self.get(feature_name).is_enabled(**kwargs)
 
-    def create(self, feature_name: str, is_enabled=False) -> FeatureFlag:
-        self._store.create(feature_name, is_enabled=is_enabled)
+    def create(
+        self,
+        feature_name: str,
+        is_enabled: Optional[bool] = False,
+        client_data: Optional[dict] = None,
+    ) -> FeatureFlag:
+        self._store.create(
+            feature_name, is_enabled=is_enabled, client_data=client_data
+        )
         return self.get(feature_name)
 
     def get(self, feature_name: str) -> FeatureFlag:

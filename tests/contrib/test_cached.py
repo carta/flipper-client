@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 from flipper import CachedFeatureFlagStore, MemoryFeatureFlagStore
+from flipper.contrib.storage import FeatureFlagStoreItem
 
 
 class BaseTest(unittest.TestCase):
@@ -15,21 +16,21 @@ class BaseTest(unittest.TestCase):
 
 
 class TestCreate(BaseTest):
-    def test_value_is_true_when_created_with_is_enabled_true(self):
+    def test_is_enabled_is_true_when_created_with_is_enabled_true(self):
         feature_name = self.txt()
 
         self.fast.create(feature_name, is_enabled=True)
 
-        self.assertTrue(self.fast.get(feature_name))
+        self.assertTrue(self.fast.get(feature_name).is_enabled())
 
-    def test_value_is_false_when_created_with_default(self):
+    def test_is_enabled_is_false_when_created_with_default(self):
         feature_name = self.txt()
 
         self.fast.create(feature_name)
 
-        self.assertFalse(self.fast.get(feature_name))
+        self.assertFalse(self.fast.get(feature_name).is_enabled())
 
-    def test_value_in_fast_matches_value_in_slow_default(self):
+    def test_is_enabled_in_fast_matches_value_in_slow_default(self):
         feature_name = self.txt()
 
         self.fast.create(feature_name)
@@ -51,29 +52,28 @@ class TestCreate(BaseTest):
 
 
 class TestGet(BaseTest):
-    def test_default_overrides_value_when_not_set(self):
+    def test_returns_instance_of_feature_flag(self):
         feature_name = self.txt()
 
-        self.assertTrue(self.fast.get(feature_name, default=True))
+        self.fast.create(feature_name)
 
-    def test_default_value_is_false(self):
-        feature_name = self.txt()
-
-        self.assertFalse(self.fast.get(feature_name))
+        self.assertTrue(
+            isinstance(self.fast.get(feature_name), FeatureFlagStoreItem)
+        )
 
     def test_returns_true_when_value_in_slow_store_is_true(self):
         feature_name = self.txt()
 
         self.slow.create(feature_name, is_enabled=True)
 
-        self.assertTrue(self.fast.get(feature_name))
+        self.assertTrue(self.fast.get(feature_name).is_enabled())
 
     def test_returns_false_when_value_in_slow_store_is_false(self):
         feature_name = self.txt()
 
         self.slow.create(feature_name)
 
-        self.assertFalse(self.fast.get(feature_name))
+        self.assertFalse(self.fast.get(feature_name).is_enabled())
 
     def test_returns_cached_value_when_ttl_not_expired(self):
         fast = CachedFeatureFlagStore(self.slow, expiration=100)
@@ -86,7 +86,7 @@ class TestGet(BaseTest):
 
         self.slow.set(feature_name, True)
 
-        self.assertFalse(fast.get(feature_name))
+        self.assertFalse(fast.get(feature_name).is_enabled())
 
     def test_does_not_call_slow_store_when_ttl_not_expired(self):
         feature_name = self.txt()
@@ -111,7 +111,7 @@ class TestGet(BaseTest):
 
         self.slow.set(feature_name, False)
 
-        self.assertFalse(self.fast.get(feature_name))
+        self.assertFalse(self.fast.get(feature_name).is_enabled())
 
 
 class TestSet(BaseTest):

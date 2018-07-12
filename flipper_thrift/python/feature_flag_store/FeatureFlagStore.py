@@ -19,11 +19,12 @@ all_structs = []
 
 
 class Iface(object):
-    def Create(self, feature_name, is_enabled):
+    def Create(self, feature_name, is_enabled, client_data):
         """
         Parameters:
          - feature_name
          - is_enabled
+         - client_data
         """
         pass
 
@@ -41,11 +42,12 @@ class Iface(object):
         """
         pass
 
-    def Set(self, feature_name, is_enabled):
+    def Set(self, feature_name, is_enabled, client_data):
         """
         Parameters:
          - feature_name
          - is_enabled
+         - client_data
         """
         pass
 
@@ -57,20 +59,22 @@ class Client(Iface):
             self._oprot = oprot
         self._seqid = 0
 
-    def Create(self, feature_name, is_enabled):
+    def Create(self, feature_name, is_enabled, client_data):
         """
         Parameters:
          - feature_name
          - is_enabled
+         - client_data
         """
-        self.send_Create(feature_name, is_enabled)
+        self.send_Create(feature_name, is_enabled, client_data)
         self.recv_Create()
 
-    def send_Create(self, feature_name, is_enabled):
+    def send_Create(self, feature_name, is_enabled, client_data):
         self._oprot.writeMessageBegin('Create', TMessageType.CALL, self._seqid)
         args = Create_args()
         args.feature_name = feature_name
         args.is_enabled = is_enabled
+        args.client_data = client_data
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
@@ -148,20 +152,22 @@ class Client(Iface):
             return result.success
         raise TApplicationException(TApplicationException.MISSING_RESULT, "Get failed: unknown result")
 
-    def Set(self, feature_name, is_enabled):
+    def Set(self, feature_name, is_enabled, client_data):
         """
         Parameters:
          - feature_name
          - is_enabled
+         - client_data
         """
-        self.send_Set(feature_name, is_enabled)
+        self.send_Set(feature_name, is_enabled, client_data)
         return self.recv_Set()
 
-    def send_Set(self, feature_name, is_enabled):
+    def send_Set(self, feature_name, is_enabled, client_data):
         self._oprot.writeMessageBegin('Set', TMessageType.CALL, self._seqid)
         args = Set_args()
         args.feature_name = feature_name
         args.is_enabled = is_enabled
+        args.client_data = client_data
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
@@ -212,7 +218,7 @@ class Processor(Iface, TProcessor):
         iprot.readMessageEnd()
         result = Create_result()
         try:
-            self._handler.Create(args.feature_name, args.is_enabled)
+            self._handler.Create(args.feature_name, args.is_enabled, args.client_data)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -281,7 +287,7 @@ class Processor(Iface, TProcessor):
         iprot.readMessageEnd()
         result = Set_result()
         try:
-            result.success = self._handler.Set(args.feature_name, args.is_enabled)
+            result.success = self._handler.Set(args.feature_name, args.is_enabled, args.client_data)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -306,12 +312,14 @@ class Create_args(object):
     Attributes:
      - feature_name
      - is_enabled
+     - client_data
     """
 
 
-    def __init__(self, feature_name=None, is_enabled=False,):
+    def __init__(self, feature_name=None, is_enabled=False, client_data=None,):
         self.feature_name = feature_name
         self.is_enabled = is_enabled
+        self.client_data = client_data
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -332,6 +340,11 @@ class Create_args(object):
                     self.is_enabled = iprot.readBool()
                 else:
                     iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.STRING:
+                    self.client_data = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -349,6 +362,10 @@ class Create_args(object):
         if self.is_enabled is not None:
             oprot.writeFieldBegin('is_enabled', TType.BOOL, 2)
             oprot.writeBool(self.is_enabled)
+            oprot.writeFieldEnd()
+        if self.client_data is not None:
+            oprot.writeFieldBegin('client_data', TType.STRING, 3)
+            oprot.writeString(self.client_data.encode('utf-8') if sys.version_info[0] == 2 else self.client_data)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -371,6 +388,7 @@ Create_args.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'feature_name', 'UTF8', None, ),  # 1
     (2, TType.BOOL, 'is_enabled', None, False, ),  # 2
+    (3, TType.STRING, 'client_data', 'UTF8', None, ),  # 3
 )
 
 
@@ -647,12 +665,14 @@ class Set_args(object):
     Attributes:
      - feature_name
      - is_enabled
+     - client_data
     """
 
 
-    def __init__(self, feature_name=None, is_enabled=None,):
+    def __init__(self, feature_name=None, is_enabled=None, client_data=None,):
         self.feature_name = feature_name
         self.is_enabled = is_enabled
+        self.client_data = client_data
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -673,6 +693,11 @@ class Set_args(object):
                     self.is_enabled = iprot.readBool()
                 else:
                     iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.STRING:
+                    self.client_data = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -690,6 +715,10 @@ class Set_args(object):
         if self.is_enabled is not None:
             oprot.writeFieldBegin('is_enabled', TType.BOOL, 2)
             oprot.writeBool(self.is_enabled)
+            oprot.writeFieldEnd()
+        if self.client_data is not None:
+            oprot.writeFieldBegin('client_data', TType.STRING, 3)
+            oprot.writeString(self.client_data.encode('utf-8') if sys.version_info[0] == 2 else self.client_data)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -712,6 +741,7 @@ Set_args.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'feature_name', 'UTF8', None, ),  # 1
     (2, TType.BOOL, 'is_enabled', None, None, ),  # 2
+    (3, TType.STRING, 'client_data', 'UTF8', None, ),  # 3
 )
 
 

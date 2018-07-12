@@ -1,4 +1,4 @@
-from .contrib.store import AbstractFeatureFlagStore
+from .contrib.interface import AbstractFeatureFlagStore
 
 
 class FeatureFlag:
@@ -6,8 +6,11 @@ class FeatureFlag:
         self.name = feature_name
         self._store = store
 
-    def is_enabled(self) -> bool:
-        return self._store.get(self.name, default=False)
+    def is_enabled(self, default=False) -> bool:
+        item = self._store.get(self.name)
+        if item is None:
+            return default
+        return item.is_enabled()
 
     def enable(self):
         self._store.set(self.name, True)

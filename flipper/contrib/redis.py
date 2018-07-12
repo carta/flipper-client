@@ -1,6 +1,9 @@
+from datetime import datetime
 from typing import Optional, List
 
-from .store import AbstractFeatureFlagStore
+from .interface import AbstractFeatureFlagStore
+from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
+from .util.date import now
 
 
 class RedisFeatureFlagStore(AbstractFeatureFlagStore):
@@ -8,28 +11,42 @@ class RedisFeatureFlagStore(AbstractFeatureFlagStore):
         self._redis = redis
         self.base_key = 'features'
 
-    def create(self, feature_name: str, is_enabled: Optional[bool]=False) -> bool:
-        self.set(feature_name, is_enabled)
+    def create(
+        self,
+        feature_name: str,
+        is_enabled: Optional[bool] = False,
+        client_data: Optional[dict] = None,
+    ) -> FeatureFlagStoreItem:
+        self.set(feature_name, is_enabled, client_data=client_data)
+        return self.get(feature_name)
 
-    def get(self, feature_name: str, default: Optional[bool]=False) -> bool:
-        value = self._redis.get(self._key_name(feature_name))
-        if value is None:
-            return default
-        return self._deserialize(value)
+    def get(self, feature_name: str) -> FeatureFlagStoreItem:
+        serialized = self._redis.get(self._key_name(feature_name))
+        if not serialized:
+            return None
+        return FeatureFlagStoreItem.deserialize(serialized)
 
     def _key_name(self, feature_name: str) -> str:
         return '/'.join([self.base_key, feature_name])
 
-    def _deserialize(self, value: str) -> bool:
-        return bool(int(value))
+    def set(
+        self,
+        feature_name: str,
+        is_enabled: bool,
+        client_data: Optional[dict] = None,
+    ):
+        client_data = client_data or {}
 
-    def set(self, feature_name: str, is_enabled: bool):
-        self._redis.set(
-            self._key_name(feature_name), self._serialize(is_enabled)
+        item = FeatureFlagStoreItem(
+            feature_name,
+            is_enabled,
+            FeatureFlagStoreMeta(now(), client_data),
         )
 
-    def _serialize(self, value: bool) -> str:
-        return b'1' if value is True else b'0'
+        self._redis.set(
+            self._key_name(feature_name),
+            item.serialize(),
+        )
 
     def delete(self, feature_name: str):
         self._redis.delete(self._key_name(feature_name))

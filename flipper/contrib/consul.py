@@ -1,8 +1,11 @@
+from datetime import datetime
 import logging
 from typing import Optional, Tuple
 import threading
 
-from .store import AbstractFeatureFlagStore
+from .interface import AbstractFeatureFlagStore
+from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
+from .util.date import now
 
 
 logger = logging.getLogger(__name__)
@@ -35,34 +38,53 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
 
     def _parse_data(self, data: Tuple[dict]):
         for item in data:
-            self._set_value(item['Key'], item['Value'])
+            serialized = item['Value']
 
-    def _set_is_enabled(self, key: str, is_enabled: str):
-        self._cache[key] = self._deserialize(is_enabled)
+            deserialized = None
 
-    def create(self, feature_name: str, is_enabled: Optional[bool]=False):
-        self.set(feature_name, is_enabled)
+            if serialized is not None:
+                deserialized = FeatureFlagStoreItem.deserialize(serialized)
 
-    def get(self, feature_name: str, default: Optional[bool]=False) -> bool:
-        return self._cache.get(self._make_key(feature_name), default)
+            self._set_item_in_cache(item['Key'], deserialized)
+
+    def _set_item_in_cache(self, key: str, item: FeatureFlagStoreItem):
+        self._cache[key] = item
+
+    def create(
+        self,
+        feature_name: str,
+        is_enabled: Optional[bool] = False,
+        client_data: Optional[dict] = None,
+    ) -> FeatureFlagStoreItem:
+        self.set(feature_name, is_enabled, client_data=client_data)
+        return self.get(feature_name)
+
+    def get(self, feature_name: str) -> FeatureFlagStoreItem:
+        return self._cache.get(self._make_key(feature_name))
 
     def _make_key(self, feature_name: str) -> str:
         return '/'.join([self.base_key, feature_name])
 
-    def set(self, feature_name: str, is_enabled: bool):
+    def set(
+        self,
+        feature_name: str,
+        is_enabled: bool,
+        client_data: Optional[dict] = None,
+    ):
+        client_data = client_data or {}
+
+        item = FeatureFlagStoreItem(
+            feature_name,
+            is_enabled,
+            FeatureFlagStoreMeta(now(), client_data)
+        )
+
         self._consul.kv.put(
             self._make_key(feature_name),
-            self._serialize(is_enabled),
+            item.serialize(),
         )
-        self._set_is_enabled(feature_name, is_enabled)
 
-    def _serialize(self, value: bool) -> str:
-        return b'1' if value is True else b'0'
-
-    def _deserialize(self, value: str) -> bool:
-        if value is None:
-            return None
-        return bool(int(value))
+        self._set_item_in_cache(feature_name, item)
 
     def delete(self, feature_name: str):
         self._consul.kv.delete(self._make_key(feature_name))
