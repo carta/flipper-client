@@ -10,7 +10,7 @@ class AbstractFeatureFlagStore(metaclass=ABCMeta):
         self,
         feature_name: str,
         is_enabled: Optional[bool] = False,
-        metadata: Optional[dict] = None,
+        client_data: Optional[dict] = None,
     ):
         pass
 
@@ -23,10 +23,20 @@ class AbstractFeatureFlagStore(metaclass=ABCMeta):
         self,
         feature_name: str,
         is_enabled: bool,
-        metadata: Optional[dict] = None,
     ):
         pass
 
     @abstractmethod
     def delete(self, feature_name: str):
         pass
+
+    def set_client_data(
+        self,
+        feature_name: str,
+        client_data: dict,
+    ):
+        pass
+
+
+class FlagDoesNotExistError(Exception):
+    pass

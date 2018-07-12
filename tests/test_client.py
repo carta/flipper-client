@@ -2,7 +2,7 @@ import unittest
 from uuid import uuid4
 
 from flipper import FeatureFlagClient, MemoryFeatureFlagStore
-from flipper.flag import FeatureFlag
+from flipper.flag import FeatureFlag, FlagDoesNotExistError
 
 
 class BaseTest(unittest.TestCase):
@@ -28,6 +28,11 @@ class TestIsEnabled(BaseTest):
 
         self.client.create(feature_name)
         self.client.disable(feature_name)
+
+        self.assertFalse(self.client.is_enabled(feature_name))
+
+    def test_returns_false_when_feature_does_not_exist(self):
+        feature_name = self.txt()
 
         self.assertFalse(self.client.is_enabled(feature_name))
 
@@ -102,6 +107,12 @@ class TestDestroy(BaseTest):
 
         self.assertFalse(self.client.is_enabled(feature_name))
 
+    def test_raises_for_nonexistent_flag(self):
+        feature_name = self.txt()
+
+        with self.assertRaises(FlagDoesNotExistError):
+            self.client.destroy(feature_name)
+
 
 class TestEnable(BaseTest):
     def test_is_enabled_will_be_true(self):
@@ -121,12 +132,11 @@ class TestEnable(BaseTest):
 
         self.assertTrue(self.client.is_enabled(feature_name))
 
-    def test_is_enabled_will_be_true_when_called_for_nonexistent_flag(self):
+    def test_raises_for_nonexistent_flag(self):
         feature_name = self.txt()
 
-        self.client.enable(feature_name)
-
-        self.assertTrue(self.client.is_enabled(feature_name))
+        with self.assertRaises(FlagDoesNotExistError):
+            self.client.enable(feature_name)
 
 
 class TestDisable(BaseTest):
@@ -147,9 +157,8 @@ class TestDisable(BaseTest):
 
         self.assertFalse(self.client.is_enabled(feature_name))
 
-    def test_is_enabled_will_be_false_when_called_for_nonexistent_flag(self):
+    def test_raises_for_nonexistent_flag(self):
         feature_name = self.txt()
 
-        self.client.disable(feature_name)
-
-        self.assertFalse(self.client.is_enabled(feature_name))
+        with self.assertRaises(FlagDoesNotExistError):
+            self.client.disable(feature_name)

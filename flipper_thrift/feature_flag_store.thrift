@@ -1,8 +1,9 @@
 service FeatureFlagStore {
     void Create(1: string feature_name, 2: bool is_enabled = false, 3: string client_data),
     void Delete(1: string feature_name),
-    bool Get(1: string feature_name),
-    bool Set(1: string feature_name, 2: bool is_enabled, 3: string client_data)
+    FeatureFlagStoreItem Get(1: string feature_name),
+    void Set(1: string feature_name, 2: bool is_enabled)
+    void SetClientData(1: string feature_name, 2: string client_data)
 }
 
 

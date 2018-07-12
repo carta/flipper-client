@@ -43,9 +43,15 @@ class ThriftRPCFeatureFlagStore(AbstractFeatureFlagStore):
         self,
         feature_name: str,
         is_enabled: bool,
-        client_data: Optional[dict] = None,
     ):
-        return self._client.Set(feature_name, is_enabled, client_data)
+        return self._client.Set(feature_name, is_enabled)
 
     def delete(self, feature_name: str):
         return self._client.Delete(feature_name)
+
+    def set_client_data(
+        self,
+        feature_name: str,
+        client_data: dict,
+    ):
+        self._client.SetClientData(feature_name, json.dumps(client_data))

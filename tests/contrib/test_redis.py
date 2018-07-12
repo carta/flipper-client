@@ -4,6 +4,7 @@ from uuid import uuid4
 import fakeredis
 
 from flipper import RedisFeatureFlagStore
+from flipper.contrib.interface import FlagDoesNotExistError
 from flipper.contrib.storage import FeatureFlagStoreItem
 
 
@@ -154,3 +155,53 @@ class TestDelete(BaseTest):
         key = '/'.join([self.store.base_key, feature_name])
 
         self.assertIsNone(self.redis.get(key))
+
+
+class TestSetClientData(BaseTest):
+    def test_sets_values_correctly(self):
+        feature_name = self.txt()
+        self.store.create(feature_name)
+
+        client_data = { self.txt(): self.txt() }
+        self.store.set_client_data(feature_name, client_data)
+
+        item = self.store.get(feature_name)
+
+        self.assertEqual(client_data, item.meta['client_data'])
+
+    def test_merges_new_values_with_existing(self):
+        feature_name = self.txt()
+        existing_data = { 'existing_key': self.txt() }
+
+        self.store.create(feature_name, client_data=existing_data)
+
+        new_data = { 'new_key': self.txt() }
+        self.store.set_client_data(feature_name, new_data)
+
+        item = self.store.get(feature_name)
+
+        self.assertEqual({
+            **existing_data,
+            **new_data,
+        }, item.meta['client_data'])
+
+    def test_can_override_existing_values(self):
+        feature_name = self.txt()
+        existing_data = { 'existing_key': self.txt() }
+
+        self.store.create(feature_name, client_data=existing_data)
+
+        new_data = {
+            'existing_key': self.txt(),
+            'new_key': self.txt(),
+        }
+        self.store.set_client_data(feature_name, new_data)
+
+        item = self.store.get(feature_name)
+
+        self.assertEqual(new_data, item.meta['client_data'])
+
+    def test_raises_exception_for_nonexistent_flag(self):
+        feature_name = self.txt()
+        with self.assertRaises(FlagDoesNotExistError):
+            self.store.set_client_data(feature_name, { 'a': self.txt() })

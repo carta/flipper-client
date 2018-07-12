@@ -6,10 +6,10 @@ class FeatureFlagStoreMeta:
     def __init__(
         self,
         created_date: int,
-        client_data: dict,
+        client_data: Optional[dict],
     ):
         self.created_date = created_date
-        self.client_data = client_data
+        self.client_data = client_data or {}
 
     def toJSON(self):
         return {

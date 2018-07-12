@@ -7,6 +7,7 @@ from .contrib import (
     ThriftRPCFeatureFlagStore,
 )
 from . import decorators
+from .flag import FlagDoesNotExistError
 
 
 __all__ = [
@@ -14,6 +15,7 @@ __all__ = [
     'ConsulFeatureFlagStore',
     'decorators',
     'FeatureFlagClient',
+    'FlagDoesNotExistError',
     'MemoryFeatureFlagStore',
     'RedisFeatureFlagStore',
     'ThriftRPCFeatureFlagStore',

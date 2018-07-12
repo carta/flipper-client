@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import unittest
 from unittest.mock import MagicMock
 from uuid import uuid4
@@ -25,6 +26,7 @@ class BaseTest(unittest.TestCase):
                 ),
             ))
             Set = MagicMock()
+            SetClientData = MagicMock()
 
         self.client = FakeThriftClient()
         self.store = ThriftRPCFeatureFlagStore(self.client)
@@ -92,7 +94,7 @@ class TestSet(BaseTest):
         self.store.create(feature_name)
         self.store.set(feature_name, True)
 
-        self.client.Set.assert_called_once_with(feature_name, True, None)
+        self.client.Set.assert_called_once_with(feature_name, True)
 
 
 
@@ -104,3 +106,16 @@ class TestDelete(BaseTest):
         self.store.delete(feature_name)
 
         self.client.Delete.assert_called_once_with(feature_name)
+
+
+class TestSetClientData(BaseTest):
+    def test_calls_rpc_client_with_correct_args(self):
+        feature_name = self.txt()
+        client_data = { self.txt(): self.txt() }
+
+        self.store.set_client_data(feature_name, client_data)
+
+        self.client.SetClientData.assert_called_once_with(
+            feature_name, json.dumps(client_data)
+        )
+

@@ -29,20 +29,27 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
         except KeyError:
             pass
 
-        value = self._store.get(feature_name)
-        self._cache[feature_name] = value
+        item = self._store.get(feature_name)
+        self._cache[feature_name] = item
 
-        return value
+        return item
 
     def set(
         self,
         feature_name: str,
         is_enabled: bool,
-        client_data: Optional[dict] = None,
     ):
-        self._store.set(feature_name, is_enabled, client_data=client_data)
-        self._cache[feature_name] = is_enabled
+        self._store.set(feature_name, is_enabled)
+        self._cache[feature_name] = self._store.get(feature_name)
 
     def delete(self, feature_name: str):
         self._store.delete(feature_name)
         self._cache.__delete__(feature_name)
+
+    def set_client_data(
+        self,
+        feature_name: str,
+        client_data: dict,
+    ):
+        self._store.set_client_data(feature_name, client_data)
+        self._cache[feature_name] = self._store.get(feature_name)

@@ -12,13 +12,13 @@ class FeatureFlagStoreItem:
         is_enabled: bool,
         meta: FeatureFlagStoreMeta,
     ):
-        self._feature_name = feature_name
+        self.feature_name = feature_name
         self._is_enabled = is_enabled
         self._meta = meta
 
     def toJSON(self):
         return {
-            'feature_name': self._feature_name,
+            'feature_name': self.feature_name,
             'is_enabled': self._is_enabled,
             'meta': self._meta.toJSON(),
         }
@@ -38,3 +38,7 @@ class FeatureFlagStoreItem:
 
     def is_enabled(self) -> bool:
         return self._is_enabled
+
+    @property
+    def meta(self):
+        return self._meta.toJSON()
