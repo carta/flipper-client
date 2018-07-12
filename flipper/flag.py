@@ -28,7 +28,6 @@ class FeatureFlag:
 
     @flag_must_exist
     def enable(self):
-        print(self.name)
         self._store.set(self.name, True)
 
     @flag_must_exist
