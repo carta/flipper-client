@@ -33,3 +33,12 @@ class FeatureFlagClient:
 
     def disable(self, feature_name: str):
         return self.get(feature_name).disable()
+
+    def set_client_data(self, feature_name: str, client_data: dict):
+        return self.get(feature_name).set_client_data(client_data)
+
+    def get_client_data(self, feature_name: str) -> dict:
+        return self.get(feature_name).get_client_data()
+
+    def get_meta(self, feature_name: str) -> dict:
+        return self.get(feature_name).get_meta()

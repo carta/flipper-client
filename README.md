@@ -92,6 +92,36 @@ Example:
 features.destroy(MY_FEATURE)
 ```
 
+**`set_client_data(feature_name: str, client_data: dict) -> void`**
+
+Set key-value pairs to be stored as metadata with the flag. Can be retrieved using `get_client_data`. This will merge the supplied values with anything that already exists.
+
+Example:
+
+```python
+features.set_client_data(MY_FEATURE, { 'ttl': 3600 })
+```
+
+**`get_client_data(feature_name: str) -> dict`**
+
+Retrieve key-value any key-value pairs stored in the metadata for this flag.
+
+Example:
+
+```python
+features.get_client_data(MY_FEATURE)
+```
+
+**`get_meta(feature_name: str) -> dict`**
+
+Similar to `get_client_data` but instead of returning onlu client-supplied metadata, it will return all metadata for the flag, including system-set values such as `created_date`.
+
+Example:
+
+```python
+features.get_meta(MY_FEATURE)
+```
+
 ## FeatureFlagClient
 
 **`is_enabled() -> bool`**
@@ -132,6 +162,36 @@ Example:
 
 ```python
 flag.destroy()
+```
+
+**`set_client_data(client_data: dict) -> void`**
+
+Set key-value pairs to be stored as metadata with the flag. Can be retrieved using `get_client_data`. This will merge the supplied values with anything that already exists.
+
+Example:
+
+```python
+flag.set_client_data({ 'ttl': 3600 })
+```
+
+**`get_client_data() -> dict`**
+
+Retrieve key-value any key-value pairs stored in the metadata for this flag.
+
+Example:
+
+```python
+flag.get_client_data()
+```
+
+**`get_meta() -> dict`**
+
+Similar to `get_client_data` but instead of returning onlu client-supplied metadata, it will return all metadata for the flag, including system-set values such as `created_date`.
+
+Example:
+
+```python
+flag.get_meta()
 ```
 
 ## decorators

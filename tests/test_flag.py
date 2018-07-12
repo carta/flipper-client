@@ -129,7 +129,64 @@ class TestDisable(BaseTest):
         store.set.assert_called_once_with(self.name, False)
 
     def test_raises_for_nonexistent_flag(self):
-        feature_name = self.txt()
-
         with self.assertRaises(FlagDoesNotExistError):
             self.flag.disable()
+
+
+class TestSetClientData(BaseTest):
+    def test_calls_backend_with_correct_args(self):
+        self.store.set_client_data = MagicMock()
+
+        client_data = { self.txt(): self.txt() }
+
+        self.store.create(self.name)
+        self.flag.set_client_data(client_data)
+
+        self.store.set_client_data.assert_called_once_with(
+            self.name, client_data
+        )
+
+    def test_raises_for_nonexistent_flag(self):
+        client_data = { self.txt(): self.txt() }
+
+        with self.assertRaises(FlagDoesNotExistError):
+            self.flag.set_client_data(client_data)
+
+
+class TestGetClientData(BaseTest):
+    def test_gets_expected_key_value_pairs(self):
+        client_data = { self.txt(): self.txt() }
+
+        self.store.create(self.name, client_data=client_data)
+
+        result = self.flag.get_client_data()
+
+        self.assertEqual(client_data, result)
+
+    def test_raises_for_nonexistent_flag(self):
+        with self.assertRaises(FlagDoesNotExistError):
+            self.flag.get_client_data()
+
+
+class TestGetMeta(BaseTest):
+    def test_includes_created_date(self):
+        client_data = { self.txt(): self.txt() }
+
+        self.store.create(self.name, client_data=client_data)
+
+        meta = self.flag.get_meta()
+
+        self.assertTrue('created_date' in meta)
+
+    def test_includes_client_data(self):
+        client_data = { self.txt(): self.txt() }
+
+        self.store.create(self.name, client_data=client_data)
+
+        meta = self.flag.get_meta()
+
+        self.assertEqual(client_data, meta['client_data'])
+
+    def test_raises_for_nonexistent_flag(self):
+        with self.assertRaises(FlagDoesNotExistError):
+            self.flag.get_meta()

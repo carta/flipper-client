@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import MagicMock
 from uuid import uuid4
 
 from flipper import FeatureFlagClient, MemoryFeatureFlagStore
@@ -162,3 +163,72 @@ class TestDisable(BaseTest):
 
         with self.assertRaises(FlagDoesNotExistError):
             self.client.disable(feature_name)
+
+
+class TestSetClientData(BaseTest):
+    def test_calls_backend_with_correct_args(self):
+        self.store.set_client_data = MagicMock()
+
+        feature_name = self.txt()
+        client_data = { self.txt(): self.txt() }
+
+        self.client.create(feature_name)
+        self.client.set_client_data(feature_name, client_data)
+
+        self.store.set_client_data.assert_called_once_with(
+            feature_name, client_data
+        )
+
+    def test_raises_for_nonexistent_flag(self):
+        feature_name = self.txt()
+        client_data = { self.txt(): self.txt() }
+
+        with self.assertRaises(FlagDoesNotExistError):
+            self.client.set_client_data(feature_name, client_data)
+
+
+class TestGetClientData(BaseTest):
+    def test_gets_expected_key_value_pairs(self):
+        feature_name = self.txt()
+        client_data = { self.txt(): self.txt() }
+
+        self.client.create(feature_name, client_data=client_data)
+
+        result = self.client.get_client_data(feature_name)
+
+        self.assertEqual(client_data, result)
+
+    def test_raises_for_nonexistent_flag(self):
+        feature_name = self.txt()
+        client_data = { self.txt(): self.txt() }
+
+        with self.assertRaises(FlagDoesNotExistError):
+            self.client.get_client_data(feature_name)
+
+
+class TestGetMeta(BaseTest):
+    def test_includes_created_date(self):
+        feature_name = self.txt()
+        client_data = { self.txt(): self.txt() }
+
+        self.client.create(feature_name, client_data=client_data)
+
+        meta = self.client.get_meta(feature_name)
+
+        self.assertTrue('created_date' in meta)
+
+    def test_includes_client_data(self):
+        feature_name = self.txt()
+        client_data = { self.txt(): self.txt() }
+
+        self.client.create(feature_name, client_data=client_data)
+
+        meta = self.client.get_meta(feature_name)
+
+        self.assertEqual(client_data, meta['client_data'])
+
+    def test_raises_for_nonexistent_flag(self):
+        feature_name = self.txt()
+
+        with self.assertRaises(FlagDoesNotExistError):
+            self.client.get_meta(feature_name)
