@@ -22,7 +22,7 @@ setup(
             'pytest~=3.6.2',
             'ipython',
             'thrift',
-            'cloudsmith',
+            'cloudsmith-cli',
             'setuptools',
             'wheel',
         ],
