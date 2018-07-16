@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 requirements = [
@@ -6,13 +6,14 @@ requirements = [
     'py-lru-cache~=0.1.4',
     'python-consul~=1.0.1',
     'redis~=2.10.6',
+    'thrift~=0.11.0',
 ]
 
 
 setup(
-    name='flipper',
+    name='flipper-client',
     version='0.0.1',
-    packages=['flipper', 'flipper_thrift'],
+    packages=find_packages(),
     license='MIT',
     long_description=open('README.md').read(),
     install_requires=requirements,
@@ -21,6 +22,9 @@ setup(
             'pytest~=3.6.2',
             'ipython',
             'thrift',
+            'cloudsmith',
+            'setuptools',
+            'wheel',
         ],
     },
 )
