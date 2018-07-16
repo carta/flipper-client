@@ -19,7 +19,7 @@ class FeatureFlag:
         self.name = feature_name
         self._store = store
 
-    def is_enabled(self, default=False) -> bool:
+    def is_enabled(self, default=False, **kwargs) -> bool:
         item = self._store.get(self.name)
         if item is None:
             return default
