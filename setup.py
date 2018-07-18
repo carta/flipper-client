@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 requirements = [
     'fakeredis~=0.11.0',
-    'py-lru-cache~=0.1.4',
+    'lru-ttl~=0.0.6',
     'python-consul~=1.0.1',
     'redis~=2.10.6',
     'thrift~=0.11.0',
@@ -12,7 +12,7 @@ requirements = [
 
 setup(
     name='flipper-client',
-    version='0.0.1',
+    version='0.0.2',
     packages=find_packages(),
     license='MIT',
     long_description=open('README.md').read(),

@@ -76,7 +76,7 @@ class TestGet(BaseTest):
         self.assertFalse(self.fast.get(feature_name).is_enabled())
 
     def test_returns_cached_value_when_ttl_not_expired(self):
-        fast = CachedFeatureFlagStore(self.slow, expiration=100)
+        fast = CachedFeatureFlagStore(self.slow, ttl=100)
 
         feature_name = self.txt()
 
@@ -93,7 +93,7 @@ class TestGet(BaseTest):
 
         self.slow.get = MagicMock()
 
-        fast = CachedFeatureFlagStore(self.slow, expiration=100)
+        fast = CachedFeatureFlagStore(self.slow, ttl=100)
 
         fast.create(feature_name, is_enabled=True)
 
@@ -104,7 +104,7 @@ class TestGet(BaseTest):
     def test_does_will_call_slow_store_after_ttl_expired(self):
         feature_name = self.txt()
 
-        fast = CachedFeatureFlagStore(self.slow, expiration=-10)
+        fast = CachedFeatureFlagStore(self.slow, ttl=-10)
 
         fast.create(feature_name, is_enabled=True)
         fast.get(feature_name)

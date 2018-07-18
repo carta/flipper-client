@@ -299,10 +299,10 @@ r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 store = RedisFeatureFlagStore(r)
 
-# For all cache options, see:
-# https://github.com/stucchio/Python-LRU-cache
-# Expiration defaults to 
-cache = CachedFeatureFlagStore(redis, expiration=30)
+# Cache options are:
+# size (number of items to store, default=5000)
+# ttl (seconds before key expires, default=None, i.e. No expiration)
+cache = CachedFeatureFlagStore(store, ttl=30)
 
 client = FeatureFlagClient(cache)
 ```
@@ -396,7 +396,7 @@ Pull requests welcome.
 
 # Development
 
-Clone the repo and run `pip install -e .[dev]` to get the environment set up. Test are run with the `pytest` command.
+Clone the repo and run `make install-dev` to get the environment set up. Test are run with the `pytest` command.
 
 
 ## Building thrift files

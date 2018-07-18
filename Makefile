@@ -1,6 +1,6 @@
 THRIFT_DIR=./flipper_thrift
 THRIFT_PYTHON=${THRIFT_DIR}/python
-PKG_VERSION = $(shell python -c "import pkg_resources; print(pkg_resources.require('flipper')[0].version)")
+PKG_VERSION = $(shell python -c "import pkg_resources; print(pkg_resources.require('flipper-client')[0].version)")
 
 
 install:
