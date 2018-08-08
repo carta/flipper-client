@@ -6,7 +6,7 @@ Flipper is Carta's feature flagging tool. This is the client library.
 
 # Quickstart
 
-`pip install flipper`
+`pip install flipper-client --extra-index-url=https://dl.cloudsmith.io/gz9dmKKBOnCjf0dG/carta/pip/python/index/`
 
 
 ```python
