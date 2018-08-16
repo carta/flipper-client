@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Optional
 
-from .storage import FeatureFlagStoreItem
+from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 
 
 class AbstractFeatureFlagStore(metaclass=ABCMeta):
@@ -30,11 +30,8 @@ class AbstractFeatureFlagStore(metaclass=ABCMeta):
     def delete(self, feature_name: str):
         pass
 
-    def set_client_data(
-        self,
-        feature_name: str,
-        client_data: dict,
-    ):
+    @abstractmethod
+    def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
         pass
 
 

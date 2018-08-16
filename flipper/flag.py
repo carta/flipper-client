@@ -1,4 +1,5 @@
 from .contrib.interface import AbstractFeatureFlagStore
+from .contrib.storage import FeatureFlagStoreMeta
 
 
 class FlagDoesNotExistError(Exception):
@@ -43,7 +44,11 @@ class FeatureFlag:
 
     @flag_must_exist
     def set_client_data(self, client_data: dict):
-        self._store.set_client_data(self.name, client_data)
+        meta = FeatureFlagStoreMeta.fromJSON(self.get_meta())
+
+        meta.update(client_data=client_data)
+
+        self._store.set_meta(self.name, meta)
 
     def get_client_data(self) -> dict:
         return self.get_meta()['client_data']

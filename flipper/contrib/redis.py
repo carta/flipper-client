@@ -59,34 +59,19 @@ class RedisFeatureFlagStore(AbstractFeatureFlagStore):
 
         self._save(item)
 
-    def set_client_data(
-        self,
-        feature_name: str,
-        client_data: dict,
-    ):
+    def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
         existing = self.get(feature_name)
 
         if existing is None:
             raise FlagDoesNotExistError('Feature %s does not exist' % feature_name)  # noqa: E501
 
-        updated_meta = self._get_merged_meta(existing.meta, client_data)
-
         item = FeatureFlagStoreItem(
             feature_name,
             existing.is_enabled(),
-            FeatureFlagStoreMeta.fromJSON(updated_meta),
+            meta,
         )
 
         self._save(item)
-
-    def _get_merged_meta(
-        self, existing_meta: dict, client_data: dict
-    ) -> dict:
-        existing_meta['client_data'] = {
-            **existing_meta['client_data'],
-            **client_data,
-        }
-        return existing_meta
 
     def delete(self, feature_name: str):
         self._redis.delete(self._key_name(feature_name))

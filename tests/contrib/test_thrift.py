@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 from flipper import ThriftRPCFeatureFlagStore
+from flipper.contrib.storage import FeatureFlagStoreMeta
 from flipper.contrib.util.date import now
 from flipper_thrift.python.feature_flag_store.ttypes import (
     FeatureFlagStoreItem as TFeatureFlagStoreItem,
@@ -26,7 +27,7 @@ class BaseTest(unittest.TestCase):
                 ),
             ))
             Set = MagicMock()
-            SetClientData = MagicMock()
+            SetMeta = MagicMock()
 
         self.client = FakeThriftClient()
         self.store = ThriftRPCFeatureFlagStore(self.client)
@@ -36,6 +37,9 @@ class BaseTest(unittest.TestCase):
 
     def configure_mock(self, method, return_value):
         method.configure_mock(return_value=return_value)
+
+    def date(self):
+        return int(datetime(2018, 1, 1).timestamp())
 
 
 class TestCreate(BaseTest):
@@ -108,14 +112,17 @@ class TestDelete(BaseTest):
         self.client.Delete.assert_called_once_with(feature_name)
 
 
-class TestSetClientData(BaseTest):
+class TestSetMeta(BaseTest):
     def test_calls_rpc_client_with_correct_args(self):
         feature_name = self.txt()
         client_data = { self.txt(): self.txt() }
+        created_date = self.date()
 
-        self.store.set_client_data(feature_name, client_data)
+        meta = FeatureFlagStoreMeta(created_date, client_data)
 
-        self.client.SetClientData.assert_called_once_with(
-            feature_name, json.dumps(client_data)
+        self.store.set_meta(feature_name, meta)
+
+        self.client.SetMeta.assert_called_once_with(
+            feature_name, json.dumps(meta.toJSON())
         )
 

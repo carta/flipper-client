@@ -28,7 +28,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('  void Delete(string feature_name)')
     print('  FeatureFlagStoreItem Get(string feature_name)')
     print('  void Set(string feature_name, bool is_enabled)')
-    print('  void SetClientData(string feature_name, string client_data)')
+    print('  void SetMeta(string feature_name, string meta)')
     print('')
     sys.exit(0)
 
@@ -132,11 +132,11 @@ elif cmd == 'Set':
         sys.exit(1)
     pp.pprint(client.Set(args[0], eval(args[1]),))
 
-elif cmd == 'SetClientData':
+elif cmd == 'SetMeta':
     if len(args) != 2:
-        print('SetClientData requires 2 args')
+        print('SetMeta requires 2 args')
         sys.exit(1)
-    pp.pprint(client.SetClientData(args[0], args[1],))
+    pp.pprint(client.SetMeta(args[0], args[1],))
 
 else:
     print('Unrecognized method %s' % cmd)

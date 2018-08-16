@@ -23,3 +23,16 @@ class FeatureFlagStoreMeta:
             fields['created_date'],
             fields['client_data'],
         )
+
+    def update(
+        self,
+        created_date: Optional[int]=None,
+        client_data: Optional[dict]=None,
+    ):
+        if created_date is not None:
+            self.created_date = created_date
+        if client_data is not None:
+            self._merge_client_data(client_data)
+
+    def _merge_client_data(self, client_data: dict):
+        self.client_data.update(client_data)

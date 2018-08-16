@@ -50,11 +50,11 @@ class Iface(object):
         """
         pass
 
-    def SetClientData(self, feature_name, client_data):
+    def SetMeta(self, feature_name, meta):
         """
         Parameters:
          - feature_name
-         - client_data
+         - meta
         """
         pass
 
@@ -190,25 +190,25 @@ class Client(Iface):
         iprot.readMessageEnd()
         return
 
-    def SetClientData(self, feature_name, client_data):
+    def SetMeta(self, feature_name, meta):
         """
         Parameters:
          - feature_name
-         - client_data
+         - meta
         """
-        self.send_SetClientData(feature_name, client_data)
-        self.recv_SetClientData()
+        self.send_SetMeta(feature_name, meta)
+        self.recv_SetMeta()
 
-    def send_SetClientData(self, feature_name, client_data):
-        self._oprot.writeMessageBegin('SetClientData', TMessageType.CALL, self._seqid)
-        args = SetClientData_args()
+    def send_SetMeta(self, feature_name, meta):
+        self._oprot.writeMessageBegin('SetMeta', TMessageType.CALL, self._seqid)
+        args = SetMeta_args()
         args.feature_name = feature_name
-        args.client_data = client_data
+        args.meta = meta
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
 
-    def recv_SetClientData(self):
+    def recv_SetMeta(self):
         iprot = self._iprot
         (fname, mtype, rseqid) = iprot.readMessageBegin()
         if mtype == TMessageType.EXCEPTION:
@@ -216,7 +216,7 @@ class Client(Iface):
             x.read(iprot)
             iprot.readMessageEnd()
             raise x
-        result = SetClientData_result()
+        result = SetMeta_result()
         result.read(iprot)
         iprot.readMessageEnd()
         return
@@ -230,7 +230,7 @@ class Processor(Iface, TProcessor):
         self._processMap["Delete"] = Processor.process_Delete
         self._processMap["Get"] = Processor.process_Get
         self._processMap["Set"] = Processor.process_Set
-        self._processMap["SetClientData"] = Processor.process_SetClientData
+        self._processMap["SetMeta"] = Processor.process_SetMeta
 
     def process(self, iprot, oprot):
         (name, type, seqid) = iprot.readMessageBegin()
@@ -339,13 +339,13 @@ class Processor(Iface, TProcessor):
         oprot.writeMessageEnd()
         oprot.trans.flush()
 
-    def process_SetClientData(self, seqid, iprot, oprot):
-        args = SetClientData_args()
+    def process_SetMeta(self, seqid, iprot, oprot):
+        args = SetMeta_args()
         args.read(iprot)
         iprot.readMessageEnd()
-        result = SetClientData_result()
+        result = SetMeta_result()
         try:
-            self._handler.SetClientData(args.feature_name, args.client_data)
+            self._handler.SetMeta(args.feature_name, args.meta)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -357,7 +357,7 @@ class Processor(Iface, TProcessor):
             logging.exception('Unexpected exception in handler')
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("SetClientData", msg_type, seqid)
+        oprot.writeMessageBegin("SetMeta", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
@@ -835,17 +835,17 @@ Set_result.thrift_spec = (
 )
 
 
-class SetClientData_args(object):
+class SetMeta_args(object):
     """
     Attributes:
      - feature_name
-     - client_data
+     - meta
     """
 
 
-    def __init__(self, feature_name=None, client_data=None,):
+    def __init__(self, feature_name=None, meta=None,):
         self.feature_name = feature_name
-        self.client_data = client_data
+        self.meta = meta
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -863,7 +863,7 @@ class SetClientData_args(object):
                     iprot.skip(ftype)
             elif fid == 2:
                 if ftype == TType.STRING:
-                    self.client_data = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                    self.meta = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
             else:
@@ -875,14 +875,14 @@ class SetClientData_args(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('SetClientData_args')
+        oprot.writeStructBegin('SetMeta_args')
         if self.feature_name is not None:
             oprot.writeFieldBegin('feature_name', TType.STRING, 1)
             oprot.writeString(self.feature_name.encode('utf-8') if sys.version_info[0] == 2 else self.feature_name)
             oprot.writeFieldEnd()
-        if self.client_data is not None:
-            oprot.writeFieldBegin('client_data', TType.STRING, 2)
-            oprot.writeString(self.client_data.encode('utf-8') if sys.version_info[0] == 2 else self.client_data)
+        if self.meta is not None:
+            oprot.writeFieldBegin('meta', TType.STRING, 2)
+            oprot.writeString(self.meta.encode('utf-8') if sys.version_info[0] == 2 else self.meta)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -900,15 +900,15 @@ class SetClientData_args(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(SetClientData_args)
-SetClientData_args.thrift_spec = (
+all_structs.append(SetMeta_args)
+SetMeta_args.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'feature_name', 'UTF8', None, ),  # 1
-    (2, TType.STRING, 'client_data', 'UTF8', None, ),  # 2
+    (2, TType.STRING, 'meta', 'UTF8', None, ),  # 2
 )
 
 
-class SetClientData_result(object):
+class SetMeta_result(object):
 
 
     def read(self, iprot):
@@ -929,7 +929,7 @@ class SetClientData_result(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('SetClientData_result')
+        oprot.writeStructBegin('SetMeta_result')
         oprot.writeFieldStop()
         oprot.writeStructEnd()
 
@@ -946,8 +946,8 @@ class SetClientData_result(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(SetClientData_result)
-SetClientData_result.thrift_spec = (
+all_structs.append(SetMeta_result)
+SetMeta_result.thrift_spec = (
 )
 fix_spec(all_structs)
 del all_structs
