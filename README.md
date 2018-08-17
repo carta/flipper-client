@@ -30,14 +30,17 @@ else:
 
 ## FeatureFlagClient
 
-**`is_enabled(feature_name: str) -> bool`**
+**`is_enabled(feature_name: str, **conditions) -> bool`**
 
-Check if a feature is enabled
+Check if a feature is enabled. Also supports conditional enabling of features. To check for conditionally enabled features, pass keyword arguments with conditions you wish to supply. For more information, see the conditions section.
 
 Example:
 
 ```python
 features.is_enabled(MY_FEATURE)
+
+# With conditons
+features.is_enabled(FEATURE_IMPROVED_HORSE_SOUNDS, is_horse_lover=True)
 ```
 
 **`create(feature_name: str, is_enabled: bool=False, client_data: dict=None) -> FeatureFlag`**
@@ -122,16 +125,36 @@ Example:
 features.get_meta(MY_FEATURE)
 ```
 
-## FeatureFlagClient
+**`add_condition(condition: Condition) -> void`**
+
+Adds a condition to for enabled checks, such that `is_enabled` will only return true if all the conditions are satisfied when it is called.
+
+Example:
+
+```python
+from flipper import Condition
+
+
+features.add_condition(MY_FEATURE, Condition(is_administrator=True))
+
+features.is_enabled(MY_FEATURE, is_administrator=True) # returns True
+features.is_enabled(MY_FEATURE, is_administrator=False) # returns False
+
+```
+
+## FeatureFlag
 
 **`is_enabled() -> bool`**
 
-Check if a feature is enabled
+Check if a feature is enabled. Also supports conditional enabling of features. To check for conditionally enabled features, pass keyword arguments with conditions you wish to supply. For more information, see the conditions section.
 
 Example:
 
 ```python
 flag.is_enabled()
+
+# With conditons
+flag.is_enabled(is_horse_lover=True, horse_type__in=['Stallion', 'Mare'])
 ```
 
 **`enable() -> void`**
@@ -194,6 +217,23 @@ Example:
 flag.get_meta()
 ```
 
+**`add_condition(condition: Condition) -> void`**
+
+Adds a condition to for enabled checks, such that `is_enabled` will only return true if all the conditions are satisfied when it is called.
+
+Example:
+
+```python
+from flipper import Condition
+
+
+flag.add_condition(Condition(is_administrator=True))
+
+flag.is_enabled(is_administrator=True)  # returns True
+flag.is_enabled(is_administrator=False)  # returns False
+
+```
+
 ## decorators
 
 **`is_enabled(features: FeatureFlagClient, feature_name: str, redirect: Optional[Callable]=None)`**
@@ -222,6 +262,52 @@ def new_horse_sound(request):
 def old_horse_sound(request):
     return HttpResponse('Neigh')
 ```
+
+## Conditions
+
+Flipper supports conditionally enabled feature flags. These are useful if you want to enable a feature for a subset of users or based on some other condition within your application. Its usage is very simple. First, import the `Condition` class:
+
+
+```python
+from flipper import Condition
+```
+
+Then add the condition to a flag using the `add_condition` method of the `FeatureFlagClient` or `FeatureFlag` interface. You can add as many conditions as you like, and each condition may specify multiple checks:
+
+
+```python
+flag = client.get(FEATURE_IMPROVED_HORSE_SOUNDS)
+
+# Feature is only enabled for horse lovers
+flag.add_condition(Condition(is_horse_lover=True))
+
+# Feature is only enabled for people with more than 9000 horses who don't live in the city
+flag.add_condition(Condition(number_of_horses_owned__gt=9000, location__ne='city'))
+```
+
+Then you can specify these checks when calling `is_enabled`. The checks are not required, and if not specified `is_enabled` will return the base `enabled` status of the feature.
+
+```python
+flag.enable()
+flag.is_enabled()  # True
+flag.is_enabled(is_horse_lover=True)  # True
+flag.is_enabled(is_horse_lover=True, number_of_horses_owned=8000)  # False
+flag.is_enabled(location='city')  # False
+```
+
+### Condition operators supported
+
+In addition to equality conditions, `Conditions` support the following operator comparisons:
+
+- `__gt` Greater than
+- `__gte` Greater than or equal to
+- `__lt` Less than
+- `__lte` Less than or equal to
+- `__ne` Not equals
+- `__in` Set membership
+- `__not_in` Set non-membership
+
+Operators must be a suffix of the argument name and must include `__`.
 
 # Initialization
 
