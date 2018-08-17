@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import MagicMock
 from uuid import uuid4
 
-from flipper import FeatureFlagClient, MemoryFeatureFlagStore
+from flipper import Condition, FeatureFlagClient, MemoryFeatureFlagStore
 from flipper.flag import FeatureFlag, FlagDoesNotExistError
 from flipper.contrib.storage import FeatureFlagStoreMeta
 
@@ -315,3 +315,30 @@ class TestGetMeta(BaseTest):
 
         with self.assertRaises(FlagDoesNotExistError):
             self.client.get_meta(feature_name)
+
+
+class TestAddCondition(BaseTest):
+    def test_condition_gets_included_in_meta(self):
+        feature_name = self.txt()
+        condition_checks = { self.txt(): True }
+        condition = Condition(**condition_checks)
+
+        self.client.create(feature_name)
+        self.client.add_condition(feature_name, condition)
+
+        meta = self.client.get_meta(feature_name)
+
+        self.assertTrue(condition.toJSON() in meta['conditions'])
+
+    def test_condition_gets_appended_to_meta(self):
+        feature_name = self.txt()
+        condition_checks = { self.txt(): True }
+        condition = Condition(**condition_checks)
+
+        self.client.create(feature_name)
+        self.client.add_condition(feature_name, condition)
+        self.client.add_condition(feature_name, condition)
+
+        meta = self.client.get_meta(feature_name)
+
+        self.assertEqual(2, len(meta['conditions']))

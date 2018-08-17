@@ -1,3 +1,4 @@
+from .conditions import Condition
 from .contrib.interface import AbstractFeatureFlagStore
 from .contrib.storage import FeatureFlagStoreMeta
 
@@ -39,8 +40,12 @@ class FeatureFlag:
         self._store.delete(self.name)
 
     @flag_must_exist
-    def add_condition(self, condition):
-        raise NotImplementedError()
+    def add_condition(self, condition: Condition):
+        meta = FeatureFlagStoreMeta.fromJSON(self.get_meta())
+
+        meta.conditions.append(condition)
+
+        self._store.set_meta(self.name, meta)
 
     @flag_must_exist
     def set_client_data(self, client_data: dict):

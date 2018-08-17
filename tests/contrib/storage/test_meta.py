@@ -3,6 +3,7 @@ import json
 import unittest
 from uuid import uuid4
 
+from flipper import Condition
 from flipper.contrib.storage import FeatureFlagStoreMeta
 
 
@@ -26,6 +27,12 @@ class TestToJSON(BaseTest):
         }
         meta = FeatureFlagStoreMeta(self.now, client_data)
         self.assertEqual(client_data, meta.toJSON()['client_data'])
+
+    def test_includes_correct_conditions(self):
+        conditions = [Condition(foo=1), Condition(bar='baz')]
+        meta = FeatureFlagStoreMeta(self.now, conditions=conditions)
+        serialized_conditions = [c.toJSON() for c in conditions]
+        self.assertEqual(serialized_conditions, meta.toJSON()['conditions'])
 
 
 class TestUpdate(BaseTest):
@@ -65,3 +72,16 @@ class TestUpdate(BaseTest):
         meta = FeatureFlagStoreMeta(self.now, {})
         meta.update(client_data=updated_client_data)
         self.assertEqual(self.now, meta.created_date)
+
+    def test_sets_conditions(self):
+        conditions = [Condition(foo=1)]
+        meta = FeatureFlagStoreMeta(self.now)
+        meta.update(conditions=conditions)
+        self.assertEqual(conditions, meta.conditions)
+
+    def test_replaces_conditions_entirely(self):
+        conditions = [Condition(foo=1)]
+        meta = FeatureFlagStoreMeta(self.now)
+        meta.update(conditions=conditions)
+        meta.update(conditions=conditions)
+        self.assertEqual(conditions, meta.conditions)

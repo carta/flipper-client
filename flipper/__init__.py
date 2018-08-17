@@ -1,4 +1,5 @@
 from .client import FeatureFlagClient
+from .conditions import Condition
 from .contrib import (
     CachedFeatureFlagStore,
     ConsulFeatureFlagStore,
@@ -12,6 +13,7 @@ from .flag import FlagDoesNotExistError
 
 __all__ = [
     'CachedFeatureFlagStore',
+    'Condition',
     'ConsulFeatureFlagStore',
     'decorators',
     'FeatureFlagClient',
