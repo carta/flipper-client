@@ -21,11 +21,11 @@ class FeatureFlag:
         self.name = feature_name
         self._store = store
 
-    def is_enabled(self, default=False, **kwargs) -> bool:
+    def is_enabled(self, default=False, **conditions) -> bool:
         item = self._store.get(self.name)
         if item is None:
             return default
-        return item.is_enabled()
+        return item.is_enabled(**conditions)
 
     @flag_must_exist
     def enable(self):

@@ -18,7 +18,7 @@ class Condition:
 
     def check(self, **checks) -> bool:
         for check_name, check_value in checks.items():
-            checkers = self._checks.get(check_name)
+            checkers = self._checks[check_name]
 
             for checker in checkers:
                 if checker.check(check_value) is False:

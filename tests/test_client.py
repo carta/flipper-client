@@ -38,6 +38,30 @@ class TestIsEnabled(BaseTest):
 
         self.assertFalse(self.client.is_enabled(feature_name))
 
+    def test_returns_true_if_condition_specifies(self):
+        feature_name = self.txt()
+
+        self.client.create(feature_name, is_enabled=True)
+        self.client.add_condition(feature_name, Condition(foo=True))
+
+        self.assertTrue(self.client.is_enabled(feature_name, foo=True))
+
+    def test_returns_false_if_condition_specifies(self):
+        feature_name = self.txt()
+
+        self.client.create(feature_name, is_enabled=True)
+        self.client.add_condition(feature_name, Condition(foo=True))
+
+        self.assertFalse(self.client.is_enabled(feature_name, foo=False))
+
+    def test_returns_false_if_feature_disabled_despite_condition(self):
+        feature_name = self.txt()
+
+        self.client.create(feature_name, is_enabled=False)
+        self.client.add_condition(feature_name, Condition(foo=True))
+
+        self.assertFalse(self.client.is_enabled(feature_name, foo=True))
+
 
 class TestCreate(BaseTest):
     def test_creates_and_returns_instance_of_feature_flag_class(self):

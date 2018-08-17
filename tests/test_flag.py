@@ -41,6 +41,24 @@ class TestIsEnabled(BaseTest):
     def test_returns_false_when_flag_does_not_exist(self):
         self.assertFalse(self.flag.is_enabled())
 
+    def test_returns_true_if_condition_specifies(self):
+        self.store.create(self.name, is_enabled=True)
+        self.flag.add_condition(Condition(foo=True))
+
+        self.assertTrue(self.flag.is_enabled(foo=True))
+
+    def test_returns_false_if_condition_specifies(self):
+        self.store.create(self.name, is_enabled=True)
+        self.flag.add_condition(Condition(foo=True))
+
+        self.assertFalse(self.flag.is_enabled(foo=False))
+
+    def test_returns_false_if_feature_disabled_despite_condition(self):
+        self.store.create(self.name, is_enabled=False)
+        self.flag.add_condition(Condition(foo=True))
+
+        self.assertFalse(self.flag.is_enabled(foo=True))
+
 
 class TestDestroy(BaseTest):
     def test_object_remains_instance_of_flag_class(self):
