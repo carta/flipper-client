@@ -3,7 +3,7 @@ service FeatureFlagStore {
     void Delete(1: string feature_name),
     FeatureFlagStoreItem Get(1: string feature_name),
     void Set(1: string feature_name, 2: bool is_enabled)
-    void SetClientData(1: string feature_name, 2: string client_data)
+    void SetMeta(1: string feature_name, 2: string meta)
 }
 
 

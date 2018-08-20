@@ -3,7 +3,7 @@ from typing import Optional, List
 from lruttl import LRUCache
 
 from .interface import AbstractFeatureFlagStore
-from .storage import FeatureFlagStoreItem
+from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 
 
 DEFAULT_SIZE = 5000
@@ -56,12 +56,8 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
         self._store.delete(feature_name)
         self._cache.set(feature_name, None, -1)
 
-    def set_client_data(
-        self,
-        feature_name: str,
-        client_data: dict,
-    ):
-        self._store.set_client_data(feature_name, client_data)
+    def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
+        self._store.set_meta(feature_name, meta)
         self._cache.set(
             feature_name,
             self._store.get(feature_name),

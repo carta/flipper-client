@@ -3,6 +3,7 @@ import json
 import unittest
 from uuid import uuid4
 
+from flipper import Condition
 from flipper.contrib.storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 
 
@@ -112,3 +113,25 @@ class TestIsEnabled(BaseTest):
         meta = FeatureFlagStoreMeta(self.now, {})
         item = FeatureFlagStoreItem(self.txt(), False, meta)
         self.assertFalse(item.is_enabled())
+
+    def test_is_true_if_conditions_are_matched(self):
+        meta = FeatureFlagStoreMeta(self.now, conditions=[Condition(foo=True)])
+        item = FeatureFlagStoreItem(self.txt(), True, meta)
+        self.assertTrue(item.is_enabled(foo=True))
+
+    def test_is_false_if_conditions_are_not_matched(self):
+        meta = FeatureFlagStoreMeta(self.now, conditions=[Condition(foo=True)])
+        item = FeatureFlagStoreItem(self.txt(), True, meta)
+        self.assertFalse(item.is_enabled(foo=False))
+
+    def test_is_false_if_one_of_many_conditions_are_not_matched(self):
+        conditions = [Condition(foo=True), Condition(x=9)]
+        meta = FeatureFlagStoreMeta(self.now, conditions=conditions)
+        item = FeatureFlagStoreItem(self.txt(), True, meta)
+        self.assertFalse(item.is_enabled(foo=True, x=11))
+
+    def test_is_true_if_all_of_many_conditions_are_matched(self):
+        conditions = [Condition(foo=True), Condition(x=9)]
+        meta = FeatureFlagStoreMeta(self.now, conditions=conditions)
+        item = FeatureFlagStoreItem(self.txt(), True, meta)
+        self.assertTrue(item.is_enabled(foo=True, x=9))

@@ -1,4 +1,6 @@
+from .conditions import Condition
 from .contrib.interface import AbstractFeatureFlagStore
+from .contrib.storage import FeatureFlagStoreMeta
 
 
 class FlagDoesNotExistError(Exception):
@@ -19,11 +21,11 @@ class FeatureFlag:
         self.name = feature_name
         self._store = store
 
-    def is_enabled(self, default=False, **kwargs) -> bool:
+    def is_enabled(self, default=False, **conditions) -> bool:
         item = self._store.get(self.name)
         if item is None:
             return default
-        return item.is_enabled()
+        return item.is_enabled(**conditions)
 
     @flag_must_exist
     def enable(self):
@@ -38,12 +40,20 @@ class FeatureFlag:
         self._store.delete(self.name)
 
     @flag_must_exist
-    def add_condition(self, condition):
-        raise NotImplementedError()
+    def add_condition(self, condition: Condition):
+        meta = FeatureFlagStoreMeta.fromJSON(self.get_meta())
+
+        meta.conditions.append(condition)
+
+        self._store.set_meta(self.name, meta)
 
     @flag_must_exist
     def set_client_data(self, client_data: dict):
-        self._store.set_client_data(self.name, client_data)
+        meta = FeatureFlagStoreMeta.fromJSON(self.get_meta())
+
+        meta.update(client_data=client_data)
+
+        self._store.set_meta(self.name, meta)
 
     def get_client_data(self) -> dict:
         return self.get_meta()['client_data']

@@ -1,5 +1,6 @@
 from typing import Optional
 
+from .conditions import Condition
 from .contrib.interface import AbstractFeatureFlagStore
 from .flag import FeatureFlag
 
@@ -8,8 +9,8 @@ class FeatureFlagClient:
     def __init__(self, store: AbstractFeatureFlagStore):
         self._store = store
 
-    def is_enabled(self, feature_name: str, **kwargs) -> bool:
-        return self.get(feature_name).is_enabled(**kwargs)
+    def is_enabled(self, feature_name: str, **conditions) -> bool:
+        return self.get(feature_name).is_enabled(**conditions)
 
     def create(
         self,
@@ -42,3 +43,6 @@ class FeatureFlagClient:
 
     def get_meta(self, feature_name: str) -> dict:
         return self.get(feature_name).get_meta()
+
+    def add_condition(self, feature_name: str, condition: Condition):
+        return self.get(feature_name).add_condition(condition)

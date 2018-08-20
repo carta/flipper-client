@@ -2,8 +2,9 @@ import unittest
 from unittest.mock import MagicMock
 from uuid import uuid4
 
-from flipper import FeatureFlagClient, MemoryFeatureFlagStore
+from flipper import Condition, FeatureFlagClient, MemoryFeatureFlagStore
 from flipper.flag import FeatureFlag, FlagDoesNotExistError
+from flipper.contrib.storage import FeatureFlagStoreMeta
 
 
 class BaseTest(unittest.TestCase):
@@ -36,6 +37,30 @@ class TestIsEnabled(BaseTest):
         feature_name = self.txt()
 
         self.assertFalse(self.client.is_enabled(feature_name))
+
+    def test_returns_true_if_condition_specifies(self):
+        feature_name = self.txt()
+
+        self.client.create(feature_name, is_enabled=True)
+        self.client.add_condition(feature_name, Condition(foo=True))
+
+        self.assertTrue(self.client.is_enabled(feature_name, foo=True))
+
+    def test_returns_false_if_condition_specifies(self):
+        feature_name = self.txt()
+
+        self.client.create(feature_name, is_enabled=True)
+        self.client.add_condition(feature_name, Condition(foo=True))
+
+        self.assertFalse(self.client.is_enabled(feature_name, foo=False))
+
+    def test_returns_false_if_feature_disabled_despite_condition(self):
+        feature_name = self.txt()
+
+        self.client.create(feature_name, is_enabled=False)
+        self.client.add_condition(feature_name, Condition(foo=True))
+
+        self.assertFalse(self.client.is_enabled(feature_name, foo=True))
 
 
 class TestCreate(BaseTest):
@@ -166,8 +191,8 @@ class TestDisable(BaseTest):
 
 
 class TestSetClientData(BaseTest):
-    def test_calls_backend_with_correct_args(self):
-        self.store.set_client_data = MagicMock()
+    def test_calls_backend_with_correct_feature_name(self):
+        self.store.set_meta = MagicMock()
 
         feature_name = self.txt()
         client_data = { self.txt(): self.txt() }
@@ -175,9 +200,91 @@ class TestSetClientData(BaseTest):
         self.client.create(feature_name)
         self.client.set_client_data(feature_name, client_data)
 
-        self.store.set_client_data.assert_called_once_with(
-            feature_name, client_data
-        )
+        [actual, _] = self.store.set_meta.call_args[0]
+
+        self.assertEqual(feature_name, actual)
+
+    def test_calls_backend_with_instance_of_meta(self):
+        self.store.set_meta = MagicMock()
+
+        feature_name = self.txt()
+        client_data = { self.txt(): self.txt() }
+
+        self.client.create(feature_name)
+        self.client.set_client_data(feature_name, client_data)
+
+        [_, meta] = self.store.set_meta.call_args[0]
+
+        self.assertIsInstance(meta, FeatureFlagStoreMeta)
+
+    def test_calls_backend_with_correct_meta_client_data(self):
+        self.store.set_meta = MagicMock()
+
+        feature_name = self.txt()
+        client_data = { self.txt(): self.txt() }
+
+        self.client.create(feature_name)
+        self.client.set_client_data(feature_name, client_data)
+
+        [_, meta] = self.store.set_meta.call_args[0]
+
+        self.assertEqual(client_data, meta.client_data)
+
+    def test_calls_backend_with_non_null_meta_created_date(self):
+        self.store.set_meta = MagicMock()
+
+        feature_name = self.txt()
+        client_data = { self.txt(): self.txt() }
+
+        self.client.create(feature_name)
+        self.client.set_client_data(feature_name, client_data)
+
+        [_, meta] = self.store.set_meta.call_args[0]
+
+        self.assertIsNotNone(meta.created_date)
+
+    def test_calls_backend_exactly_once(self):
+        self.store.set_meta = MagicMock()
+
+        feature_name = self.txt()
+        client_data = { self.txt(): self.txt() }
+
+        self.client.create(feature_name)
+        self.client.set_client_data(feature_name, client_data)
+
+        self.assertEqual(1, self.store.set_meta.call_count)
+
+    def test_merges_new_values_with_existing(self):
+        feature_name = self.txt()
+        existing_data = { 'existing_key': self.txt() }
+
+        self.store.create(feature_name, client_data=existing_data)
+
+        new_data = { 'new_key': self.txt() }
+        self.client.set_client_data(feature_name, new_data)
+
+        item = self.store.get(feature_name)
+
+        self.assertEqual({
+            **existing_data,
+            **new_data,
+        }, item.meta['client_data'])
+
+    def test_can_override_existing_values(self):
+        feature_name = self.txt()
+        existing_data = { 'existing_key': self.txt() }
+
+        self.store.create(feature_name, client_data=existing_data)
+
+        new_data = {
+            'existing_key': self.txt(),
+            'new_key': self.txt(),
+        }
+        self.client.set_client_data(feature_name, new_data)
+
+        item = self.store.get(feature_name)
+
+        self.assertEqual(new_data, item.meta['client_data'])
 
     def test_raises_for_nonexistent_flag(self):
         feature_name = self.txt()
@@ -232,3 +339,30 @@ class TestGetMeta(BaseTest):
 
         with self.assertRaises(FlagDoesNotExistError):
             self.client.get_meta(feature_name)
+
+
+class TestAddCondition(BaseTest):
+    def test_condition_gets_included_in_meta(self):
+        feature_name = self.txt()
+        condition_checks = { self.txt(): True }
+        condition = Condition(**condition_checks)
+
+        self.client.create(feature_name)
+        self.client.add_condition(feature_name, condition)
+
+        meta = self.client.get_meta(feature_name)
+
+        self.assertTrue(condition.toJSON() in meta['conditions'])
+
+    def test_condition_gets_appended_to_meta(self):
+        feature_name = self.txt()
+        condition_checks = { self.txt(): True }
+        condition = Condition(**condition_checks)
+
+        self.client.create(feature_name)
+        self.client.add_condition(feature_name, condition)
+        self.client.add_condition(feature_name, condition)
+
+        meta = self.client.get_meta(feature_name)
+
+        self.assertEqual(2, len(meta['conditions']))

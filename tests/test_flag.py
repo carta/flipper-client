@@ -2,8 +2,9 @@ import unittest
 from unittest.mock import MagicMock
 from uuid import uuid4
 
-from flipper import MemoryFeatureFlagStore
+from flipper import Condition, MemoryFeatureFlagStore
 from flipper.flag import FeatureFlag, FlagDoesNotExistError
+from flipper.contrib.storage import FeatureFlagStoreMeta
 
 
 class BaseTest(unittest.TestCase):
@@ -39,6 +40,24 @@ class TestIsEnabled(BaseTest):
 
     def test_returns_false_when_flag_does_not_exist(self):
         self.assertFalse(self.flag.is_enabled())
+
+    def test_returns_true_if_condition_specifies(self):
+        self.store.create(self.name, is_enabled=True)
+        self.flag.add_condition(Condition(foo=True))
+
+        self.assertTrue(self.flag.is_enabled(foo=True))
+
+    def test_returns_false_if_condition_specifies(self):
+        self.store.create(self.name, is_enabled=True)
+        self.flag.add_condition(Condition(foo=True))
+
+        self.assertFalse(self.flag.is_enabled(foo=False))
+
+    def test_returns_false_if_feature_disabled_despite_condition(self):
+        self.store.create(self.name, is_enabled=False)
+        self.flag.add_condition(Condition(foo=True))
+
+        self.assertFalse(self.flag.is_enabled(foo=True))
 
 
 class TestDestroy(BaseTest):
@@ -134,17 +153,93 @@ class TestDisable(BaseTest):
 
 
 class TestSetClientData(BaseTest):
-    def test_calls_backend_with_correct_args(self):
-        self.store.set_client_data = MagicMock()
+    def test_calls_backend_with_correct_feature_name(self):
+        self.store.set_meta = MagicMock()
 
         client_data = { self.txt(): self.txt() }
 
         self.store.create(self.name)
         self.flag.set_client_data(client_data)
 
-        self.store.set_client_data.assert_called_once_with(
-            self.name, client_data
-        )
+        [actual, _] = self.store.set_meta.call_args[0]
+
+        self.assertEqual(self.name, actual)
+
+    def test_calls_backend_with_instance_of_meta(self):
+        self.store.set_meta = MagicMock()
+
+        client_data = { self.txt(): self.txt() }
+
+        self.store.create(self.name)
+        self.flag.set_client_data(client_data)
+
+        [_, meta] = self.store.set_meta.call_args[0]
+
+        self.assertIsInstance(meta, FeatureFlagStoreMeta)
+
+    def test_calls_backend_with_correct_meta_client_data(self):
+        self.store.set_meta = MagicMock()
+
+        client_data = { self.txt(): self.txt() }
+
+        self.store.create(self.name)
+        self.flag.set_client_data(client_data)
+
+        [_, meta] = self.store.set_meta.call_args[0]
+
+        self.assertEqual(client_data, meta.client_data)
+
+    def test_calls_backend_with_non_null_meta_created_date(self):
+        self.store.set_meta = MagicMock()
+
+        client_data = { self.txt(): self.txt() }
+
+        self.store.create(self.name)
+        self.flag.set_client_data(client_data)
+
+        [_, meta] = self.store.set_meta.call_args[0]
+
+        self.assertIsNotNone(meta.created_date)
+
+    def test_calls_backend_exactly_once(self):
+        self.store.set_meta = MagicMock()
+
+        client_data = { self.txt(): self.txt() }
+
+        self.store.create(self.name)
+        self.flag.set_client_data(client_data)
+
+        self.assertEqual(1, self.store.set_meta.call_count)
+
+    def test_merges_new_values_with_existing(self):
+        existing_data = { 'existing_key': self.txt() }
+
+        self.store.create(self.name, client_data=existing_data)
+
+        new_data = { 'new_key': self.txt() }
+        self.flag.set_client_data(new_data)
+
+        item = self.store.get(self.name)
+
+        self.assertEqual({
+            **existing_data,
+            **new_data,
+        }, item.meta['client_data'])
+
+    def test_can_override_existing_values(self):
+        existing_data = { 'existing_key': self.txt() }
+
+        self.store.create(self.name, client_data=existing_data)
+
+        new_data = {
+            'existing_key': self.txt(),
+            'new_key': self.txt(),
+        }
+        self.flag.set_client_data(new_data)
+
+        item = self.store.get(self.name)
+
+        self.assertEqual(new_data, item.meta['client_data'])
 
     def test_raises_for_nonexistent_flag(self):
         client_data = { self.txt(): self.txt() }
@@ -190,3 +285,28 @@ class TestGetMeta(BaseTest):
     def test_raises_for_nonexistent_flag(self):
         with self.assertRaises(FlagDoesNotExistError):
             self.flag.get_meta()
+
+
+class TestAddCondition(BaseTest):
+    def test_condition_gets_included_in_meta(self):
+        condition_checks = { self.txt(): True }
+        condition = Condition(**condition_checks)
+
+        self.store.create(self.name)
+        self.flag.add_condition(condition)
+
+        meta = self.flag.get_meta()
+
+        self.assertTrue(condition.toJSON() in meta['conditions'])
+
+    def test_condition_gets_appended_to_meta(self):
+        condition_checks = { self.txt(): True }
+        condition = Condition(**condition_checks)
+
+        self.store.create(self.name)
+        self.flag.add_condition(condition)
+        self.flag.add_condition(condition)
+
+        meta = self.flag.get_meta()
+
+        self.assertEqual(2, len(meta['conditions']))
