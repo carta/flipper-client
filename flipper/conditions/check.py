@@ -51,7 +51,7 @@ class Check:
         }
 
     @classmethod
-    def fromJSON(cls, fields: dict):
+    def fromJSON(cls, fields: dict) -> 'Check':
         return cls(
             fields['variable'],
             fields['value'],
@@ -59,8 +59,7 @@ class Check:
         )
 
     @classmethod
-    def make_check_key(cls, variable: str, operator: str):
+    def make_check_key(cls, variable: str, operator: str) -> str:
         if operator is None:
             return variable
         return OPERATOR_DELIMITER.join([variable, operator])
-

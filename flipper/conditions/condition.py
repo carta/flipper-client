@@ -32,7 +32,7 @@ class Condition:
         }
 
     @classmethod
-    def fromJSON(cls, conditions: Dict[str, Any]):
+    def fromJSON(cls, conditions: Dict[str, Any]) -> 'Condition':
         constructor_kwargs = {}
 
         for _, checks in conditions.items():
@@ -43,5 +43,5 @@ class Condition:
         return cls(**constructor_kwargs)
 
     @classmethod
-    def _make_key_for_check(cls, check: Dict[str, Any]):
+    def _make_key_for_check(cls, check: Dict[str, Any]) -> str:
         return Check.make_check_key(check['variable'], check['operator'])
