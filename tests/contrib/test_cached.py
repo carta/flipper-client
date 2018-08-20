@@ -1,9 +1,10 @@
+from datetime import datetime
 import unittest
 from unittest.mock import MagicMock
 from uuid import uuid4
 
-from flipper import CachedFeatureFlagStore, MemoryFeatureFlagStore
-from flipper.contrib.storage import FeatureFlagStoreItem
+from flipper import CachedFeatureFlagStore, Condition, MemoryFeatureFlagStore
+from flipper.contrib.storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 
 
 class BaseTest(unittest.TestCase):
@@ -150,3 +151,54 @@ class TestDelete(BaseTest):
         self.fast.delete(feature_name)
 
         self.assertFalse(self.slow.get(feature_name))
+
+
+class TestSetMeta(BaseTest):
+    def test_sets_created_date_correctly(self):
+        feature_name = self.txt()
+
+        self.fast.create(feature_name)
+
+        meta = FeatureFlagStoreMeta(int(datetime.now().timestamp()))
+
+        self.fast.set_meta(feature_name, meta)
+
+        self.assertEqual(
+            meta.created_date,
+            self.fast.get(feature_name).meta['created_date'],
+        )
+
+    def test_sets_client_data_correctly(self):
+        feature_name = self.txt()
+
+        self.fast.create(feature_name)
+
+        meta = FeatureFlagStoreMeta(
+            int(datetime.now().timestamp()),
+            client_data={ self.txt(): self.txt },
+        )
+
+        self.fast.set_meta(feature_name, meta)
+
+        self.assertEqual(
+            meta.client_data,
+            self.fast.get(feature_name).meta['client_data'],
+        )
+
+    def test_sets_conditions_correctly(self):
+        feature_name = self.txt()
+
+        self.fast.create(feature_name)
+
+        condition = Condition(**{ self.txt(): self.txt() })
+        meta = FeatureFlagStoreMeta(
+            int(datetime.now().timestamp()),
+            conditions=[condition],
+        )
+
+        self.fast.set_meta(feature_name, meta)
+
+        self.assertEqual(
+            condition.toJSON(),
+            self.fast.get(feature_name).meta['conditions'][0],
+        )

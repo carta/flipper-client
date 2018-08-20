@@ -61,5 +61,5 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
         self._cache.set(
             feature_name,
             self._store.get(feature_name),
-            self._cache_options,
+            **self._cache_options,
         )
