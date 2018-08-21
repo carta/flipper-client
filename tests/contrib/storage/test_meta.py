@@ -35,6 +35,24 @@ class TestToJSON(BaseTest):
         self.assertEqual(serialized_conditions, meta.toJSON()['conditions'])
 
 
+class TestFromJSON(BaseTest):
+    def test_will_not_crash_if_client_data_not_present(self):
+        json = {
+            'created_date': self.now,
+            'conditions': [],
+        }
+        meta = FeatureFlagStoreMeta.fromJSON(json)
+        self.assertEqual({}, meta.client_data)
+
+    def test_will_not_crash_if_conditions_not_present(self):
+        json = {
+            'created_date': self.now,
+            'client_data': {},
+        }
+        meta = FeatureFlagStoreMeta.fromJSON(json)
+        self.assertEqual([], meta.conditions)
+
+
 class TestUpdate(BaseTest):
     def test_updates_created_date(self):
         later = self.now + 1

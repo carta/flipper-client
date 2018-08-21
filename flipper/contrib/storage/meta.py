@@ -28,10 +28,10 @@ class FeatureFlagStoreMeta:
     def fromJSON(cls, fields: dict):
         return cls(
             fields['created_date'],
-            client_data=fields['client_data'],
+            client_data=fields.get('client_data', []),
             conditions=[
                 Condition.fromJSON(condition)
-                for condition in fields['conditions']
+                for condition in fields.get('conditions', [])
             ],
         )
 
