@@ -36,6 +36,10 @@ class FeatureFlagStoreItem:
             FeatureFlagStoreMeta.fromJSON(deserialized['meta']),
         )
 
+    @property
+    def raw_is_enabled(self):
+        return self._is_enabled
+
     def is_enabled(self, **conditions) -> bool:
         if self._is_enabled is False:
             return False

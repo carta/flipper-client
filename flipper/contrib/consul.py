@@ -109,7 +109,7 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
 
         item = FeatureFlagStoreItem(
             feature_name,
-            existing.is_enabled(),
+            existing.raw_is_enabled,
             meta,
         )
 
