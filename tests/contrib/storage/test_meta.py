@@ -4,6 +4,7 @@ import unittest
 from uuid import uuid4
 
 from flipper import Condition
+from flipper.bucketing import PercentageBucketer, Percentage
 from flipper.contrib.storage import FeatureFlagStoreMeta
 
 
@@ -34,6 +35,11 @@ class TestToJSON(BaseTest):
         serialized_conditions = [c.toJSON() for c in conditions]
         self.assertEqual(serialized_conditions, meta.toJSON()['conditions'])
 
+    def test_includes_currect_bucketer(self):
+        bucketer = PercentageBucketer(percentage=Percentage(0.3))
+        meta = FeatureFlagStoreMeta(self.now, bucketer=bucketer)
+        self.assertEqual(bucketer.toJSON(), meta.toJSON()['bucketer'])
+
 
 class TestFromJSON(BaseTest):
     def test_will_not_crash_if_client_data_not_present(self):
@@ -51,6 +57,16 @@ class TestFromJSON(BaseTest):
         }
         meta = FeatureFlagStoreMeta.fromJSON(json)
         self.assertEqual([], meta.conditions)
+
+    def test_can_create_with_bucketer(self):
+        bucketer = PercentageBucketer(percentage=Percentage(0.3))
+        json = {
+            'created_date': self.now,
+            'bucketer': bucketer.toJSON(),
+        }
+        meta = FeatureFlagStoreMeta.fromJSON(json)
+        print(meta.bucketer._percentage)
+        self.assertEqual(bucketer.toJSON(), meta.bucketer.toJSON())
 
 
 class TestUpdate(BaseTest):
@@ -103,3 +119,10 @@ class TestUpdate(BaseTest):
         meta.update(conditions=conditions)
         meta.update(conditions=conditions)
         self.assertEqual(conditions, meta.conditions)
+
+    def test_sets_bucketer(self):
+        percentage_value = 0.1
+        bucketer = PercentageBucketer(percentage=Percentage(percentage_value))
+        meta = FeatureFlagStoreMeta(self.now)
+        meta.update(bucketer=bucketer)
+        self.assertEqual(percentage_value, meta.bucketer.percentage)

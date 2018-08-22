@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import unittest
+from unittest.mock import MagicMock
 from uuid import uuid4
 
 from flipper import Condition
@@ -135,3 +136,73 @@ class TestIsEnabled(BaseTest):
         meta = FeatureFlagStoreMeta(self.now, conditions=conditions)
         item = FeatureFlagStoreItem(self.txt(), True, meta)
         self.assertTrue(item.is_enabled(foo=True, x=9))
+
+    def test_returns_false_if_bucketer_check_returns_false(self):
+        bucketer = MagicMock()
+        bucketer.check.return_value = False
+        meta = FeatureFlagStoreMeta(self.now, bucketer=bucketer)
+        item = FeatureFlagStoreItem(self.txt(), True, meta)
+        self.assertFalse(item.is_enabled())
+
+    def test_returns_true_if_bucketer_check_returns_true(self):
+        bucketer = MagicMock()
+        bucketer.check.return_value = True
+        meta = FeatureFlagStoreMeta(self.now, bucketer=bucketer)
+        item = FeatureFlagStoreItem(self.txt(), True, meta)
+        self.assertTrue(item.is_enabled())
+
+    def test_returns_false_when_bucketer_returns_false_and_conditions_not_specified(self):  # noqa: E501
+        # flag.is_enabled(user_id=2) # False
+        bucketer = MagicMock()
+        bucketer.check.return_value = False
+        condition = Condition(is_admin=True)
+
+        meta = FeatureFlagStoreMeta(
+            self.now,
+            bucketer=bucketer,
+            conditions=[condition],
+        )
+        item = FeatureFlagStoreItem(self.txt(), True, meta)
+        self.assertFalse(item.is_enabled())
+
+    def test_returns_true_when_bucketer_returns_false_and_conditions_return_true(self):  # noqa: E501
+        # flag.is_enabled(user_id=2, is_admin=True) # True
+        bucketer = MagicMock()
+        bucketer.check.return_value = False
+        condition = Condition(is_admin=True)
+
+        meta = FeatureFlagStoreMeta(
+            self.now,
+            bucketer=bucketer,
+            conditions=[condition],
+        )
+        item = FeatureFlagStoreItem(self.txt(), True, meta)
+        self.assertTrue(item.is_enabled(is_admin=True))
+
+    def test_returns_true_when_bucketer_returns_true_and_conditions_not_specified(self):  # noqa: E501
+        # flag.is_enabled(user_id=1) # True
+        bucketer = MagicMock()
+        bucketer.check.return_value = True
+        condition = Condition(is_admin=True)
+
+        meta = FeatureFlagStoreMeta(
+            self.now,
+            bucketer=bucketer,
+            conditions=[condition],
+        )
+        item = FeatureFlagStoreItem(self.txt(), True, meta)
+        self.assertTrue(item.is_enabled())
+
+    def test_returns_false_when_bucketer_returns_true_and_conditions_return_false(self):  # noqa: E501
+        # flag.is_enabled(user_id=1, is_admin=False) # False
+        bucketer = MagicMock()
+        bucketer.check.return_value = True
+        condition = Condition(is_admin=True)
+
+        meta = FeatureFlagStoreMeta(
+            self.now,
+            bucketer=bucketer,
+            conditions=[condition],
+        )
+        item = FeatureFlagStoreItem(self.txt(), True, meta)
+        self.assertFalse(item.is_enabled(is_admin=False))

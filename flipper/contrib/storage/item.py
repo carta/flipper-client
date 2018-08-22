@@ -46,22 +46,11 @@ class FeatureFlagStoreItem:
         if self._is_enabled is False:
             return False
 
-        for condition in self._meta.conditions:
-            if condition.check(**conditions) is False:
-                return False
+        if len(conditions) and self._has_conditions():
+            return self._all_conditions_satisfied(**conditions)
 
-        bucketer_satisfied = self._meta.bucketer.check(**conditions)
-        conditions_satisfied = self._all_conditions_satisfied(**conditions)
-
-        has_bucketer = self._has_bucketer()
-        has_conditions = self._has_conditions()
-
-        if has_bucketer and has_conditions:
-            return bucketer_satisfied or conditions_satisfied
-        elif has_bucketer:
-            return bucketer_satisfied
-        elif has_conditions:
-            return conditions_satisfied
+        if self._has_bucketer():
+            return self._meta.bucketer.check(**conditions)
 
         return True
 
