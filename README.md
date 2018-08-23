@@ -117,7 +117,7 @@ features.get_client_data(MY_FEATURE)
 
 **`get_meta(feature_name: str) -> dict`**
 
-Similar to `get_client_data` but instead of returning onlu client-supplied metadata, it will return all metadata for the flag, including system-set values such as `created_date`.
+Similar to `get_client_data` but instead of returning only client-supplied metadata, it will return all metadata for the flag, including system-set values such as `created_date`.
 
 Example:
 
@@ -209,7 +209,7 @@ flag.get_client_data()
 
 **`get_meta() -> dict`**
 
-Similar to `get_client_data` but instead of returning onlu client-supplied metadata, it will return all metadata for the flag, including system-set values such as `created_date`.
+Similar to `get_client_data` but instead of returning only client-supplied metadata, it will return all metadata for the flag, including system-set values such as `created_date`.
 
 Example:
 
