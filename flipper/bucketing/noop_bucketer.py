@@ -18,5 +18,5 @@ class NoOpBucketer(AbstractBucketer):
     def fromJSON(
         cls,
         fields: Dict[str, Any],
-    ) -> 'PercentageBucketer':
+    ) -> 'NoOpBucketer':
         return cls()
