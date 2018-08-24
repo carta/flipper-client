@@ -18,15 +18,15 @@ class FeatureFlagStoreItem:
         self._is_enabled = is_enabled
         self._meta = meta
 
-    def toJSON(self):
+    def to_dict(self):
         return {
             'feature_name': self.feature_name,
             'is_enabled': self._is_enabled,
-            'meta': self._meta.toJSON(),
+            'meta': self._meta.to_dict(),
         }
 
     def serialize(self) -> bytes:
-        return json.dumps(self.toJSON()).encode('utf-8')
+        return json.dumps(self.to_dict()).encode('utf-8')
 
     @classmethod
     def deserialize(cls, serialized: bytes):
@@ -35,7 +35,7 @@ class FeatureFlagStoreItem:
         return cls(
             deserialized['feature_name'],
             deserialized['is_enabled'],
-            FeatureFlagStoreMeta.fromJSON(deserialized['meta']),
+            FeatureFlagStoreMeta.from_dict(deserialized['meta']),
         )
 
     @property
@@ -65,4 +65,4 @@ class FeatureFlagStoreItem:
 
     @property
     def meta(self):
-        return self._meta.toJSON()
+        return self._meta.to_dict()

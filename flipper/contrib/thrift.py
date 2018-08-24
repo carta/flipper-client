@@ -50,4 +50,4 @@ class ThriftRPCFeatureFlagStore(AbstractFeatureFlagStore):
         return self._client.Delete(feature_name)
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
-        self._client.SetMeta(feature_name, json.dumps(meta.toJSON()))
+        self._client.SetMeta(feature_name, json.dumps(meta.to_dict()))

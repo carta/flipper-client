@@ -36,6 +36,6 @@ class TestCreate(unittest.TestCase):
         percentage = 0.21
         bucketer = BucketerFactory.create({
             'type': PercentageBucketer.get_type(),
-            'percentage': Percentage(value=percentage).toJSON(),
+            'percentage': Percentage(value=percentage).to_dict(),
         })
         self.assertEqual(percentage, bucketer.percentage)

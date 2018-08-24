@@ -70,7 +70,7 @@ class TestCheck(unittest.TestCase):
             )
 
 
-class TestToJSON(unittest.TestCase):
+class TestToDict(unittest.TestCase):
     def test_returns_correct_data(self):
         percentage = Percentage(value=0.5)
         key_whitelist = ['foo']
@@ -81,19 +81,19 @@ class TestToJSON(unittest.TestCase):
         expected = {
             'type': ConsistentHashPercentageBucketer.get_type(),
             'key_whitelist': key_whitelist,
-            'percentage': percentage.toJSON(),
+            'percentage': percentage.to_dict(),
         }
-        self.assertEqual(expected, bucketer.toJSON())
+        self.assertEqual(expected, bucketer.to_dict())
 
 
-class TestFromJSON(unittest.TestCase):
+class TestFromDict(unittest.TestCase):
     def test_sets_correct_data(self):
         percentage = Percentage(value=0.5)
         key_whitelist = ['foo']
         data = {
             'type': ConsistentHashPercentageBucketer.get_type(),
             'key_whitelist': key_whitelist,
-            'percentage': percentage.toJSON(),
+            'percentage': percentage.to_dict(),
         }
-        bucketer = ConsistentHashPercentageBucketer.fromJSON(data)
-        self.assertEqual(data, bucketer.toJSON())
+        bucketer = ConsistentHashPercentageBucketer.from_dict(data)
+        self.assertEqual(data, bucketer.to_dict())

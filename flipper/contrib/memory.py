@@ -44,7 +44,7 @@ class MemoryFeatureFlagStore(AbstractFeatureFlagStore):
         item = FeatureFlagStoreItem(
             feature_name,
             is_enabled,
-            FeatureFlagStoreMeta.fromJSON(existing.meta),
+            FeatureFlagStoreMeta.from_dict(existing.meta),
         )
         self._save(item)
 

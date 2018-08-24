@@ -21,7 +21,7 @@ class BucketerFactory:
     @classmethod
     def create(cls, fields: Dict[str, Any]) -> AbstractBucketer:
         try:
-            return cls.BUCKETER_MAP[fields['type']].fromJSON(fields)
+            return cls.BUCKETER_MAP[fields['type']].from_dict(fields)
         except KeyError:
             raise cls.InvalidBucketerTypeError(
                 'Bucketer type not supported: %s' % fields['type']

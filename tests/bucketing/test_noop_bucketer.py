@@ -20,19 +20,19 @@ class TestCheck(unittest.TestCase):
         self.assertTrue(bucketer.check(foo=1))
 
 
-class TestToJSON(unittest.TestCase):
+class TestToDict(unittest.TestCase):
     def test_returns_correct_data(self):
         bucketer = NoOpBucketer()
         expected = {
             'type': NoOpBucketer.get_type(),
         }
-        self.assertEqual(expected, bucketer.toJSON())
+        self.assertEqual(expected, bucketer.to_dict())
 
 
-class TestFromJSON(unittest.TestCase):
+class TestFromDict(unittest.TestCase):
     def test_sets_correct_data(self):
         data = {
             'type': NoOpBucketer.get_type(),
         }
-        bucketer = NoOpBucketer.fromJSON(data)
-        self.assertEqual(data, bucketer.toJSON())
+        bucketer = NoOpBucketer.from_dict(data)
+        self.assertEqual(data, bucketer.to_dict())

@@ -387,7 +387,7 @@ class TestAddCondition(BaseTest):
 
         meta = self.client.get_meta(feature_name)
 
-        self.assertTrue(condition.toJSON() in meta['conditions'])
+        self.assertTrue(condition.to_dict() in meta['conditions'])
 
     def test_condition_gets_appended_to_meta(self):
         feature_name = self.txt()
@@ -415,4 +415,4 @@ class TestSetBucketer(BaseTest):
 
         meta = self.client.get_meta(feature_name)
 
-        self.assertEqual(bucketer.toJSON(), meta['bucketer'])
+        self.assertEqual(bucketer.to_dict(), meta['bucketer'])

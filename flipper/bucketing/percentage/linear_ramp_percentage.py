@@ -41,9 +41,9 @@ class LinearRampPercentage(AbstractPercentage):
     def dt(self) -> int:
         return (datetime.now() - self._initial_time).seconds
 
-    def toJSON(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return {
-            **super().toJSON(),
+            **super().to_dict(),
             'initial_value': self._initial_value,
             'final_value': self._final_value,
             'ramp_duration': self._ramp_duration,
@@ -51,7 +51,7 @@ class LinearRampPercentage(AbstractPercentage):
         }
 
     @classmethod
-    def fromJSON(cls, fields: Dict[str, Any]) -> 'Percentage':
+    def from_dict(cls, fields: Dict[str, Any]) -> 'Percentage':
         return cls(
             initial_value=fields.get('initial_value'),
             final_value=fields.get('final_value'),

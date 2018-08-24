@@ -15,12 +15,12 @@ class Percentage(AbstractPercentage):
     def value(self):
         return self._value
 
-    def toJSON(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return {
-            **super().toJSON(),
+            **super().to_dict(),
             'value': self._value
         }
 
     @classmethod
-    def fromJSON(cls, fields: Dict[str, Any]) -> 'Percentage':
+    def from_dict(cls, fields: Dict[str, Any]) -> 'Percentage':
         return cls(value=fields.get('value'))

@@ -199,6 +199,6 @@ class TestSetMeta(BaseTest):
         self.fast.set_meta(feature_name, meta)
 
         self.assertEqual(
-            condition.toJSON(),
+            condition.to_dict(),
             self.fast.get(feature_name).meta['conditions'][0],
         )

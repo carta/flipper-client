@@ -23,7 +23,7 @@ class TestValue(unittest.TestCase):
         self.assertEqual(1.0, percentage.value)
 
 
-class TestToJSON(unittest.TestCase):
+class TestToDict(unittest.TestCase):
     def test_returns_correct_values(self):
         value = 0.8
         percentage = Percentage(value=value)
@@ -31,14 +31,14 @@ class TestToJSON(unittest.TestCase):
             'value': value,
             'type': Percentage.get_type(),
         }
-        self.assertEqual(expected, percentage.toJSON())
+        self.assertEqual(expected, percentage.to_dict())
 
 
-class TestFromJSON(unittest.TestCase):
+class TestFromDict(unittest.TestCase):
     def test_sets_correct_data(self):
         data = {
             'value': 0.8,
             'type': Percentage.get_type(),
         }
-        percentage = Percentage.fromJSON(data)
-        self.assertEqual(data, percentage.toJSON())
+        percentage = Percentage.from_dict(data)
+        self.assertEqual(data, percentage.to_dict())

@@ -45,15 +45,15 @@ class ConsistentHashPercentageBucketer(PercentageBucketer):
     def _score_hash(self, hashed) -> float:
         return (int(hashed.hexdigest(), 16) % 100) / 100
 
-    def toJSON(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return {
-            **super().toJSON(),
+            **super().to_dict(),
             'type': ConsistentHashPercentageBucketer.get_type(),
             'key_whitelist': list(self._key_whitelist),
         }
 
     @classmethod
-    def fromJSON(
+    def from_dict(
         cls,
         fields: Dict[str, Any],
     ) -> 'ConsistentHashPercentageBucketer':
