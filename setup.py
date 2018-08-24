@@ -25,7 +25,7 @@ setup(
             'cloudsmith-cli',
             'setuptools',
             'wheel',
-            'freezegun',
+            'ipdb',
         ],
     },
 )

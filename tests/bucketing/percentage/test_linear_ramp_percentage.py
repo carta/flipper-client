@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 import unittest
-
-from freezegun import freeze_time
+from unittest.mock import patch
 
 from flipper.bucketing import LinearRampPercentage
 
@@ -34,12 +33,16 @@ class TestValue(unittest.TestCase):
         )
         self.assertEqual(final_value, percentage.value)
 
-    @freeze_time('2018-01-01')
-    def test_returns_a_value_that_is_linearly_interpolated_between_initial_and_final_value_by_time(self):  # noqa: E501
+    @patch('flipper.bucketing.percentage.linear_ramp_percentage.datetime')
+    def test_returns_a_value_that_is_linearly_interpolated_between_initial_and_final_value_by_time(self, mock_datetime):  # noqa: E501
+        now = datetime(2018, 1, 1)
+
+        mock_datetime.now.return_value = now
+        mock_datetime.fromtimestamp = datetime.fromtimestamp
+
         initial_value = 0.2
         final_value = 0.6
         ramp_duration = 60
-        now = datetime.now()
         expected_percentage = 0.5
 
         dt = timedelta(seconds=ramp_duration * expected_percentage)
