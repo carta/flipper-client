@@ -15,7 +15,7 @@ class AbstractPercentage(metaclass=ABCMeta):
 
     @abstractmethod
     def toJSON(self) -> Dict[str, Any]:
-        pass
+        return { 'type': self.get_type() }
 
     @classmethod
     @abstractmethod

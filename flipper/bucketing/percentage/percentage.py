@@ -17,7 +17,7 @@ class Percentage(AbstractPercentage):
 
     def toJSON(self) -> Dict[str, Any]:
         return {
-            'type': Percentage.get_type(),
+            **super().toJSON(),
             'value': self._value
         }
 

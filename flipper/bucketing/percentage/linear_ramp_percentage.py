@@ -43,7 +43,7 @@ class LinearRampPercentage(AbstractPercentage):
 
     def toJSON(self) -> Dict[str, Any]:
         return {
-            'type': LinearRampPercentage.get_type(),
+            **super().toJSON(),
             'initial_value': self._initial_value,
             'final_value': self._final_value,
             'ramp_duration': self._ramp_duration,

@@ -12,9 +12,7 @@ class NoOpBucketer(AbstractBucketer):
         return True
 
     def toJSON(self) -> Dict[str, Any]:
-        return {
-            'type': NoOpBucketer.get_type(),
-        }
+        return super().toJSON()
 
     @classmethod
     def fromJSON(

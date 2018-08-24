@@ -24,7 +24,7 @@ class PercentageBucketer(AbstractBucketer):
 
     def toJSON(self) -> Dict[str, Any]:
         return {
-            'type': PercentageBucketer.get_type(),
+            **super().toJSON(),
             'percentage': self._percentage.toJSON(),
         }
 

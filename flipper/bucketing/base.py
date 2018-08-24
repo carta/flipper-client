@@ -14,7 +14,7 @@ class AbstractBucketer(metaclass=ABCMeta):
 
     @abstractmethod
     def toJSON(self) -> Dict[str, Any]:
-        pass
+        return { 'type': self.__class__.get_type() }
 
     @classmethod
     @abstractmethod
