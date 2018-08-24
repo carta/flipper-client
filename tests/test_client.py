@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 from flipper import Condition, FeatureFlagClient, MemoryFeatureFlagStore
+from flipper.bucketing import PercentageBucketer, Percentage
 from flipper.flag import FeatureFlag, FlagDoesNotExistError
 from flipper.contrib.storage import FeatureFlagStoreMeta
 
@@ -61,6 +62,40 @@ class TestIsEnabled(BaseTest):
         self.client.add_condition(feature_name, Condition(foo=True))
 
         self.assertFalse(self.client.is_enabled(feature_name, foo=True))
+
+    def test_returns_false_if_bucketer_check_returns_false(self):
+        feature_name = self.txt()
+
+        bucketer = MagicMock()
+        bucketer.check.return_value = False
+
+        self.client.create(feature_name, is_enabled=True)
+        self.client.set_bucketer(feature_name, bucketer)
+
+        self.assertFalse(self.client.is_enabled(feature_name))
+
+    def test_returns_true_if_bucketer_check_returns_true(self):
+        feature_name = self.txt()
+
+        bucketer = MagicMock()
+        bucketer.check.return_value = True
+
+        self.client.create(feature_name, is_enabled=True)
+        self.client.set_bucketer(feature_name, bucketer)
+
+        self.assertTrue(self.client.is_enabled(feature_name))
+
+    def test_forwards_conditions_to_bucketer(self):
+        feature_name = self.txt()
+
+        bucketer = MagicMock()
+
+        self.client.create(feature_name, is_enabled=True)
+        self.client.set_bucketer(feature_name, bucketer)
+
+        self.client.is_enabled(feature_name, foo=True)
+
+        bucketer.check.assert_called_with(foo=True)
 
 
 class TestCreate(BaseTest):
@@ -366,3 +401,18 @@ class TestAddCondition(BaseTest):
         meta = self.client.get_meta(feature_name)
 
         self.assertEqual(2, len(meta['conditions']))
+
+
+class TestSetBucketer(BaseTest):
+    def test_bucketer_gets_included_in_meta(self):
+        feature_name = self.txt()
+
+        percentage_value = 0.1
+        bucketer = PercentageBucketer(percentage=Percentage(percentage_value))
+
+        self.client.create(feature_name)
+        self.client.set_bucketer(feature_name, bucketer)
+
+        meta = self.client.get_meta(feature_name)
+
+        self.assertEqual(bucketer.toJSON(), meta['bucketer'])

@@ -1,3 +1,4 @@
+from .bucketing.base import AbstractBucketer
 from .conditions import Condition
 from .contrib.interface import AbstractFeatureFlagStore
 from .contrib.storage import FeatureFlagStoreMeta
@@ -61,3 +62,11 @@ class FeatureFlag:
     @flag_must_exist
     def get_meta(self) -> dict:
         return self._store.get(self.name).meta
+
+    @flag_must_exist
+    def set_bucketer(self, bucketer: AbstractBucketer):
+        meta = FeatureFlagStoreMeta.fromJSON(self.get_meta())
+
+        meta.update(bucketer=bucketer)
+
+        self._store.set_meta(self.name, meta)

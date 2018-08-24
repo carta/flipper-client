@@ -2,6 +2,8 @@ from datetime import datetime
 import json
 from typing import Optional
 
+from flipper.bucketing import NoOpBucketer
+
 from .meta import FeatureFlagStoreMeta
 
 
@@ -36,13 +38,30 @@ class FeatureFlagStoreItem:
             FeatureFlagStoreMeta.fromJSON(deserialized['meta']),
         )
 
+    @property
+    def raw_is_enabled(self):
+        return self._is_enabled
+
     def is_enabled(self, **conditions) -> bool:
         if self._is_enabled is False:
             return False
-        for condition in self._meta.conditions:
-            if condition.check(**conditions) is False:
-                return False
+
+        if len(conditions) and self._has_conditions():
+            return self._all_conditions_satisfied(**conditions)
+
+        if self._has_bucketer():
+            return self._meta.bucketer.check(**conditions)
+
         return True
+
+    def _all_conditions_satisfied(self, **conditions) -> bool:
+        return all(c.check(**conditions) for c in self._meta.conditions)
+
+    def _has_bucketer(self) -> bool:
+        return self._meta.bucketer.get_type() != NoOpBucketer.get_type()
+
+    def _has_conditions(self) -> bool:
+        return len(self._meta.conditions) > 0
 
     @property
     def meta(self):

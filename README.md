@@ -125,7 +125,7 @@ Example:
 features.get_meta(MY_FEATURE)
 ```
 
-**`add_condition(condition: Condition) -> void`**
+**`add_condition(feature_name: str, condition: Condition) -> void`**
 
 Adds a condition to for enabled checks, such that `is_enabled` will only return true if all the conditions are satisfied when it is called.
 
@@ -140,6 +140,22 @@ features.add_condition(MY_FEATURE, Condition(is_administrator=True))
 features.is_enabled(MY_FEATURE, is_administrator=True) # returns True
 features.is_enabled(MY_FEATURE, is_administrator=False) # returns False
 
+```
+
+**`set_bucketer(feature_name: str, bucketer: Bucketer) -> void`**
+
+Set the bucketer that used to bucket requests based on the checks passed to `is_enabled`. This is useful if you want to segment your traffic based on percentages or other heuristics that cannot be enforced with `Condition`s. See the `Bucketing` section for more details.
+
+```python
+from flipper.bucketing import Percentage, PercentageBucketer
+
+
+# Create a bucketer that will randomly enable a feature for 10% of traffic
+bucketer = PercentageBucketer(percentage=Percentage(0.1))
+
+client.set_bucketer(MY_FEATURE, bucketer)
+
+client.is_enabled(MY_FEATURE) # returns False 90% of the time
 ```
 
 ## FeatureFlag
@@ -231,7 +247,22 @@ flag.add_condition(Condition(is_administrator=True))
 
 flag.is_enabled(is_administrator=True)  # returns True
 flag.is_enabled(is_administrator=False)  # returns False
+```
 
+**`set_bucketer(bucketer: Bucketer) -> void`**
+
+Set the bucketer that used to bucket requests based on the checks passed to `is_enabled`. This is useful if you want to segment your traffic based on percentages or other heuristics that cannot be enforced with `Condition`s. See the `Bucketing` section for more details.
+
+```python
+from flipper.bucketing import Percentage, PercentageBucketer
+
+
+# Create a bucketer that will enable a feature for 10% of traffic
+bucketer = PercentageBucketer(percentage=Percentage(0.1))
+
+flag.set_bucketer(bucketer)
+
+flag.is_enabled() # returns False 90% of the time
 ```
 
 ## decorators
@@ -308,6 +339,155 @@ In addition to equality conditions, `Conditions` support the following operator 
 - `__not_in` Set non-membership
 
 Operators must be a suffix of the argument name and must include `__`.
+
+## Bucketing
+
+Bucketing is useful if you ever want the result of `is_enabled` to vary depending on a pre-defined percentage value. Examples might include A/B testing or canary releases. Out of the box, flipper supports percentage-based bucketing for both random-assignment cases and consistent-assignment cases. Flipper also supports linear ramps for variable percentage cases.
+
+Conditions always take precedence over bucketing when applied together.
+
+### Random assignment
+
+This is the simplest possible bucketing scenario, where you want to randomly segment traffic using a constant percentage.
+
+```python
+from flipper.bucketing import Percentage, PercentageBucketer
+
+from myapp import features
+
+
+FEATURE_NAME = 'HOMEPAGE_AB_TEST'
+
+flag = features.create(FEATURE_NAME)
+
+bucketer = PercentageBucketer(Percentage(0.5))
+
+flag.set_bucketer(bucketer)
+flag.enable()  # global enabled status overrides buckets
+
+flag.is_enabled()  # has a 50% shot of returning True each time it is called
+```
+
+### Consistent assignment
+
+This mechanism works like percentage-based bucket assignment, except the bucketer will always return the same value for the values it is provided. In other words, if you pass the same keyword arguments to `is_enabled` it will always return the same result for those arguments. This works using consistent hashing of the keyword arguments. The keyword arguments get serialized as json and hashed. This hash is then mod-ded by 100 to give a value in the range 0-100. This value is then compared to the current percentage to derminine whether or not that bucket is enabled.
+
+When is this useful? Any time you want to randomize traffic, but you want each individual client/user to always receive the same experience.
+
+This is perhaps easisest to illustrate with and example:
+
+```python
+from flipper.bucketing import Percentage, ConsistentHashPercentageBucketer
+
+from myapp import features
+
+
+FEATURE_NAME = 'HOMEPAGE_AB_TEST'
+
+flag = features.create(FEATURE_NAME)
+
+bucketer = ConsistentHashPercentageBucketer(
+    key_whitelist=['user_id'],
+    percentage=Percentage(0.5),
+)
+
+flag.set_bucketer(bucketer)
+flag.enable()  # global enabled status overrides buckets
+
+flag.is_enabled(user_id=1) # Always returns True (bucket is 0.48)
+flag.is_enabled(user_id=2) # Always returns False (bucket is 0.94)
+```
+
+#### Combining with Conditions
+
+These can also be combined with conditions. When a bucketer is combined with one or more conditions, the conditions take precedence. That is, if any of the conditions evaluate to `False`, then `is_enabled` will return `False` regardless of what the bucketing status is. The converse also holds: If if all of the conditions evaluate to `True`, then `is_enabled` will return `True` regardless of what the bucketing status is.
+
+However, if no keyword arguments that match current conditions are supplied to `is_enabled`, any conditions will evaluate to `True`.
+
+```python
+bucketer = ConsistentHashPercentageBucketer(
+    key_whitelist=['user_id'],
+    percentage=Percentage(0.5),
+)
+condition = Condition(is_admin=True)
+
+# This will enable the flag for 50% of traffic and all administrators
+flag.enable()
+flag.add_condition(condition)
+flag.set_bucketer(bucketer)
+
+flag.is_enabled(user_id=2) # False
+flag.is_enabled(user_id=2, is_admin=True) # True
+
+flag.is_enabled(user_id=1) # True
+flag.is_enabled(user_id=1, is_admin=False) # False
+```
+
+#### Key whitelists
+
+If you want bucketers to inspect a subset of the keyword arguments that `is_enabled` receives, use the `key_whitelist` parameter when initializing the `ConsistentHashPercentageBucketer`.
+
+```python
+bucketer = ConsistentHashPercentageBucketer(
+    key_whitelist=['user_id'],
+    percentage=Percentage(0.5),
+)
+condition = Condition(number_of_horses_owned__lt=9000)
+
+flag.enable()
+flag.set_bucketer(bucketer)
+
+# Ignore all keys except user_id
+flag.is_enabled(user_id=1, number_of_horses_owned=9001)  # True
+```
+
+### Ramping percentages over time
+
+If you want to increase or decrease the percentage value over time, you can use the `LinearRampPercentage` class. This class takes the following parameters:
+
+- `initial_value: float=0.0`: The starting percentage
+- `final_value: float=1.0`: The ending percentage
+- `ramp_duration: int=3600`: The time (in seconds) for the ramp to complete
+- `initial_time: Optional[int]=now()`: The timestamp of when the ramp "started". Not common. Defaults to now.
+
+This class can be used anywhere you would use a `Percentage`:
+
+
+```python
+from flipper.bucketing import LinearRampPercentage, PercentageBucketer
+
+from myapp import features
+
+
+FEATURE_NAME = 'HOMEPAGE_AB_TEST'
+
+flag = features.create(FEATURE_NAME)
+
+# Ramp from 20% to 80% over 30 minutes
+bucketer = PercentageBucketer(
+    percentage=LinearRampPercentage(
+        initial_value=0.2,
+        final_value=0.8,
+        ramp_duration=1800,
+    ),
+)
+
+flag.set_bucketer(bucketer)
+flag.enable()  # global enabled status overrides buckets
+
+flag.is_enabled()  # has ≈ 0% chance
+
+# Wait 10 minutes
+flag.is_enabled() # has ≈ 33% chance
+
+# Wait another 10 minutes
+flag.is_enabled() # has ≈ 67% chance
+
+# Wait another 10 minutes
+flag.is_enabled() # has 100% chance
+```
+
+It works with `ConsistentHashPercentageBucketer` as well.
 
 # Initialization
 

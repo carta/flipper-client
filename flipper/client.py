@@ -1,5 +1,6 @@
 from typing import Optional
 
+from .bucketing.base import AbstractBucketer
 from .conditions import Condition
 from .contrib.interface import AbstractFeatureFlagStore
 from .flag import FeatureFlag
@@ -46,3 +47,6 @@ class FeatureFlagClient:
 
     def add_condition(self, feature_name: str, condition: Condition):
         return self.get(feature_name).add_condition(condition)
+
+    def set_bucketer(self, feature_name: str, bucketer: AbstractBucketer):
+        return self.get(feature_name).set_bucketer(bucketer)

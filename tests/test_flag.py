@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 from flipper import Condition, MemoryFeatureFlagStore
+from flipper.bucketing import PercentageBucketer, Percentage
 from flipper.flag import FeatureFlag, FlagDoesNotExistError
 from flipper.contrib.storage import FeatureFlagStoreMeta
 
@@ -58,6 +59,34 @@ class TestIsEnabled(BaseTest):
         self.flag.add_condition(Condition(foo=True))
 
         self.assertFalse(self.flag.is_enabled(foo=True))
+
+    def test_returns_false_if_bucketer_check_returns_false(self):
+        bucketer = MagicMock()
+        bucketer.check.return_value = False
+
+        self.store.create(self.name, is_enabled=True)
+        self.flag.set_bucketer(bucketer)
+
+        self.assertFalse(self.flag.is_enabled())
+
+    def test_returns_true_if_bucketer_check_returns_true(self):
+        bucketer = MagicMock()
+        bucketer.check.return_value = True
+
+        self.store.create(self.name, is_enabled=True)
+        self.flag.set_bucketer(bucketer)
+
+        self.assertTrue(self.flag.is_enabled())
+
+    def test_forwards_conditions_to_bucketer(self):
+        bucketer = MagicMock()
+
+        self.store.create(self.name, is_enabled=True)
+        self.flag.set_bucketer(bucketer)
+
+        self.flag.is_enabled(foo=True)
+
+        bucketer.check.assert_called_with(foo=True)
 
 
 class TestDestroy(BaseTest):
@@ -310,3 +339,16 @@ class TestAddCondition(BaseTest):
         meta = self.flag.get_meta()
 
         self.assertEqual(2, len(meta['conditions']))
+
+
+class TestSetBucketer(BaseTest):
+    def test_bucketer_gets_included_in_meta(self):
+        percentage_value = 0.1
+        bucketer = PercentageBucketer(percentage=Percentage(percentage_value))
+
+        self.store.create(self.name)
+        self.flag.set_bucketer(bucketer)
+
+        meta = self.flag.get_meta()
+
+        self.assertEqual(bucketer.toJSON(), meta['bucketer'])
