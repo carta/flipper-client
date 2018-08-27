@@ -19,22 +19,22 @@ class FeatureFlagStoreMeta:
         self.conditions = conditions or []
         self.bucketer = bucketer or NoOpBucketer()
 
-    def toJSON(self):
+    def to_dict(self):
         return {
             'client_data': self.client_data,
             'created_date': self.created_date,
             'conditions': [
-                condition.toJSON() for condition in self.conditions
+                condition.to_dict() for condition in self.conditions
             ],
-            'bucketer': self.bucketer.toJSON(),
+            'bucketer': self.bucketer.to_dict(),
         }
 
     @classmethod
-    def fromJSON(cls, fields: dict):
+    def from_dict(cls, fields: dict):
         kwargs = {
             'client_data': fields.get('client_data', []),
             'conditions': [
-                Condition.fromJSON(condition)
+                Condition.from_dict(condition)
                 for condition in fields.get('conditions', [])
             ],
         }

@@ -82,7 +82,7 @@ class TestFactory(BaseTest):
         self.assertIsInstance(check.operator, SetMembershipOperator)
 
 
-class TestToJSON(BaseTest):
+class TestToDict(BaseTest):
     def test_includes_expected_fields(self):
         variable, value, operator = self.txt(), self.txt(), EqualityOperator()
 
@@ -92,10 +92,10 @@ class TestToJSON(BaseTest):
             'variable': variable,
             'value': value,
             'operator': operator.SYMBOL,
-        }, check.toJSON())
+        }, check.to_dict())
 
 
-class TestFromJSON(BaseTest):
+class TestFromDict(BaseTest):
     def test_includes_expected_fields(self):
         variable, value, operator = self.txt(), self.txt(), EqualityOperator()
 
@@ -105,9 +105,9 @@ class TestFromJSON(BaseTest):
             'operator': operator.SYMBOL,
         }
 
-        check = Check.fromJSON(json)
+        check = Check.from_dict(json)
 
-        self.assertEqual(json, check.toJSON())
+        self.assertEqual(json, check.to_dict())
 
 
 class TestMakeCheckKey(BaseTest):

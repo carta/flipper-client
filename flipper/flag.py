@@ -42,7 +42,7 @@ class FeatureFlag:
 
     @flag_must_exist
     def add_condition(self, condition: Condition):
-        meta = FeatureFlagStoreMeta.fromJSON(self.get_meta())
+        meta = FeatureFlagStoreMeta.from_dict(self.get_meta())
 
         meta.conditions.append(condition)
 
@@ -50,7 +50,7 @@ class FeatureFlag:
 
     @flag_must_exist
     def set_client_data(self, client_data: dict):
-        meta = FeatureFlagStoreMeta.fromJSON(self.get_meta())
+        meta = FeatureFlagStoreMeta.from_dict(self.get_meta())
 
         meta.update(client_data=client_data)
 
@@ -65,7 +65,7 @@ class FeatureFlag:
 
     @flag_must_exist
     def set_bucketer(self, bucketer: AbstractBucketer):
-        meta = FeatureFlagStoreMeta.fromJSON(self.get_meta())
+        meta = FeatureFlagStoreMeta.from_dict(self.get_meta())
 
         meta.update(bucketer=bucketer)
 

@@ -43,7 +43,7 @@ class Check:
 
         return variable, Operator.factory(raw_operator)
 
-    def toJSON(self) -> dict:
+    def to_dict(self) -> dict:
         return {
             'variable': self._variable,
             'value': self._value,
@@ -51,7 +51,7 @@ class Check:
         }
 
     @classmethod
-    def fromJSON(cls, fields: dict) -> 'Check':
+    def from_dict(cls, fields: dict) -> 'Check':
         return cls(
             fields['variable'],
             fields['value'],

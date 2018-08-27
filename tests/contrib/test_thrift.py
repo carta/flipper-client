@@ -123,6 +123,6 @@ class TestSetMeta(BaseTest):
         self.store.set_meta(feature_name, meta)
 
         self.client.SetMeta.assert_called_once_with(
-            feature_name, json.dumps(meta.toJSON())
+            feature_name, json.dumps(meta.to_dict())
         )
 

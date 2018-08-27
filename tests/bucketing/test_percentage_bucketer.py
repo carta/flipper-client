@@ -44,23 +44,23 @@ class TestCheck(unittest.TestCase):
         self.assertFalse(bucketer.check(randomizer=randomizer))
 
 
-class TestToJSON(unittest.TestCase):
+class TestToDict(unittest.TestCase):
     def test_returns_correct_data(self):
         percentage = Percentage(value=0.5)
         bucketer = PercentageBucketer(percentage=percentage)
         expected = {
             'type': PercentageBucketer.get_type(),
-            'percentage': percentage.toJSON(),
+            'percentage': percentage.to_dict(),
         }
-        self.assertEqual(expected, bucketer.toJSON())
+        self.assertEqual(expected, bucketer.to_dict())
 
 
-class TestFromJSON(unittest.TestCase):
+class TestFromDict(unittest.TestCase):
     def test_sets_correct_data(self):
         percentage = Percentage(value=0.5)
         data = {
             'type': PercentageBucketer.get_type(),
-            'percentage': percentage.toJSON(),
+            'percentage': percentage.to_dict(),
         }
-        bucketer = PercentageBucketer.fromJSON(data)
-        self.assertEqual(data, bucketer.toJSON())
+        bucketer = PercentageBucketer.from_dict(data)
+        self.assertEqual(data, bucketer.to_dict())

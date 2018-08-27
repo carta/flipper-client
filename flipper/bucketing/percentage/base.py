@@ -14,12 +14,12 @@ class AbstractPercentage(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def toJSON(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return { 'type': self.get_type() }
 
     @classmethod
     @abstractmethod
-    def fromJSON(cls, fields: Dict[str, Any]) -> 'AbstractPercentage':
+    def from_dict(cls, fields: Dict[str, Any]) -> 'AbstractPercentage':
         pass
 
     def __gt__(self, comparison: float) -> bool:

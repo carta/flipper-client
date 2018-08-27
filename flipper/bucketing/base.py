@@ -13,10 +13,10 @@ class AbstractBucketer(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def toJSON(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return { 'type': self.__class__.get_type() }
 
     @classmethod
     @abstractmethod
-    def fromJSON(cls, fields: Dict[str, Any]) -> 'AbstractBucketer':
+    def from_dict(cls, fields: Dict[str, Any]) -> 'AbstractBucketer':
         pass

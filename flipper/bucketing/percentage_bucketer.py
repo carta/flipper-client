@@ -22,14 +22,14 @@ class PercentageBucketer(AbstractBucketer):
             return False
         return randomizer() <= self._percentage
 
-    def toJSON(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return {
-            **super().toJSON(),
-            'percentage': self._percentage.toJSON(),
+            **super().to_dict(),
+            'percentage': self._percentage.to_dict(),
         }
 
     @classmethod
-    def fromJSON(
+    def from_dict(
         cls,
         fields: Dict[str, Any],
     ) -> 'PercentageBucketer':

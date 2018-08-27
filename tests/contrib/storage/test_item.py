@@ -16,32 +16,32 @@ class BaseTest(unittest.TestCase):
         return uuid4().hex
 
 
-class TestToJSON(BaseTest):
+class TestToDict(BaseTest):
     def test_includes_correct_feature_name(self):
         name = self.txt()
         meta = FeatureFlagStoreMeta(self.now, {})
         item = FeatureFlagStoreItem(name, True, meta)
-        self.assertEqual(name, item.toJSON()['feature_name'])
+        self.assertEqual(name, item.to_dict()['feature_name'])
 
     def test_includes_correct_is_enabled_when_true(self):
         is_enabled = True
         item = FeatureFlagStoreItem(
             self.txt(), is_enabled, FeatureFlagStoreMeta(self.now, {})
         )
-        self.assertEqual(is_enabled, item.toJSON()['is_enabled'])
+        self.assertEqual(is_enabled, item.to_dict()['is_enabled'])
 
     def test_includes_correct_is_enabled_when_true(self):
         is_enabled = False
         item = FeatureFlagStoreItem(
             self.txt(), is_enabled, FeatureFlagStoreMeta(self.now, {})
         )
-        self.assertEqual(is_enabled, item.toJSON()['is_enabled'])
+        self.assertEqual(is_enabled, item.to_dict()['is_enabled'])
 
     def test_includes_correct_meta(self):
         client_data = { 'foo': 'bar' }
         meta = FeatureFlagStoreMeta(self.now, client_data)
         item = FeatureFlagStoreItem(self.txt(), True, meta)
-        self.assertEqual(meta.toJSON(), item.toJSON()['meta'])
+        self.assertEqual(meta.to_dict(), item.to_dict()['meta'])
 
 
 class TestSerialize(BaseTest):
@@ -58,7 +58,7 @@ class TestSerialize(BaseTest):
         meta = FeatureFlagStoreMeta(self.now, {})
         item = FeatureFlagStoreItem(name, is_enabled, meta)
         self.assertEqual(
-            json.dumps(item.toJSON()),
+            json.dumps(item.to_dict()),
             item.serialize().decode('utf-8')
         )
 
@@ -80,7 +80,7 @@ class TestDeserialize(BaseTest):
         item = FeatureFlagStoreItem(name, is_enabled, meta)
         serialized = item.serialize()
         deserialized = FeatureFlagStoreItem.deserialize(serialized)
-        self.assertEqual(name, deserialized.toJSON()['feature_name'])
+        self.assertEqual(name, deserialized.to_dict()['feature_name'])
 
     def test_sets_correct_is_enabled(self):
         name = self.txt()
@@ -100,7 +100,7 @@ class TestDeserialize(BaseTest):
         serialized = item.serialize()
         deserialized = FeatureFlagStoreItem.deserialize(serialized)
         self.assertEqual(
-            client_data, deserialized.toJSON()['meta']['client_data']
+            client_data, deserialized.to_dict()['meta']['client_data']
         )
 
 

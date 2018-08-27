@@ -16,10 +16,10 @@ class BaseTest(unittest.TestCase):
         return uuid4().hex
 
 
-class TestToJSON(BaseTest):
+class TestToDict(BaseTest):
     def test_includes_correct_created_date(self):
         meta = FeatureFlagStoreMeta(self.now, {})
-        self.assertEqual(self.now, meta.toJSON()['created_date'])
+        self.assertEqual(self.now, meta.to_dict()['created_date'])
 
     def test_includes_correct_client_data(self):
         client_data = {
@@ -27,27 +27,27 @@ class TestToJSON(BaseTest):
             'bar': 'ajds'
         }
         meta = FeatureFlagStoreMeta(self.now, client_data)
-        self.assertEqual(client_data, meta.toJSON()['client_data'])
+        self.assertEqual(client_data, meta.to_dict()['client_data'])
 
     def test_includes_correct_conditions(self):
         conditions = [Condition(foo=1), Condition(bar='baz')]
         meta = FeatureFlagStoreMeta(self.now, conditions=conditions)
-        serialized_conditions = [c.toJSON() for c in conditions]
-        self.assertEqual(serialized_conditions, meta.toJSON()['conditions'])
+        serialized_conditions = [c.to_dict() for c in conditions]
+        self.assertEqual(serialized_conditions, meta.to_dict()['conditions'])
 
     def test_includes_currect_bucketer(self):
         bucketer = PercentageBucketer(percentage=Percentage(0.3))
         meta = FeatureFlagStoreMeta(self.now, bucketer=bucketer)
-        self.assertEqual(bucketer.toJSON(), meta.toJSON()['bucketer'])
+        self.assertEqual(bucketer.to_dict(), meta.to_dict()['bucketer'])
 
 
-class TestFromJSON(BaseTest):
+class TestFromDict(BaseTest):
     def test_will_not_crash_if_client_data_not_present(self):
         json = {
             'created_date': self.now,
             'conditions': [],
         }
-        meta = FeatureFlagStoreMeta.fromJSON(json)
+        meta = FeatureFlagStoreMeta.from_dict(json)
         self.assertEqual({}, meta.client_data)
 
     def test_will_not_crash_if_conditions_not_present(self):
@@ -55,18 +55,18 @@ class TestFromJSON(BaseTest):
             'created_date': self.now,
             'client_data': {},
         }
-        meta = FeatureFlagStoreMeta.fromJSON(json)
+        meta = FeatureFlagStoreMeta.from_dict(json)
         self.assertEqual([], meta.conditions)
 
     def test_can_create_with_bucketer(self):
         bucketer = PercentageBucketer(percentage=Percentage(0.3))
         json = {
             'created_date': self.now,
-            'bucketer': bucketer.toJSON(),
+            'bucketer': bucketer.to_dict(),
         }
-        meta = FeatureFlagStoreMeta.fromJSON(json)
+        meta = FeatureFlagStoreMeta.from_dict(json)
         print(meta.bucketer._percentage)
-        self.assertEqual(bucketer.toJSON(), meta.bucketer.toJSON())
+        self.assertEqual(bucketer.to_dict(), meta.bucketer.to_dict())
 
 
 class TestUpdate(BaseTest):

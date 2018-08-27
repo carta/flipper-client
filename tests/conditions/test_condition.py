@@ -156,7 +156,7 @@ class TestCheck(BaseTest):
         ))
 
 
-class TestToJSON(BaseTest):
+class TestToDict(BaseTest):
     def test_includes_all_checks(self):
         condition = Condition(
             foo=True,
@@ -170,7 +170,7 @@ class TestToJSON(BaseTest):
             derp__not_in=[8, 1000],
         )
 
-        actual = condition.toJSON()
+        actual = condition.to_dict()
 
         expected = {
             'foo': [{
@@ -216,7 +216,7 @@ class TestToJSON(BaseTest):
             }],
         }
 
-        self._compare(expected, condition.toJSON())
+        self._compare(expected, condition.to_dict())
 
     def _compare(self, expected, actual):
         for key, checks in expected.items():
@@ -224,7 +224,7 @@ class TestToJSON(BaseTest):
                 self.assertTrue(check in actual[key])
 
 
-class TestFromJSON(BaseTest):
+class TestFromDict(BaseTest):
     def test_includes_all_checks(self):
         input = {
             'foo': [{
@@ -270,9 +270,9 @@ class TestFromJSON(BaseTest):
             }],
         }
 
-        condition = Condition.fromJSON(input)
+        condition = Condition.from_dict(input)
 
-        self._compare(input, condition.toJSON())
+        self._compare(input, condition.to_dict())
 
     def _compare(self, expected, actual):
         for key, checks in expected.items():

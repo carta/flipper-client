@@ -61,7 +61,7 @@ class TestValue(unittest.TestCase):
         self.assertEqual(expected, percentage.value)
 
 
-class TestToJSON(unittest.TestCase):
+class TestToDict(unittest.TestCase):
     def test_returns_correct_values(self):
         initial_value = 0.2
         final_value = 0.6
@@ -81,10 +81,10 @@ class TestToJSON(unittest.TestCase):
             'ramp_duration': ramp_duration,
             'initial_time': initial_time,
         }
-        self.assertEqual(expected, percentage.toJSON())
+        self.assertEqual(expected, percentage.to_dict())
 
 
-class TestFromJSON(unittest.TestCase):
+class TestFromDict(unittest.TestCase):
     def test_sets_correct_data(self):
         initial_value = 0.2
         final_value = 0.6
@@ -98,5 +98,5 @@ class TestFromJSON(unittest.TestCase):
             'ramp_duration': ramp_duration,
             'initial_time': initial_time,
         }
-        percentage = LinearRampPercentage.fromJSON(data)
-        self.assertEqual(data, percentage.toJSON())
+        percentage = LinearRampPercentage.from_dict(data)
+        self.assertEqual(data, percentage.to_dict())

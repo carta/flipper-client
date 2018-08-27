@@ -326,7 +326,7 @@ class TestAddCondition(BaseTest):
 
         meta = self.flag.get_meta()
 
-        self.assertTrue(condition.toJSON() in meta['conditions'])
+        self.assertTrue(condition.to_dict() in meta['conditions'])
 
     def test_condition_gets_appended_to_meta(self):
         condition_checks = { self.txt(): True }
@@ -351,4 +351,4 @@ class TestSetBucketer(BaseTest):
 
         meta = self.flag.get_meta()
 
-        self.assertEqual(bucketer.toJSON(), meta['bucketer'])
+        self.assertEqual(bucketer.to_dict(), meta['bucketer'])

@@ -11,11 +11,11 @@ class NoOpBucketer(AbstractBucketer):
     def check(self, **checks) -> bool:
         return True
 
-    def toJSON(self) -> Dict[str, Any]:
-        return super().toJSON()
+    def to_dict(self) -> Dict[str, Any]:
+        return super().to_dict()
 
     @classmethod
-    def fromJSON(
+    def from_dict(
         cls,
         fields: Dict[str, Any],
     ) -> 'NoOpBucketer':

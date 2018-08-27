@@ -25,14 +25,14 @@ class Condition:
                     return False
         return True
 
-    def toJSON(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return {
-            variable: [check.toJSON() for check in checkers]
+            variable: [check.to_dict() for check in checkers]
             for variable, checkers in self._checks.items()
         }
 
     @classmethod
-    def fromJSON(cls, conditions: Dict[str, Any]) -> 'Condition':
+    def from_dict(cls, conditions: Dict[str, Any]) -> 'Condition':
         constructor_kwargs = {}
 
         for _, checks in conditions.items():
