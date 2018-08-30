@@ -225,6 +225,44 @@ class TestDisable(BaseTest):
             self.client.disable(feature_name)
 
 
+class TestList(BaseTest):
+    def test_calls_backend_with_correct_args(self):
+        self.store.list = MagicMock()
+
+        limit, offset = 10, 25
+        list(self.client.list(limit=limit, offset=offset))
+
+        self.store.list.assert_called_once_with(limit=limit, offset=offset)
+
+    def test_returns_flag_objects(self):
+        feature_name = self.txt()
+
+        self.client.create(feature_name)
+
+        flag = next(self.client.list())
+
+        self.assertIsInstance(flag, FeatureFlag)
+
+    def test_returns_correct_flag_objects(self):
+        feature_name = self.txt()
+
+        expected = self.client.create(feature_name)
+
+        actual = next(self.client.list())
+
+        self.assertEqual(expected.name, actual.name)
+
+    def test_returns_correct_count_of_flag_objects(self):
+        feature_names = [self.txt() for _ in range(10)]
+
+        for feature_name in feature_names:
+            self.client.create(feature_name)
+
+        actual = list(self.client.list())
+
+        self.assertEqual(len(feature_names), len(actual))
+
+
 class TestSetClientData(BaseTest):
     def test_calls_backend_with_correct_feature_name(self):
         self.store.set_meta = MagicMock()
