@@ -4,6 +4,7 @@ service FeatureFlagStore {
     FeatureFlagStoreItem Get(1: string feature_name),
     void Set(1: string feature_name, 2: bool is_enabled)
     void SetMeta(1: string feature_name, 2: string meta)
+    list<FeatureFlagStoreItem> List(1: i64 limit, 2: i64 offset)
 }
 
 

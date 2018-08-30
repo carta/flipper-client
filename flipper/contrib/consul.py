@@ -1,6 +1,6 @@
 from datetime import datetime
 import logging
-from typing import Optional, Tuple
+from typing import Iterator, Optional, Tuple
 import threading
 
 from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError
@@ -37,6 +37,8 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
             self._parse_data(data)
 
     def _parse_data(self, data: Tuple[dict]):
+        if data is None:
+            return
         for item in data:
             serialized = item['Value']
 
@@ -100,6 +102,19 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
 
     def delete(self, feature_name: str):
         self._consul.kv.delete(self._make_key(feature_name))
+
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: int = 0,
+    ) -> Iterator[FeatureFlagStoreItem]:
+        feature_names = sorted(self._cache.keys())[offset:]
+
+        if limit is not None:
+            feature_names = feature_names[:limit]
+
+        for feature_name in feature_names:
+            yield self.get(feature_name)
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
         existing = self.get(feature_name)

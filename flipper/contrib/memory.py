@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Iterator, Optional
 
 from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
@@ -51,6 +51,19 @@ class MemoryFeatureFlagStore(AbstractFeatureFlagStore):
     def delete(self, feature_name: str):
         if feature_name in self._memory:
             del self._memory[feature_name]
+
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: int = 0,
+    ) -> Iterator[FeatureFlagStoreItem]:
+        feature_names = sorted(self._memory.keys())[offset:]
+
+        if limit is not None:
+            feature_names = feature_names[:limit]
+
+        for feature_name in feature_names:
+            yield self.get(feature_name)
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
         existing = self.get(feature_name)

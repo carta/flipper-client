@@ -11,7 +11,7 @@ from flipper.contrib.storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 
 class BaseTest(unittest.TestCase):
     def setUp(self):
-        self.redis = fakeredis.FakeStrictRedis()
+        self.redis = fakeredis.FakeStrictRedis(singleton=False)
         self.store = RedisFeatureFlagStore(self.redis)
 
     def txt(self):
@@ -159,6 +159,70 @@ class TestDelete(BaseTest):
         key = '/'.join([self.store.base_key, feature_name])
 
         self.assertIsNone(self.redis.get(key))
+
+
+class TestList(BaseTest):
+    def test_returns_all_features(self):
+        feature_names = [self.txt() for _ in range(10)]
+
+        for name in feature_names:
+            self.store.create(name)
+
+        results = self.store.list()
+
+        expected = sorted(feature_names)
+        actual = sorted([item.feature_name for item in results])
+
+        self.assertEqual(expected, actual)
+
+    def test_returns_features_subject_to_offset(self):
+        feature_names = [self.txt() for _ in range(10)]
+
+        for name in feature_names:
+            self.store.create(name)
+
+        offset = 3
+
+        results = self.store.list(offset=offset)
+
+        actual = [item.feature_name for item in results]
+
+        self.assertEqual(len(feature_names) - offset, len(actual))
+        for feature_name in actual:
+            self.assertTrue(feature_name in feature_names)
+
+    def test_returns_features_subject_to_limit(self):
+        feature_names = [self.txt() for _ in range(10)]
+
+        for name in feature_names:
+            self.store.create(name)
+
+        limit = 3
+
+        results = self.store.list(limit=limit)
+
+        actual = [item.feature_name for item in results]
+
+        self.assertEqual(limit, len(actual))
+        for feature_name in actual:
+            self.assertTrue(feature_name in feature_names)
+
+    def test_returns_features_subject_to_offset_and_limit(self):
+        feature_names = [self.txt() for _ in range(10)]
+
+        for name in feature_names:
+            self.store.create(name)
+
+        offset = 2
+        limit = 3
+
+        results = self.store.list(limit=limit, offset=offset)
+
+        actual = [item.feature_name for item in results]
+
+        self.assertEqual(limit, len(actual))
+        for feature_name in actual:
+            self.assertTrue(feature_name in feature_names)
 
 
 class TestSetMeta(BaseTest):

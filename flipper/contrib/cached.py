@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Iterator, Optional, List
 
 from lruttl import LRUCache
 
@@ -55,6 +55,13 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
     def delete(self, feature_name: str):
         self._store.delete(feature_name)
         self._cache.set(feature_name, None, -1)
+
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: int = 0,
+    ) -> Iterator[FeatureFlagStoreItem]:
+        return self._store.list(limit=limit, offset=offset)
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
         self._store.set_meta(feature_name, meta)
