@@ -153,6 +153,67 @@ class TestDelete(BaseTest):
         self.assertFalse(self.slow.get(feature_name))
 
 
+class TestList(BaseTest):
+    def test_returns_all_features_in_sorted_order(self):
+        feature_names = [self.txt() for _ in range(10)]
+
+        for name in feature_names:
+            self.fast.create(name)
+
+        results = self.fast.list()
+
+        expected = sorted(feature_names)
+        actual = [item.feature_name for item in results]
+
+        self.assertEqual(expected, actual)
+
+    def test_returns_features_subject_to_offset(self):
+        feature_names = [self.txt() for _ in range(10)]
+
+        for name in feature_names:
+            self.fast.create(name)
+
+        offset = 3
+
+        results = self.fast.list(offset=offset)
+
+        expected = sorted(feature_names)[offset:]
+        actual = [item.feature_name for item in results]
+
+        self.assertEqual(expected, actual)
+
+    def test_returns_features_subject_to_limit(self):
+        feature_names = [self.txt() for _ in range(10)]
+
+        for name in feature_names:
+            self.fast.create(name)
+
+        limit = 3
+
+        results = self.fast.list(limit=limit)
+
+        expected = sorted(feature_names)[:limit]
+        actual = [item.feature_name for item in results]
+
+        self.assertEqual(expected, actual)
+
+    def test_returns_features_subject_to_offset_and_limit(self):
+        feature_names = [self.txt() for _ in range(10)]
+
+        for name in feature_names:
+            self.fast.create(name)
+
+        offset = 2
+        limit = 3
+
+        results = self.fast.list(limit=limit, offset=offset)
+
+        expected = sorted(feature_names)[offset:offset + limit]
+        actual = [item.feature_name for item in results]
+
+        self.assertEqual(expected, actual)
+
+
 class TestSetMeta(BaseTest):
     def test_sets_created_date_correctly(self):
         feature_name = self.txt()

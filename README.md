@@ -95,6 +95,17 @@ Example:
 features.destroy(MY_FEATURE)
 ```
 
+**`list(limit: Optional[int] = None, offset: int = 0) -> Iterator[FeatureFlag]`**
+
+Lists all flags subject to the limit and offset you provide. The results are not guaranteed to be in order. Ordering depends on the backend you choose so plan accordingly.
+
+Example:
+
+```python
+for feature in features.list(limit=100):
+    print(feature.name, feature.is_enabled())
+```
+
 **`set_client_data(feature_name: str, client_data: dict) -> void`**
 
 Set key-value pairs to be stored as metadata with the flag. Can be retrieved using `get_client_data`. This will merge the supplied values with anything that already exists.

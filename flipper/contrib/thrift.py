@@ -1,5 +1,5 @@
 import json
-from typing import Optional
+from typing import Iterator, Optional
 
 from flipper_thrift.python.feature_flag_store.ttypes import (
     FeatureFlagStoreItem as TFeatureFlagStoreItem
@@ -48,6 +48,13 @@ class ThriftRPCFeatureFlagStore(AbstractFeatureFlagStore):
 
     def delete(self, feature_name: str):
         return self._client.Delete(feature_name)
+
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: int = 0,
+    ) -> Iterator[FeatureFlagStoreItem]:
+        return self._client.List(limit, offset)
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
         self._client.SetMeta(feature_name, json.dumps(meta.to_dict()))

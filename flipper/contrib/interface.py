@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Optional
+from typing import Iterator, Optional
 
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 
@@ -28,6 +28,14 @@ class AbstractFeatureFlagStore(metaclass=ABCMeta):
 
     @abstractmethod
     def delete(self, feature_name: str):
+        pass
+
+    @abstractmethod
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: int = 0,
+    ) -> Iterator[FeatureFlagStoreItem]:
         pass
 
     @abstractmethod

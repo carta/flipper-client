@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Iterator, Optional
 
 from .bucketing.base import AbstractBucketer
 from .conditions import Condition
@@ -35,6 +35,14 @@ class FeatureFlagClient:
 
     def disable(self, feature_name: str):
         return self.get(feature_name).disable()
+
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: int = 0,
+    ) -> Iterator[FeatureFlag]:
+        for item in self._store.list(limit=limit, offset=offset):
+            yield self.get(item.feature_name)
 
     def set_client_data(self, feature_name: str, client_data: dict):
         return self.get(feature_name).set_client_data(client_data)

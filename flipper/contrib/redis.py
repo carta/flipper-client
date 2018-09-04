@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Iterator, Optional, List
 
 from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
@@ -58,6 +58,35 @@ class RedisFeatureFlagStore(AbstractFeatureFlagStore):
         )
 
         self._save(item)
+
+    def list(
+        self,
+        limit: Optional[int] = None,
+        offset: int = 0,
+    ) -> Iterator[FeatureFlagStoreItem]:
+        visited = 0
+
+        for feature_name in self._list_keys():
+            visited += 1
+
+            if visited <= offset:
+                continue
+            if limit is not None and visited > limit + offset:
+                return
+
+            yield self.get(feature_name)
+
+
+    def _list_keys(self) -> Iterator[str]:
+        keys = self._redis.scan_iter(match=self._make_scan_wildcard_match())
+        for key in keys:
+            yield self._feature_name(key.decode('utf-8'))
+
+    def _feature_name(self, key_name: str) -> str:
+        return key_name.replace('%s/' % self.base_key, '')
+
+    def _make_scan_wildcard_match(self) -> str:
+        return '%s/*' % self.base_key
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
         existing = self.get(feature_name)
