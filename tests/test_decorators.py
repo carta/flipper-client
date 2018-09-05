@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock 
+from unittest.mock import MagicMock
 from uuid import uuid4
 
 from flipper import decorators, FeatureFlagClient, MemoryFeatureFlagStore
@@ -27,7 +27,7 @@ class TestIsEnabled(BaseTest):
 
         self.flag.enable()
 
-        args = (1, 2, 3, )
+        args = (1, 2, 3)
 
         method(*args)
 
@@ -49,17 +49,13 @@ class TestIsEnabled(BaseTest):
     def test_redirects_when_feature_disabled_and_redirect_supplied(self):
         redirect_to = MagicMock()
 
-        @decorators.is_enabled(
-            self.client,
-            self.feature_name,
-            redirect=redirect_to,
-        )
+        @decorators.is_enabled(self.client, self.feature_name, redirect=redirect_to)
         def method(*args, **kwargs):
             return
 
         self.flag.disable()
 
-        args = (1, 2, 3, )
+        args = (1, 2, 3)
 
         method(*args)
 
@@ -68,11 +64,7 @@ class TestIsEnabled(BaseTest):
     def test_does_not_redirect_when_feature_enabled(self):  # noqa: E501
         redirect_to = MagicMock()
 
-        @decorators.is_enabled(
-            self.client,
-            self.feature_name,
-            redirect=redirect_to,
-        )
+        @decorators.is_enabled(self.client, self.feature_name, redirect=redirect_to)
         def method(*args, **kwargs):
             return
 

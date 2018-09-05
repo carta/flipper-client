@@ -12,13 +12,13 @@ from .flag import FlagDoesNotExistError
 
 
 __all__ = [
-    'CachedFeatureFlagStore',
-    'Condition',
-    'ConsulFeatureFlagStore',
-    'decorators',
-    'FeatureFlagClient',
-    'FlagDoesNotExistError',
-    'MemoryFeatureFlagStore',
-    'RedisFeatureFlagStore',
-    'ThriftRPCFeatureFlagStore',
+    "CachedFeatureFlagStore",
+    "Condition",
+    "ConsulFeatureFlagStore",
+    "decorators",
+    "FeatureFlagClient",
+    "FlagDoesNotExistError",
+    "MemoryFeatureFlagStore",
+    "RedisFeatureFlagStore",
+    "ThriftRPCFeatureFlagStore",
 ]

@@ -1,9 +1,7 @@
 from typing import Any, Dict
 
 from .base import AbstractBucketer
-from .consistent_hash_percentage_bucketer import (
-    ConsistentHashPercentageBucketer,
-)
+from .consistent_hash_percentage_bucketer import ConsistentHashPercentageBucketer
 from .noop_bucketer import NoOpBucketer
 from .percentage_bucketer import PercentageBucketer
 
@@ -21,8 +19,8 @@ class BucketerFactory:
     @classmethod
     def create(cls, fields: Dict[str, Any]) -> AbstractBucketer:
         try:
-            return cls.BUCKETER_MAP[fields['type']].from_dict(fields)
+            return cls.BUCKETER_MAP[fields["type"]].from_dict(fields)
         except KeyError:
             raise cls.InvalidBucketerTypeError(
-                'Bucketer type not supported: %s' % fields['type']
+                "Bucketer type not supported: %s" % fields["type"]
             )

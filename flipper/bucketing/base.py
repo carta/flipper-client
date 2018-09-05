@@ -14,9 +14,9 @@ class AbstractBucketer(metaclass=ABCMeta):
 
     @abstractmethod
     def to_dict(self) -> Dict[str, Any]:
-        return { 'type': self.__class__.get_type() }
+        return {"type": self.__class__.get_type()}
 
     @classmethod
     @abstractmethod
-    def from_dict(cls, fields: Dict[str, Any]) -> 'AbstractBucketer':
+    def from_dict(cls, fields: Dict[str, Any]) -> "AbstractBucketer":
         pass

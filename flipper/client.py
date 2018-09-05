@@ -19,9 +19,7 @@ class FeatureFlagClient:
         is_enabled: Optional[bool] = False,
         client_data: Optional[dict] = None,
     ) -> FeatureFlag:
-        self._store.create(
-            feature_name, is_enabled=is_enabled, client_data=client_data
-        )
+        self._store.create(feature_name, is_enabled=is_enabled, client_data=client_data)
         return self.get(feature_name)
 
     def get(self, feature_name: str) -> FeatureFlag:
@@ -37,9 +35,7 @@ class FeatureFlagClient:
         return self.get(feature_name).disable()
 
     def list(
-        self,
-        limit: Optional[int] = None,
-        offset: int = 0,
+        self, limit: Optional[int] = None, offset: int = 0
     ) -> Iterator[FeatureFlag]:
         for item in self._store.list(limit=limit, offset=offset):
             yield self.get(item.feature_name)

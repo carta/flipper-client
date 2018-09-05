@@ -15,11 +15,11 @@ class AbstractPercentage(metaclass=ABCMeta):
 
     @abstractmethod
     def to_dict(self) -> Dict[str, Any]:
-        return { 'type': self.get_type() }
+        return {"type": self.get_type()}
 
     @classmethod
     @abstractmethod
-    def from_dict(cls, fields: Dict[str, Any]) -> 'AbstractPercentage':
+    def from_dict(cls, fields: Dict[str, Any]) -> "AbstractPercentage":
         pass
 
     def __gt__(self, comparison: float) -> bool:

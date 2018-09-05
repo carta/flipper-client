@@ -8,34 +8,29 @@ from .meta import FeatureFlagStoreMeta
 
 
 class FeatureFlagStoreItem:
-    def __init__(
-        self,
-        feature_name: str,
-        is_enabled: bool,
-        meta: FeatureFlagStoreMeta,
-    ):
+    def __init__(self, feature_name: str, is_enabled: bool, meta: FeatureFlagStoreMeta):
         self.feature_name = feature_name
         self._is_enabled = is_enabled
         self._meta = meta
 
     def to_dict(self):
         return {
-            'feature_name': self.feature_name,
-            'is_enabled': self._is_enabled,
-            'meta': self._meta.to_dict(),
+            "feature_name": self.feature_name,
+            "is_enabled": self._is_enabled,
+            "meta": self._meta.to_dict(),
         }
 
     def serialize(self) -> bytes:
-        return json.dumps(self.to_dict()).encode('utf-8')
+        return json.dumps(self.to_dict()).encode("utf-8")
 
     @classmethod
     def deserialize(cls, serialized: bytes):
-        deserialized = json.loads(serialized.decode('utf-8'))
+        deserialized = json.loads(serialized.decode("utf-8"))
 
         return cls(
-            deserialized['feature_name'],
-            deserialized['is_enabled'],
-            FeatureFlagStoreMeta.from_dict(deserialized['meta']),
+            deserialized["feature_name"],
+            deserialized["is_enabled"],
+            FeatureFlagStoreMeta.from_dict(deserialized["meta"]),
         )
 
     @property

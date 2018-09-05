@@ -8,12 +8,12 @@ from .percentage_bucketer import PercentageBucketer
 
 class ConsistentHashPercentageBucketer(PercentageBucketer):
     def __init__(self, **kwargs):
-        self._key_whitelist = set(kwargs.pop('key_whitelist', []))
+        self._key_whitelist = set(kwargs.pop("key_whitelist", []))
         super().__init__(**kwargs)
 
     @classmethod
     def get_type(cls) -> str:
-        return 'ConsistentHashPercentageBucketer'
+        return "ConsistentHashPercentageBucketer"
 
     def check(self, **checks) -> bool:
         if self._percentage == 0:
@@ -29,7 +29,7 @@ class ConsistentHashPercentageBucketer(PercentageBucketer):
     def _serialize_checks(self, checks: Dict[str, Any]) -> bytes:
         filtered_checks = self._filter_checks(checks)
         sorted_checks = self._sort_checks(filtered_checks)
-        return json.dumps(sorted_checks).encode('utf-8')
+        return json.dumps(sorted_checks).encode("utf-8")
 
     def _filter_checks(self, checks: Dict[str, Any]) -> Dict[str, Any]:
         return {k: v for (k, v) in checks.items() if self._should_check_key(k)}
@@ -48,17 +48,14 @@ class ConsistentHashPercentageBucketer(PercentageBucketer):
     def to_dict(self) -> Dict[str, Any]:
         return {
             **super().to_dict(),
-            'type': ConsistentHashPercentageBucketer.get_type(),
-            'key_whitelist': list(self._key_whitelist),
+            "type": ConsistentHashPercentageBucketer.get_type(),
+            "key_whitelist": list(self._key_whitelist),
         }
 
     @classmethod
-    def from_dict(
-        cls,
-        fields: Dict[str, Any],
-    ) -> 'ConsistentHashPercentageBucketer':
-        key_whitelist = fields.get('key_whitelist', [])
-        percentage_fields = fields.get('percentage')
+    def from_dict(cls, fields: Dict[str, Any]) -> "ConsistentHashPercentageBucketer":
+        key_whitelist = fields.get("key_whitelist", [])
+        percentage_fields = fields.get("percentage")
         percentage = None
         if percentage_fields is not None:
             percentage = PercentageFactory.create(percentage_fields)

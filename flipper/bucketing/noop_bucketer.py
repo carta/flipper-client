@@ -6,7 +6,7 @@ from .base import AbstractBucketer
 class NoOpBucketer(AbstractBucketer):
     @classmethod
     def get_type(cls) -> str:
-        return 'NoOpBucketer'
+        return "NoOpBucketer"
 
     def check(self, **checks) -> bool:
         return True
@@ -15,8 +15,5 @@ class NoOpBucketer(AbstractBucketer):
         return super().to_dict()
 
     @classmethod
-    def from_dict(
-        cls,
-        fields: Dict[str, Any],
-    ) -> 'NoOpBucketer':
+    def from_dict(cls, fields: Dict[str, Any]) -> "NoOpBucketer":
         return cls()

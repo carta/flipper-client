@@ -5,8 +5,8 @@ from .percentage import Percentage
 
 
 __all__ = [
-    'AbstractPercentage',
-    'LinearRampPercentage',
-    'Percentage',
-    'PercentageFactory',
+    "AbstractPercentage",
+    "LinearRampPercentage",
+    "Percentage",
+    "PercentageFactory",
 ]

@@ -36,20 +36,14 @@ class TestCreate(BaseTest):
 
         self.fast.create(feature_name)
 
-        self.assertEqual(
-            self.fast.get(feature_name),
-            self.slow.get(feature_name)
-        )
+        self.assertEqual(self.fast.get(feature_name), self.slow.get(feature_name))
 
     def test_value_in_fast_matches_value_in_slow_when_feature_enabled(self):
         feature_name = self.txt()
 
         self.fast.create(feature_name, is_enabled=True)
 
-        self.assertEqual(
-            self.fast.get(feature_name),
-            self.slow.get(feature_name)
-        )
+        self.assertEqual(self.fast.get(feature_name), self.slow.get(feature_name))
 
 
 class TestGet(BaseTest):
@@ -58,9 +52,7 @@ class TestGet(BaseTest):
 
         self.fast.create(feature_name)
 
-        self.assertTrue(
-            isinstance(self.fast.get(feature_name), FeatureFlagStoreItem)
-        )
+        self.assertTrue(isinstance(self.fast.get(feature_name), FeatureFlagStoreItem))
 
     def test_returns_true_when_value_in_slow_store_is_true(self):
         feature_name = self.txt()
@@ -208,7 +200,7 @@ class TestList(BaseTest):
 
         results = self.fast.list(limit=limit, offset=offset)
 
-        expected = sorted(feature_names)[offset:offset + limit]
+        expected = sorted(feature_names)[offset : offset + limit]
         actual = [item.feature_name for item in results]
 
         self.assertEqual(expected, actual)
@@ -225,8 +217,7 @@ class TestSetMeta(BaseTest):
         self.fast.set_meta(feature_name, meta)
 
         self.assertEqual(
-            meta.created_date,
-            self.fast.get(feature_name).meta['created_date'],
+            meta.created_date, self.fast.get(feature_name).meta["created_date"]
         )
 
     def test_sets_client_data_correctly(self):
@@ -235,15 +226,13 @@ class TestSetMeta(BaseTest):
         self.fast.create(feature_name)
 
         meta = FeatureFlagStoreMeta(
-            int(datetime.now().timestamp()),
-            client_data={ self.txt(): self.txt },
+            int(datetime.now().timestamp()), client_data={self.txt(): self.txt}
         )
 
         self.fast.set_meta(feature_name, meta)
 
         self.assertEqual(
-            meta.client_data,
-            self.fast.get(feature_name).meta['client_data'],
+            meta.client_data, self.fast.get(feature_name).meta["client_data"]
         )
 
     def test_sets_conditions_correctly(self):
@@ -251,15 +240,13 @@ class TestSetMeta(BaseTest):
 
         self.fast.create(feature_name)
 
-        condition = Condition(**{ self.txt(): self.txt() })
+        condition = Condition(**{self.txt(): self.txt()})
         meta = FeatureFlagStoreMeta(
-            int(datetime.now().timestamp()),
-            conditions=[condition],
+            int(datetime.now().timestamp()), conditions=[condition]
         )
 
         self.fast.set_meta(feature_name, meta)
 
         self.assertEqual(
-            condition.to_dict(),
-            self.fast.get(feature_name).meta['conditions'][0],
+            condition.to_dict(), self.fast.get(feature_name).meta["conditions"][0]
         )

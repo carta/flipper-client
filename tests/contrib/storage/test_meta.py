@@ -19,51 +19,39 @@ class BaseTest(unittest.TestCase):
 class TestToDict(BaseTest):
     def test_includes_correct_created_date(self):
         meta = FeatureFlagStoreMeta(self.now, {})
-        self.assertEqual(self.now, meta.to_dict()['created_date'])
+        self.assertEqual(self.now, meta.to_dict()["created_date"])
 
     def test_includes_correct_client_data(self):
-        client_data = {
-            'foo': 99,
-            'bar': 'ajds'
-        }
+        client_data = {"foo": 99, "bar": "ajds"}
         meta = FeatureFlagStoreMeta(self.now, client_data)
-        self.assertEqual(client_data, meta.to_dict()['client_data'])
+        self.assertEqual(client_data, meta.to_dict()["client_data"])
 
     def test_includes_correct_conditions(self):
-        conditions = [Condition(foo=1), Condition(bar='baz')]
+        conditions = [Condition(foo=1), Condition(bar="baz")]
         meta = FeatureFlagStoreMeta(self.now, conditions=conditions)
         serialized_conditions = [c.to_dict() for c in conditions]
-        self.assertEqual(serialized_conditions, meta.to_dict()['conditions'])
+        self.assertEqual(serialized_conditions, meta.to_dict()["conditions"])
 
     def test_includes_currect_bucketer(self):
         bucketer = PercentageBucketer(percentage=Percentage(0.3))
         meta = FeatureFlagStoreMeta(self.now, bucketer=bucketer)
-        self.assertEqual(bucketer.to_dict(), meta.to_dict()['bucketer'])
+        self.assertEqual(bucketer.to_dict(), meta.to_dict()["bucketer"])
 
 
 class TestFromDict(BaseTest):
     def test_will_not_crash_if_client_data_not_present(self):
-        json = {
-            'created_date': self.now,
-            'conditions': [],
-        }
+        json = {"created_date": self.now, "conditions": []}
         meta = FeatureFlagStoreMeta.from_dict(json)
         self.assertEqual({}, meta.client_data)
 
     def test_will_not_crash_if_conditions_not_present(self):
-        json = {
-            'created_date': self.now,
-            'client_data': {},
-        }
+        json = {"created_date": self.now, "client_data": {}}
         meta = FeatureFlagStoreMeta.from_dict(json)
         self.assertEqual([], meta.conditions)
 
     def test_can_create_with_bucketer(self):
         bucketer = PercentageBucketer(percentage=Percentage(0.3))
-        json = {
-            'created_date': self.now,
-            'bucketer': bucketer.to_dict(),
-        }
+        json = {"created_date": self.now, "bucketer": bucketer.to_dict()}
         meta = FeatureFlagStoreMeta.from_dict(json)
         print(meta.bucketer._percentage)
         self.assertEqual(bucketer.to_dict(), meta.bucketer.to_dict())
@@ -77,21 +65,18 @@ class TestUpdate(BaseTest):
         self.assertEqual(later, meta.created_date)
 
     def test_updates_client_data(self):
-        updated_client_data = { self.txt(): self.txt() }
+        updated_client_data = {self.txt(): self.txt()}
         meta = FeatureFlagStoreMeta(self.now, {})
         meta.update(client_data=updated_client_data)
         self.assertEqual(updated_client_data, meta.client_data)
 
     def test_merges_old_and_new_client_data(self):
-        original_client_data = { 'a': 1, 'b': 2 }
-        updated_client_data = { 'b': 3 }
+        original_client_data = {"a": 1, "b": 2}
+        updated_client_data = {"b": 3}
         meta = FeatureFlagStoreMeta(self.now, original_client_data)
         meta.update(client_data=updated_client_data)
         self.assertEqual(
-            {
-                'a': original_client_data['a'],
-                'b': updated_client_data['b'],
-            },
+            {"a": original_client_data["a"], "b": updated_client_data["b"]},
             meta.client_data,
         )
 
@@ -102,7 +87,7 @@ class TestUpdate(BaseTest):
         self.assertEqual({}, meta.client_data)
 
     def test_updating_client_data_does_not_affect_created_date(self):
-        updated_client_data = { self.txt(): self.txt() }
+        updated_client_data = {self.txt(): self.txt()}
         meta = FeatureFlagStoreMeta(self.now, {})
         meta.update(client_data=updated_client_data)
         self.assertEqual(self.now, meta.created_date)

@@ -18,14 +18,13 @@ class BaseTest(unittest.TestCase):
         class FakeThriftClient:
             Create = MagicMock()
             Delete = MagicMock()
-            Get = MagicMock(return_value=TFeatureFlagStoreItem(
-                feature_name=self.txt(),
-                is_enabled=False,
-                meta=TFeatureFlagStoreMeta(
-                    created_date=now(),
-                    client_data='{}',
-                ),
-            ))
+            Get = MagicMock(
+                return_value=TFeatureFlagStoreItem(
+                    feature_name=self.txt(),
+                    is_enabled=False,
+                    meta=TFeatureFlagStoreMeta(created_date=now(), client_data="{}"),
+                )
+            )
             Set = MagicMock()
             SetMeta = MagicMock()
 
@@ -46,14 +45,14 @@ class TestCreate(BaseTest):
     def test_value_is_true_when_created_with_is_enabled_true(self):
         feature_name = self.txt()
 
-        self.configure_mock(self.client.Get, TFeatureFlagStoreItem(
-            feature_name=feature_name,
-            is_enabled=True,
-            meta=TFeatureFlagStoreMeta(
-                created_date=now(),
-                client_data='{}',
+        self.configure_mock(
+            self.client.Get,
+            TFeatureFlagStoreItem(
+                feature_name=feature_name,
+                is_enabled=True,
+                meta=TFeatureFlagStoreMeta(created_date=now(), client_data="{}"),
             ),
-        ))
+        )
 
         self.store.create(feature_name, is_enabled=True)
 
@@ -101,7 +100,6 @@ class TestSet(BaseTest):
         self.client.Set.assert_called_once_with(feature_name, True)
 
 
-
 class TestDelete(BaseTest):
     def test_calls_rpc_client_with_correct_args(self):
         feature_name = self.txt()
@@ -115,7 +113,7 @@ class TestDelete(BaseTest):
 class TestSetMeta(BaseTest):
     def test_calls_rpc_client_with_correct_args(self):
         feature_name = self.txt()
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
         created_date = self.date()
 
         meta = FeatureFlagStoreMeta(created_date, client_data)
@@ -125,4 +123,3 @@ class TestSetMeta(BaseTest):
         self.client.SetMeta.assert_called_once_with(
             feature_name, json.dumps(meta.to_dict())
         )
-

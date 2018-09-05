@@ -1,9 +1,7 @@
 import unittest
 from uuid import uuid4
 
-from flipper.conditions.operators.set_membership_operator import (
-    SetMembershipOperator,
-)
+from flipper.conditions.operators.set_membership_operator import SetMembershipOperator
 
 
 class TestCompare(unittest.TestCase):

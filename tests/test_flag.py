@@ -185,7 +185,7 @@ class TestSetClientData(BaseTest):
     def test_calls_backend_with_correct_feature_name(self):
         self.store.set_meta = MagicMock()
 
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.store.create(self.name)
         self.flag.set_client_data(client_data)
@@ -197,7 +197,7 @@ class TestSetClientData(BaseTest):
     def test_calls_backend_with_instance_of_meta(self):
         self.store.set_meta = MagicMock()
 
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.store.create(self.name)
         self.flag.set_client_data(client_data)
@@ -209,7 +209,7 @@ class TestSetClientData(BaseTest):
     def test_calls_backend_with_correct_meta_client_data(self):
         self.store.set_meta = MagicMock()
 
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.store.create(self.name)
         self.flag.set_client_data(client_data)
@@ -221,7 +221,7 @@ class TestSetClientData(BaseTest):
     def test_calls_backend_with_non_null_meta_created_date(self):
         self.store.set_meta = MagicMock()
 
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.store.create(self.name)
         self.flag.set_client_data(client_data)
@@ -233,7 +233,7 @@ class TestSetClientData(BaseTest):
     def test_calls_backend_exactly_once(self):
         self.store.set_meta = MagicMock()
 
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.store.create(self.name)
         self.flag.set_client_data(client_data)
@@ -241,37 +241,31 @@ class TestSetClientData(BaseTest):
         self.assertEqual(1, self.store.set_meta.call_count)
 
     def test_merges_new_values_with_existing(self):
-        existing_data = { 'existing_key': self.txt() }
+        existing_data = {"existing_key": self.txt()}
 
         self.store.create(self.name, client_data=existing_data)
 
-        new_data = { 'new_key': self.txt() }
+        new_data = {"new_key": self.txt()}
         self.flag.set_client_data(new_data)
 
         item = self.store.get(self.name)
 
-        self.assertEqual({
-            **existing_data,
-            **new_data,
-        }, item.meta['client_data'])
+        self.assertEqual({**existing_data, **new_data}, item.meta["client_data"])
 
     def test_can_override_existing_values(self):
-        existing_data = { 'existing_key': self.txt() }
+        existing_data = {"existing_key": self.txt()}
 
         self.store.create(self.name, client_data=existing_data)
 
-        new_data = {
-            'existing_key': self.txt(),
-            'new_key': self.txt(),
-        }
+        new_data = {"existing_key": self.txt(), "new_key": self.txt()}
         self.flag.set_client_data(new_data)
 
         item = self.store.get(self.name)
 
-        self.assertEqual(new_data, item.meta['client_data'])
+        self.assertEqual(new_data, item.meta["client_data"])
 
     def test_raises_for_nonexistent_flag(self):
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         with self.assertRaises(FlagDoesNotExistError):
             self.flag.set_client_data(client_data)
@@ -279,7 +273,7 @@ class TestSetClientData(BaseTest):
 
 class TestGetClientData(BaseTest):
     def test_gets_expected_key_value_pairs(self):
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.store.create(self.name, client_data=client_data)
 
@@ -294,22 +288,22 @@ class TestGetClientData(BaseTest):
 
 class TestGetMeta(BaseTest):
     def test_includes_created_date(self):
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.store.create(self.name, client_data=client_data)
 
         meta = self.flag.get_meta()
 
-        self.assertTrue('created_date' in meta)
+        self.assertTrue("created_date" in meta)
 
     def test_includes_client_data(self):
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.store.create(self.name, client_data=client_data)
 
         meta = self.flag.get_meta()
 
-        self.assertEqual(client_data, meta['client_data'])
+        self.assertEqual(client_data, meta["client_data"])
 
     def test_raises_for_nonexistent_flag(self):
         with self.assertRaises(FlagDoesNotExistError):
@@ -318,7 +312,7 @@ class TestGetMeta(BaseTest):
 
 class TestAddCondition(BaseTest):
     def test_condition_gets_included_in_meta(self):
-        condition_checks = { self.txt(): True }
+        condition_checks = {self.txt(): True}
         condition = Condition(**condition_checks)
 
         self.store.create(self.name)
@@ -326,10 +320,10 @@ class TestAddCondition(BaseTest):
 
         meta = self.flag.get_meta()
 
-        self.assertTrue(condition.to_dict() in meta['conditions'])
+        self.assertTrue(condition.to_dict() in meta["conditions"])
 
     def test_condition_gets_appended_to_meta(self):
-        condition_checks = { self.txt(): True }
+        condition_checks = {self.txt(): True}
         condition = Condition(**condition_checks)
 
         self.store.create(self.name)
@@ -338,7 +332,7 @@ class TestAddCondition(BaseTest):
 
         meta = self.flag.get_meta()
 
-        self.assertEqual(2, len(meta['conditions']))
+        self.assertEqual(2, len(meta["conditions"]))
 
 
 class TestSetBucketer(BaseTest):
@@ -351,4 +345,4 @@ class TestSetBucketer(BaseTest):
 
         meta = self.flag.get_meta()
 
-        self.assertEqual(bucketer.to_dict(), meta['bucketer'])
+        self.assertEqual(bucketer.to_dict(), meta["bucketer"])

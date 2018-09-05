@@ -12,11 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
-    def __init__(
-        self,
-        consul,
-        base_key='features'
-    ):
+    def __init__(self, consul, base_key="features"):
         self._cache = {}
         self._consul = consul
         self.base_key = base_key
@@ -24,7 +20,7 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
         self._start()
 
     def _start(self):
-        logger.debug('Spawning a thread to track changes in consul')
+        logger.debug("Spawning a thread to track changes in consul")
 
         self._thread = threading.Thread(target=self._watch)
         self._thread.daemon = True
@@ -40,14 +36,14 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
         if data is None:
             return
         for item in data:
-            serialized = item['Value']
+            serialized = item["Value"]
 
             deserialized = None
 
             if serialized is not None:
                 deserialized = FeatureFlagStoreItem.deserialize(serialized)
 
-            self._set_item_in_cache(item['Key'], deserialized)
+            self._set_item_in_cache(item["Key"], deserialized)
 
     def _set_item_in_cache(self, key: str, item: FeatureFlagStoreItem):
         self._cache[key] = item
@@ -59,17 +55,12 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
         client_data: Optional[dict] = None,
     ) -> FeatureFlagStoreItem:
         item = FeatureFlagStoreItem(
-            feature_name,
-            is_enabled,
-            FeatureFlagStoreMeta(now(), client_data),
+            feature_name, is_enabled, FeatureFlagStoreMeta(now(), client_data)
         )
         return self._save(item)
 
     def _save(self, item: FeatureFlagStoreItem) -> FeatureFlagStoreItem:
-        self._consul.kv.put(
-            self._make_key(item.feature_name),
-            item.serialize(),
-        )
+        self._consul.kv.put(self._make_key(item.feature_name), item.serialize())
 
         self._set_item_in_cache(item.feature_name, item)
 
@@ -79,13 +70,9 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
         return self._cache.get(self._make_key(feature_name))
 
     def _make_key(self, feature_name: str) -> str:
-        return '/'.join([self.base_key, feature_name])
+        return "/".join([self.base_key, feature_name])
 
-    def set(
-        self,
-        feature_name: str,
-        is_enabled: bool,
-    ):
+    def set(self, feature_name: str, is_enabled: bool):
         existing = self.get(feature_name)
 
         if existing is None:
@@ -93,9 +80,7 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
             return
 
         item = FeatureFlagStoreItem(
-            feature_name,
-            is_enabled,
-            FeatureFlagStoreMeta.from_dict(existing.meta),
+            feature_name, is_enabled, FeatureFlagStoreMeta.from_dict(existing.meta)
         )
 
         self._save(item)
@@ -104,9 +89,7 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
         self._consul.kv.delete(self._make_key(feature_name))
 
     def list(
-        self,
-        limit: Optional[int] = None,
-        offset: int = 0,
+        self, limit: Optional[int] = None, offset: int = 0
     ) -> Iterator[FeatureFlagStoreItem]:
         feature_names = sorted(self._cache.keys())[offset:]
 
@@ -120,12 +103,10 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
         existing = self.get(feature_name)
 
         if existing is None:
-            raise FlagDoesNotExistError('Feature %s does not exist' % feature_name)  # noqa: E501
+            raise FlagDoesNotExistError(
+                "Feature %s does not exist" % feature_name
+            )  # noqa: E501
 
-        item = FeatureFlagStoreItem(
-            feature_name,
-            existing.raw_is_enabled,
-            meta,
-        )
+        item = FeatureFlagStoreItem(feature_name, existing.raw_is_enabled, meta)
 
         self._save(item)

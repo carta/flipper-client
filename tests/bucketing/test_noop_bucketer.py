@@ -7,7 +7,7 @@ from flipper.bucketing import Percentage, NoOpBucketer
 class TestGetType(unittest.TestCase):
     def test_is_correct_value(self):
         bucketer = NoOpBucketer()
-        self.assertEqual('NoOpBucketer', bucketer.get_type())
+        self.assertEqual("NoOpBucketer", bucketer.get_type())
 
 
 class TestCheck(unittest.TestCase):
@@ -23,16 +23,12 @@ class TestCheck(unittest.TestCase):
 class TestToDict(unittest.TestCase):
     def test_returns_correct_data(self):
         bucketer = NoOpBucketer()
-        expected = {
-            'type': NoOpBucketer.get_type(),
-        }
+        expected = {"type": NoOpBucketer.get_type()}
         self.assertEqual(expected, bucketer.to_dict())
 
 
 class TestFromDict(unittest.TestCase):
     def test_sets_correct_data(self):
-        data = {
-            'type': NoOpBucketer.get_type(),
-        }
+        data = {"type": NoOpBucketer.get_type()}
         bucketer = NoOpBucketer.from_dict(data)
         self.assertEqual(data, bucketer.to_dict())

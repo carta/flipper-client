@@ -17,9 +17,7 @@ class MemoryFeatureFlagStore(AbstractFeatureFlagStore):
         client_data: Optional[dict] = None,
     ) -> FeatureFlagStoreItem:
         item = FeatureFlagStoreItem(
-            feature_name,
-            is_enabled,
-            FeatureFlagStoreMeta(now(), client_data),
+            feature_name, is_enabled, FeatureFlagStoreMeta(now(), client_data)
         )
         return self._save(item)
 
@@ -30,11 +28,7 @@ class MemoryFeatureFlagStore(AbstractFeatureFlagStore):
     def get(self, feature_name: str) -> FeatureFlagStoreItem:
         return self._memory.get(feature_name)
 
-    def set(
-        self,
-        feature_name: str,
-        is_enabled: bool,
-    ):
+    def set(self, feature_name: str, is_enabled: bool):
         existing = self.get(feature_name)
 
         if existing is None:
@@ -42,9 +36,7 @@ class MemoryFeatureFlagStore(AbstractFeatureFlagStore):
             return
 
         item = FeatureFlagStoreItem(
-            feature_name,
-            is_enabled,
-            FeatureFlagStoreMeta.from_dict(existing.meta),
+            feature_name, is_enabled, FeatureFlagStoreMeta.from_dict(existing.meta)
         )
         self._save(item)
 
@@ -53,9 +45,7 @@ class MemoryFeatureFlagStore(AbstractFeatureFlagStore):
             del self._memory[feature_name]
 
     def list(
-        self,
-        limit: Optional[int] = None,
-        offset: int = 0,
+        self, limit: Optional[int] = None, offset: int = 0
     ) -> Iterator[FeatureFlagStoreItem]:
         feature_names = sorted(self._memory.keys())[offset:]
 
@@ -69,12 +59,10 @@ class MemoryFeatureFlagStore(AbstractFeatureFlagStore):
         existing = self.get(feature_name)
 
         if existing is None:
-            raise FlagDoesNotExistError('Feature %s does not exist' % feature_name)  # noqa: E501
+            raise FlagDoesNotExistError(
+                "Feature %s does not exist" % feature_name
+            )  # noqa: E501
 
-        item = FeatureFlagStoreItem(
-            feature_name,
-            existing.raw_is_enabled,
-            meta,
-        )
+        item = FeatureFlagStoreItem(feature_name, existing.raw_is_enabled, meta)
 
         self._save(item)

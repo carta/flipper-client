@@ -48,7 +48,7 @@ class TestCreate(BaseTest):
 
         self.store.create(feature_name, is_enabled=True)
 
-        key = '/'.join([self.store.base_key, feature_name])
+        key = "/".join([self.store.base_key, feature_name])
 
         self.assertTrue(
             FeatureFlagStoreItem.deserialize(self.redis.get(key)).is_enabled()
@@ -59,7 +59,7 @@ class TestCreate(BaseTest):
 
         self.store.create(feature_name, is_enabled=False)
 
-        key = '/'.join([self.store.base_key, feature_name])
+        key = "/".join([self.store.base_key, feature_name])
 
         self.assertFalse(
             FeatureFlagStoreItem.deserialize(self.redis.get(key)).is_enabled()
@@ -70,7 +70,7 @@ class TestCreate(BaseTest):
 
         self.store.create(feature_name)
 
-        key = '/'.join([self.store.base_key, feature_name])
+        key = "/".join([self.store.base_key, feature_name])
 
         self.assertFalse(
             FeatureFlagStoreItem.deserialize(self.redis.get(key)).is_enabled()
@@ -106,7 +106,7 @@ class TestSet(BaseTest):
         self.store.create(feature_name)
         self.store.set(feature_name, True)
 
-        key = '/'.join([self.store.base_key, feature_name])
+        key = "/".join([self.store.base_key, feature_name])
 
         self.assertTrue(
             FeatureFlagStoreItem.deserialize(self.redis.get(key)).is_enabled()
@@ -118,7 +118,7 @@ class TestSet(BaseTest):
         self.store.create(feature_name)
         self.store.set(feature_name, False)
 
-        key = '/'.join([self.store.base_key, feature_name])
+        key = "/".join([self.store.base_key, feature_name])
 
         self.assertFalse(
             FeatureFlagStoreItem.deserialize(self.redis.get(key)).is_enabled()
@@ -156,7 +156,7 @@ class TestDelete(BaseTest):
         self.store.create(feature_name)
         self.store.delete(feature_name)
 
-        key = '/'.join([self.store.base_key, feature_name])
+        key = "/".join([self.store.base_key, feature_name])
 
         self.assertIsNone(self.redis.get(key))
 
@@ -230,7 +230,7 @@ class TestSetMeta(BaseTest):
         feature_name = self.txt()
         self.store.create(feature_name)
 
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
         created_date = self.date()
         meta = FeatureFlagStoreMeta(self.date(), client_data)
 
@@ -238,13 +238,13 @@ class TestSetMeta(BaseTest):
 
         item = self.store.get(feature_name)
 
-        self.assertEqual(client_data, item.meta['client_data'])
+        self.assertEqual(client_data, item.meta["client_data"])
 
     def test_sets_created_date_correctly(self):
         feature_name = self.txt()
         self.store.create(feature_name)
 
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
         created_date = self.date()
         meta = FeatureFlagStoreMeta(self.date(), client_data)
 
@@ -252,9 +252,9 @@ class TestSetMeta(BaseTest):
 
         item = self.store.get(feature_name)
 
-        self.assertEqual(created_date, item.meta['created_date'])
+        self.assertEqual(created_date, item.meta["created_date"])
 
     def test_raises_exception_for_nonexistent_flag(self):
         feature_name = self.txt()
         with self.assertRaises(FlagDoesNotExistError):
-            self.store.set_meta(feature_name, { 'a': self.txt() })
+            self.store.set_meta(feature_name, {"a": self.txt()})

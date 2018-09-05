@@ -6,12 +6,12 @@ from .percentage import AbstractPercentage, Percentage, PercentageFactory
 
 
 class PercentageBucketer(AbstractBucketer):
-    def __init__(self, percentage: AbstractPercentage=None):
+    def __init__(self, percentage: AbstractPercentage = None):
         self._percentage = percentage or Percentage()
 
     @classmethod
     def get_type(cls) -> str:
-        return 'PercentageBucketer'
+        return "PercentageBucketer"
 
     @property
     def percentage(self):
@@ -23,18 +23,12 @@ class PercentageBucketer(AbstractBucketer):
         return randomizer() <= self._percentage
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
-            **super().to_dict(),
-            'percentage': self._percentage.to_dict(),
-        }
+        return {**super().to_dict(), "percentage": self._percentage.to_dict()}
 
     @classmethod
-    def from_dict(
-        cls,
-        fields: Dict[str, Any],
-    ) -> 'PercentageBucketer':
+    def from_dict(cls, fields: Dict[str, Any]) -> "PercentageBucketer":
         percentage = None
-        percentage_fields = fields.get('percentage')
+        percentage_fields = fields.get("percentage")
         if percentage_fields is not None:
             percentage = PercentageFactory.create(percentage_fields)
         return cls(percentage=percentage)

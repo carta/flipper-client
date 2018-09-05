@@ -19,11 +19,7 @@ class AbstractFeatureFlagStore(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def set(
-        self,
-        feature_name: str,
-        is_enabled: bool,
-    ):
+    def set(self, feature_name: str, is_enabled: bool):
         pass
 
     @abstractmethod
@@ -32,9 +28,7 @@ class AbstractFeatureFlagStore(metaclass=ABCMeta):
 
     @abstractmethod
     def list(
-        self,
-        limit: Optional[int] = None,
-        offset: int = 0,
+        self, limit: Optional[int] = None, offset: int = 0
     ) -> Iterator[FeatureFlagStoreItem]:
         pass
 

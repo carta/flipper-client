@@ -6,9 +6,9 @@ from .thrift import ThriftRPCFeatureFlagStore
 
 
 __all__ = [
-    'CachedFeatureFlagStore',
-    'ConsulFeatureFlagStore',
-    'MemoryFeatureFlagStore',
-    'RedisFeatureFlagStore',
-    'ThriftRPCFeatureFlagStore',
+    "CachedFeatureFlagStore",
+    "ConsulFeatureFlagStore",
+    "MemoryFeatureFlagStore",
+    "RedisFeatureFlagStore",
+    "ThriftRPCFeatureFlagStore",
 ]

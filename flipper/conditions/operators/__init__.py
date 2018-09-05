@@ -1,4 +1,4 @@
 from .operator import Operator
 
 
-__all__ = ['Operator']
+__all__ = ["Operator"]

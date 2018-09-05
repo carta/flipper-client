@@ -4,9 +4,7 @@ from .client import FeatureFlagClient
 
 
 def is_enabled(
-    flags: FeatureFlagClient,
-    feature_name: str,
-    redirect: Optional[Callable]=None
+    flags: FeatureFlagClient, feature_name: str, redirect: Optional[Callable] = None
 ):
     def decorator(fn):
         def wrapper(*args, **kwargs):
@@ -15,5 +13,7 @@ def is_enabled(
             if redirect is None:
                 return
             return redirect(*args, **kwargs)
+
         return wrapper
+
     return decorator

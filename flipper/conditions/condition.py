@@ -32,16 +32,16 @@ class Condition:
         }
 
     @classmethod
-    def from_dict(cls, conditions: Dict[str, Any]) -> 'Condition':
+    def from_dict(cls, conditions: Dict[str, Any]) -> "Condition":
         constructor_kwargs = {}
 
         for _, checks in conditions.items():
             for check in checks:
                 check_key = cls._make_key_for_check(check)
-                constructor_kwargs[check_key] = check['value']
+                constructor_kwargs[check_key] = check["value"]
 
         return cls(**constructor_kwargs)
 
     @classmethod
     def _make_key_for_check(cls, check: Dict[str, Any]) -> str:
-        return Check.make_check_key(check['variable'], check['operator'])
+        return Check.make_check_key(check["variable"], check["operator"])

@@ -21,27 +21,27 @@ class TestToDict(BaseTest):
         name = self.txt()
         meta = FeatureFlagStoreMeta(self.now, {})
         item = FeatureFlagStoreItem(name, True, meta)
-        self.assertEqual(name, item.to_dict()['feature_name'])
+        self.assertEqual(name, item.to_dict()["feature_name"])
 
     def test_includes_correct_is_enabled_when_true(self):
         is_enabled = True
         item = FeatureFlagStoreItem(
             self.txt(), is_enabled, FeatureFlagStoreMeta(self.now, {})
         )
-        self.assertEqual(is_enabled, item.to_dict()['is_enabled'])
+        self.assertEqual(is_enabled, item.to_dict()["is_enabled"])
 
     def test_includes_correct_is_enabled_when_true(self):
         is_enabled = False
         item = FeatureFlagStoreItem(
             self.txt(), is_enabled, FeatureFlagStoreMeta(self.now, {})
         )
-        self.assertEqual(is_enabled, item.to_dict()['is_enabled'])
+        self.assertEqual(is_enabled, item.to_dict()["is_enabled"])
 
     def test_includes_correct_meta(self):
-        client_data = { 'foo': 'bar' }
+        client_data = {"foo": "bar"}
         meta = FeatureFlagStoreMeta(self.now, client_data)
         item = FeatureFlagStoreItem(self.txt(), True, meta)
-        self.assertEqual(meta.to_dict(), item.to_dict()['meta'])
+        self.assertEqual(meta.to_dict(), item.to_dict()["meta"])
 
 
 class TestSerialize(BaseTest):
@@ -50,17 +50,14 @@ class TestSerialize(BaseTest):
         is_enabled = True
         meta = FeatureFlagStoreMeta(self.now, {})
         item = FeatureFlagStoreItem(name, is_enabled, meta)
-        self.assertTrue(isinstance(item.serialize().decode('utf-8'), str))
+        self.assertTrue(isinstance(item.serialize().decode("utf-8"), str))
 
     def test_contains_all_fields_from_json(self):
         name = self.txt()
         is_enabled = True
         meta = FeatureFlagStoreMeta(self.now, {})
         item = FeatureFlagStoreItem(name, is_enabled, meta)
-        self.assertEqual(
-            json.dumps(item.to_dict()),
-            item.serialize().decode('utf-8')
-        )
+        self.assertEqual(json.dumps(item.to_dict()), item.serialize().decode("utf-8"))
 
 
 class TestDeserialize(BaseTest):
@@ -80,7 +77,7 @@ class TestDeserialize(BaseTest):
         item = FeatureFlagStoreItem(name, is_enabled, meta)
         serialized = item.serialize()
         deserialized = FeatureFlagStoreItem.deserialize(serialized)
-        self.assertEqual(name, deserialized.to_dict()['feature_name'])
+        self.assertEqual(name, deserialized.to_dict()["feature_name"])
 
     def test_sets_correct_is_enabled(self):
         name = self.txt()
@@ -94,14 +91,12 @@ class TestDeserialize(BaseTest):
     def test_sets_correct_client_data(self):
         name = self.txt()
         is_enabled = True
-        client_data = { 'foo': 'bar' }
+        client_data = {"foo": "bar"}
         meta = FeatureFlagStoreMeta(self.now, client_data)
         item = FeatureFlagStoreItem(name, is_enabled, meta)
         serialized = item.serialize()
         deserialized = FeatureFlagStoreItem.deserialize(serialized)
-        self.assertEqual(
-            client_data, deserialized.to_dict()['meta']['client_data']
-        )
+        self.assertEqual(client_data, deserialized.to_dict()["meta"]["client_data"])
 
 
 class TestIsEnabled(BaseTest):
@@ -151,58 +146,50 @@ class TestIsEnabled(BaseTest):
         item = FeatureFlagStoreItem(self.txt(), True, meta)
         self.assertTrue(item.is_enabled())
 
-    def test_returns_false_when_bucketer_returns_false_and_conditions_not_specified(self):  # noqa: E501
+    def test_returns_false_when_bucketer_returns_false_and_conditions_not_specified(
+        self
+    ):  # noqa: E501
         # flag.is_enabled(user_id=2) # False
         bucketer = MagicMock()
         bucketer.check.return_value = False
         condition = Condition(is_admin=True)
 
-        meta = FeatureFlagStoreMeta(
-            self.now,
-            bucketer=bucketer,
-            conditions=[condition],
-        )
+        meta = FeatureFlagStoreMeta(self.now, bucketer=bucketer, conditions=[condition])
         item = FeatureFlagStoreItem(self.txt(), True, meta)
         self.assertFalse(item.is_enabled())
 
-    def test_returns_true_when_bucketer_returns_false_and_conditions_return_true(self):  # noqa: E501
+    def test_returns_true_when_bucketer_returns_false_and_conditions_return_true(
+        self
+    ):  # noqa: E501
         # flag.is_enabled(user_id=2, is_admin=True) # True
         bucketer = MagicMock()
         bucketer.check.return_value = False
         condition = Condition(is_admin=True)
 
-        meta = FeatureFlagStoreMeta(
-            self.now,
-            bucketer=bucketer,
-            conditions=[condition],
-        )
+        meta = FeatureFlagStoreMeta(self.now, bucketer=bucketer, conditions=[condition])
         item = FeatureFlagStoreItem(self.txt(), True, meta)
         self.assertTrue(item.is_enabled(is_admin=True))
 
-    def test_returns_true_when_bucketer_returns_true_and_conditions_not_specified(self):  # noqa: E501
+    def test_returns_true_when_bucketer_returns_true_and_conditions_not_specified(
+        self
+    ):  # noqa: E501
         # flag.is_enabled(user_id=1) # True
         bucketer = MagicMock()
         bucketer.check.return_value = True
         condition = Condition(is_admin=True)
 
-        meta = FeatureFlagStoreMeta(
-            self.now,
-            bucketer=bucketer,
-            conditions=[condition],
-        )
+        meta = FeatureFlagStoreMeta(self.now, bucketer=bucketer, conditions=[condition])
         item = FeatureFlagStoreItem(self.txt(), True, meta)
         self.assertTrue(item.is_enabled())
 
-    def test_returns_false_when_bucketer_returns_true_and_conditions_return_false(self):  # noqa: E501
+    def test_returns_false_when_bucketer_returns_true_and_conditions_return_false(
+        self
+    ):  # noqa: E501
         # flag.is_enabled(user_id=1, is_admin=False) # False
         bucketer = MagicMock()
         bucketer.check.return_value = True
         condition = Condition(is_admin=True)
 
-        meta = FeatureFlagStoreMeta(
-            self.now,
-            bucketer=bucketer,
-            conditions=[condition],
-        )
+        meta = FeatureFlagStoreMeta(self.now, bucketer=bucketer, conditions=[condition])
         item = FeatureFlagStoreItem(self.txt(), True, meta)
         self.assertFalse(item.is_enabled(is_admin=False))

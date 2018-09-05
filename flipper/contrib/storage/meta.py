@@ -21,35 +21,33 @@ class FeatureFlagStoreMeta:
 
     def to_dict(self):
         return {
-            'client_data': self.client_data,
-            'created_date': self.created_date,
-            'conditions': [
-                condition.to_dict() for condition in self.conditions
-            ],
-            'bucketer': self.bucketer.to_dict(),
+            "client_data": self.client_data,
+            "created_date": self.created_date,
+            "conditions": [condition.to_dict() for condition in self.conditions],
+            "bucketer": self.bucketer.to_dict(),
         }
 
     @classmethod
     def from_dict(cls, fields: dict):
         kwargs = {
-            'client_data': fields.get('client_data', []),
-            'conditions': [
+            "client_data": fields.get("client_data", []),
+            "conditions": [
                 Condition.from_dict(condition)
-                for condition in fields.get('conditions', [])
+                for condition in fields.get("conditions", [])
             ],
         }
 
-        bucketer_fields = fields.get('bucketer')
+        bucketer_fields = fields.get("bucketer")
         if bucketer_fields is not None:
-            kwargs['bucketer'] = BucketerFactory.create(bucketer_fields)
+            kwargs["bucketer"] = BucketerFactory.create(bucketer_fields)
 
-        return cls(fields['created_date'], **kwargs)
+        return cls(fields["created_date"], **kwargs)
 
     def update(
         self,
-        created_date: Optional[int]=None,
-        client_data: Optional[dict]=None,
-        conditions: Optional[List[Condition]]=None,
+        created_date: Optional[int] = None,
+        client_data: Optional[dict] = None,
+        conditions: Optional[List[Condition]] = None,
         bucketer: Optional[AbstractBucketer] = None,
     ):
         if created_date is not None:

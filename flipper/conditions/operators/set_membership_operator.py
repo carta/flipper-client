@@ -4,7 +4,7 @@ from .interface import AbstractOperator
 
 
 class SetMembershipOperator(AbstractOperator):
-    SYMBOL = 'in'
+    SYMBOL = "in"
 
     def compare(self, expected: Iterable, actual: Any) -> bool:
         return expected in actual

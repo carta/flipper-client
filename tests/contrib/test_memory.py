@@ -54,9 +54,7 @@ class TestGet(BaseTest):
 
         self.store.create(feature_name)
 
-        self.assertTrue(
-            isinstance(self.store.get(feature_name), FeatureFlagStoreItem)
-        )
+        self.assertTrue(isinstance(self.store.get(feature_name), FeatureFlagStoreItem))
 
 
 class TestSet(BaseTest):
@@ -153,7 +151,7 @@ class TestList(BaseTest):
 
         results = self.store.list(limit=limit, offset=offset)
 
-        expected = sorted(feature_names)[offset:offset + limit]
+        expected = sorted(feature_names)[offset : offset + limit]
         actual = [item.feature_name for item in results]
 
         self.assertEqual(expected, actual)
@@ -164,7 +162,7 @@ class TestSetMeta(BaseTest):
         feature_name = self.txt()
         self.store.create(feature_name)
 
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
         created_date = self.date()
         meta = FeatureFlagStoreMeta(self.date(), client_data)
 
@@ -172,13 +170,13 @@ class TestSetMeta(BaseTest):
 
         item = self.store.get(feature_name)
 
-        self.assertEqual(client_data, item.meta['client_data'])
+        self.assertEqual(client_data, item.meta["client_data"])
 
     def test_sets_created_date_correctly(self):
         feature_name = self.txt()
         self.store.create(feature_name)
 
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
         created_date = self.date()
         meta = FeatureFlagStoreMeta(self.date(), client_data)
 
@@ -186,9 +184,9 @@ class TestSetMeta(BaseTest):
 
         item = self.store.get(feature_name)
 
-        self.assertEqual(created_date, item.meta['created_date'])
+        self.assertEqual(created_date, item.meta["created_date"])
 
     def test_raises_exception_for_nonexistent_flag(self):
         feature_name = self.txt()
         with self.assertRaises(FlagDoesNotExistError):
-            self.store.set_meta(feature_name, { 'a': self.txt() })
+            self.store.set_meta(feature_name, {"a": self.txt()})

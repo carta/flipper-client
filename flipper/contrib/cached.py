@@ -12,12 +12,9 @@ DEFAULT_TTL = None
 
 class CachedFeatureFlagStore(AbstractFeatureFlagStore):
     def __init__(self, store: AbstractFeatureFlagStore, **cache_options):
-        self._cache = LRUCache(cache_options.get('size', DEFAULT_SIZE))
+        self._cache = LRUCache(cache_options.get("size", DEFAULT_SIZE))
         self._store = store
-        self._cache_options = {
-            'ttl': None,
-            **cache_options,
-        }
+        self._cache_options = {"ttl": None, **cache_options}
 
     def create(
         self,
@@ -40,16 +37,10 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
 
         return item
 
-    def set(
-        self,
-        feature_name: str,
-        is_enabled: bool,
-    ):
+    def set(self, feature_name: str, is_enabled: bool):
         self._store.set(feature_name, is_enabled)
         self._cache.set(
-            feature_name,
-            self._store.get(feature_name),
-            **self._cache_options,
+            feature_name, self._store.get(feature_name), **self._cache_options
         )
 
     def delete(self, feature_name: str):
@@ -57,16 +48,12 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
         self._cache.set(feature_name, None, -1)
 
     def list(
-        self,
-        limit: Optional[int] = None,
-        offset: int = 0,
+        self, limit: Optional[int] = None, offset: int = 0
     ) -> Iterator[FeatureFlagStoreItem]:
         return self._store.list(limit=limit, offset=offset)
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
         self._store.set_meta(feature_name, meta)
         self._cache.set(
-            feature_name,
-            self._store.get(feature_name),
-            **self._cache_options,
+            feature_name, self._store.get(feature_name), **self._cache_options
         )

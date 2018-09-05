@@ -14,6 +14,7 @@ def flag_must_exist(fn):
         if item is None:
             raise FlagDoesNotExistError()
         return fn(self, *args, **kwargs)
+
     return wrapper
 
 
@@ -57,7 +58,7 @@ class FeatureFlag:
         self._store.set_meta(self.name, meta)
 
     def get_client_data(self) -> dict:
-        return self.get_meta()['client_data']
+        return self.get_meta()["client_data"]
 
     @flag_must_exist
     def get_meta(self) -> dict:

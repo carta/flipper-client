@@ -28,6 +28,4 @@ class Operator:
         try:
             return cls.OPERATOR_MAP[operator_symbol]()
         except KeyError:
-            raise cls.InvalidSymbolError(
-                'Operator not supported: %s' % operator_symbol
-            )
+            raise cls.InvalidSymbolError("Operator not supported: %s" % operator_symbol)

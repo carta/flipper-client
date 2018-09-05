@@ -1,9 +1,7 @@
 import unittest
 from uuid import uuid4
 
-from flipper.conditions.operators.less_than_operator import (
-    LessThanOperator,
-)
+from flipper.conditions.operators.less_than_operator import LessThanOperator
 
 
 class TestCompare(unittest.TestCase):

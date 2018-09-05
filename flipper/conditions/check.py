@@ -3,7 +3,7 @@ from typing import Any, Tuple
 from .operators import Operator
 
 
-OPERATOR_DELIMITER = '__'
+OPERATOR_DELIMITER = "__"
 
 
 class Check:
@@ -45,17 +45,15 @@ class Check:
 
     def to_dict(self) -> dict:
         return {
-            'variable': self._variable,
-            'value': self._value,
-            'operator': self._operator.SYMBOL,
+            "variable": self._variable,
+            "value": self._value,
+            "operator": self._operator.SYMBOL,
         }
 
     @classmethod
-    def from_dict(cls, fields: dict) -> 'Check':
+    def from_dict(cls, fields: dict) -> "Check":
         return cls(
-            fields['variable'],
-            fields['value'],
-            Operator.factory(fields['operator']),
+            fields["variable"], fields["value"], Operator.factory(fields["operator"])
         )
 
     @classmethod

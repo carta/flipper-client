@@ -268,7 +268,7 @@ class TestSetClientData(BaseTest):
         self.store.set_meta = MagicMock()
 
         feature_name = self.txt()
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.client.create(feature_name)
         self.client.set_client_data(feature_name, client_data)
@@ -281,7 +281,7 @@ class TestSetClientData(BaseTest):
         self.store.set_meta = MagicMock()
 
         feature_name = self.txt()
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.client.create(feature_name)
         self.client.set_client_data(feature_name, client_data)
@@ -294,7 +294,7 @@ class TestSetClientData(BaseTest):
         self.store.set_meta = MagicMock()
 
         feature_name = self.txt()
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.client.create(feature_name)
         self.client.set_client_data(feature_name, client_data)
@@ -307,7 +307,7 @@ class TestSetClientData(BaseTest):
         self.store.set_meta = MagicMock()
 
         feature_name = self.txt()
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.client.create(feature_name)
         self.client.set_client_data(feature_name, client_data)
@@ -320,7 +320,7 @@ class TestSetClientData(BaseTest):
         self.store.set_meta = MagicMock()
 
         feature_name = self.txt()
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.client.create(feature_name)
         self.client.set_client_data(feature_name, client_data)
@@ -329,39 +329,33 @@ class TestSetClientData(BaseTest):
 
     def test_merges_new_values_with_existing(self):
         feature_name = self.txt()
-        existing_data = { 'existing_key': self.txt() }
+        existing_data = {"existing_key": self.txt()}
 
         self.store.create(feature_name, client_data=existing_data)
 
-        new_data = { 'new_key': self.txt() }
+        new_data = {"new_key": self.txt()}
         self.client.set_client_data(feature_name, new_data)
 
         item = self.store.get(feature_name)
 
-        self.assertEqual({
-            **existing_data,
-            **new_data,
-        }, item.meta['client_data'])
+        self.assertEqual({**existing_data, **new_data}, item.meta["client_data"])
 
     def test_can_override_existing_values(self):
         feature_name = self.txt()
-        existing_data = { 'existing_key': self.txt() }
+        existing_data = {"existing_key": self.txt()}
 
         self.store.create(feature_name, client_data=existing_data)
 
-        new_data = {
-            'existing_key': self.txt(),
-            'new_key': self.txt(),
-        }
+        new_data = {"existing_key": self.txt(), "new_key": self.txt()}
         self.client.set_client_data(feature_name, new_data)
 
         item = self.store.get(feature_name)
 
-        self.assertEqual(new_data, item.meta['client_data'])
+        self.assertEqual(new_data, item.meta["client_data"])
 
     def test_raises_for_nonexistent_flag(self):
         feature_name = self.txt()
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         with self.assertRaises(FlagDoesNotExistError):
             self.client.set_client_data(feature_name, client_data)
@@ -370,7 +364,7 @@ class TestSetClientData(BaseTest):
 class TestGetClientData(BaseTest):
     def test_gets_expected_key_value_pairs(self):
         feature_name = self.txt()
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.client.create(feature_name, client_data=client_data)
 
@@ -380,7 +374,7 @@ class TestGetClientData(BaseTest):
 
     def test_raises_for_nonexistent_flag(self):
         feature_name = self.txt()
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         with self.assertRaises(FlagDoesNotExistError):
             self.client.get_client_data(feature_name)
@@ -389,23 +383,23 @@ class TestGetClientData(BaseTest):
 class TestGetMeta(BaseTest):
     def test_includes_created_date(self):
         feature_name = self.txt()
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.client.create(feature_name, client_data=client_data)
 
         meta = self.client.get_meta(feature_name)
 
-        self.assertTrue('created_date' in meta)
+        self.assertTrue("created_date" in meta)
 
     def test_includes_client_data(self):
         feature_name = self.txt()
-        client_data = { self.txt(): self.txt() }
+        client_data = {self.txt(): self.txt()}
 
         self.client.create(feature_name, client_data=client_data)
 
         meta = self.client.get_meta(feature_name)
 
-        self.assertEqual(client_data, meta['client_data'])
+        self.assertEqual(client_data, meta["client_data"])
 
     def test_raises_for_nonexistent_flag(self):
         feature_name = self.txt()
@@ -417,7 +411,7 @@ class TestGetMeta(BaseTest):
 class TestAddCondition(BaseTest):
     def test_condition_gets_included_in_meta(self):
         feature_name = self.txt()
-        condition_checks = { self.txt(): True }
+        condition_checks = {self.txt(): True}
         condition = Condition(**condition_checks)
 
         self.client.create(feature_name)
@@ -425,11 +419,11 @@ class TestAddCondition(BaseTest):
 
         meta = self.client.get_meta(feature_name)
 
-        self.assertTrue(condition.to_dict() in meta['conditions'])
+        self.assertTrue(condition.to_dict() in meta["conditions"])
 
     def test_condition_gets_appended_to_meta(self):
         feature_name = self.txt()
-        condition_checks = { self.txt(): True }
+        condition_checks = {self.txt(): True}
         condition = Condition(**condition_checks)
 
         self.client.create(feature_name)
@@ -438,7 +432,7 @@ class TestAddCondition(BaseTest):
 
         meta = self.client.get_meta(feature_name)
 
-        self.assertEqual(2, len(meta['conditions']))
+        self.assertEqual(2, len(meta["conditions"]))
 
 
 class TestSetBucketer(BaseTest):
@@ -453,4 +447,4 @@ class TestSetBucketer(BaseTest):
 
         meta = self.client.get_meta(feature_name)
 
-        self.assertEqual(bucketer.to_dict(), meta['bucketer'])
+        self.assertEqual(bucketer.to_dict(), meta["bucketer"])
