@@ -1,9 +1,9 @@
-from datetime import datetime
 import unittest
+from datetime import datetime
 from uuid import uuid4
 
 from flipper import Condition
-from flipper.bucketing import PercentageBucketer, Percentage
+from flipper.bucketing import Percentage, PercentageBucketer
 from flipper.contrib.storage import FeatureFlagStoreMeta
 
 

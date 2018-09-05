@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
 import unittest
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
 from flipper.bucketing import LinearRampPercentage

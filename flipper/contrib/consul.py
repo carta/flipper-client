@@ -1,11 +1,10 @@
 import logging
-from typing import Iterator, Optional, Tuple
 import threading
+from typing import Iterator, Optional, Tuple
 
 from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 from .util.date import now
-
 
 logger = logging.getLogger(__name__)
 

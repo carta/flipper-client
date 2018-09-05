@@ -1,3 +1,7 @@
+"""
+   isort:skip_file
+   See: https://github.com/ambv/black/issues/250
+"""
 import unittest
 
 from flipper.conditions.operators.negated_set_membership_operator import (

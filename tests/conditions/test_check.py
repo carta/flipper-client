@@ -1,8 +1,12 @@
+"""
+   isort:skip_file
+   See: https://github.com/ambv/black/issues/250
+"""
 import unittest
 from unittest.mock import MagicMock
 from uuid import uuid4
 
-from flipper.conditions.check import Check, OPERATOR_DELIMITER
+from flipper.conditions.check import OPERATOR_DELIMITER, Check
 from flipper.conditions.operators.equality_operator import EqualityOperator
 from flipper.conditions.operators.greater_than_operator import GreaterThanOperator
 from flipper.conditions.operators.greater_than_or_equal_to_operator import (

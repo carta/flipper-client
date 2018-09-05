@@ -4,7 +4,6 @@ from .noop_bucketer import NoOpBucketer
 from .percentage import LinearRampPercentage, Percentage, PercentageFactory
 from .percentage_bucketer import PercentageBucketer
 
-
 __all__ = [
     "BucketerFactory",
     "ConsistentHashPercentageBucketer",

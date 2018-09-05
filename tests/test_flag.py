@@ -3,9 +3,9 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 from flipper import Condition, MemoryFeatureFlagStore
-from flipper.bucketing import PercentageBucketer, Percentage
-from flipper.flag import FeatureFlag, FlagDoesNotExistError
+from flipper.bucketing import Percentage, PercentageBucketer
 from flipper.contrib.storage import FeatureFlagStoreMeta
+from flipper.flag import FeatureFlag, FlagDoesNotExistError
 
 
 class BaseTest(unittest.TestCase):

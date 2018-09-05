@@ -5,7 +5,6 @@ from lruttl import LRUCache
 from .interface import AbstractFeatureFlagStore
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 
-
 DEFAULT_SIZE = 5000
 DEFAULT_TTL = None
 

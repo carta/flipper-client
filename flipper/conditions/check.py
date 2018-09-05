@@ -2,7 +2,6 @@ from typing import Any, Tuple
 
 from .operators import Operator
 
-
 OPERATOR_DELIMITER = "__"
 
 

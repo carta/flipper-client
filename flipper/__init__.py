@@ -1,3 +1,4 @@
+from . import decorators
 from .client import FeatureFlagClient
 from .conditions import Condition
 from .contrib import (
@@ -7,9 +8,7 @@ from .contrib import (
     RedisFeatureFlagStore,
     ThriftRPCFeatureFlagStore,
 )
-from . import decorators
 from .flag import FlagDoesNotExistError
-
 
 __all__ = [
     "CachedFeatureFlagStore",

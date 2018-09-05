@@ -1,5 +1,5 @@
-from datetime import datetime
 import unittest
+from datetime import datetime
 from unittest.mock import MagicMock
 from uuid import uuid4
 

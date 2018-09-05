@@ -1,3 +1,7 @@
+"""
+   isort:skip_file
+   See: https://github.com/ambv/black/issues/250
+"""
 import unittest
 
 from flipper.conditions.operators.greater_than_or_equal_to_operator import (

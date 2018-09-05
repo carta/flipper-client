@@ -1,6 +1,5 @@
 from setuptools import find_packages, setup
 
-
 requirements = [
     "fakeredis~=0.11.0",
     "lru-ttl~=0.0.6",
@@ -28,6 +27,8 @@ setup(
             "ipdb",
             "black",
             "pre-commit",
+            "isort",
+            "flake8",
         ]
     },
 )

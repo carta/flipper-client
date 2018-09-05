@@ -1,3 +1,7 @@
+"""
+   isort:skip_file
+   See: https://github.com/ambv/black/issues/250
+"""
 import json
 from typing import Iterator, Optional
 

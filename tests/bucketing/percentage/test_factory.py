@@ -2,8 +2,8 @@ import unittest
 
 from flipper.bucketing.percentage import (
     LinearRampPercentage,
-    PercentageFactory,
     Percentage,
+    PercentageFactory,
 )
 
 

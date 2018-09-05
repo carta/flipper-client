@@ -1,6 +1,6 @@
 import unittest
 
-from flipper.bucketing import Percentage, ConsistentHashPercentageBucketer
+from flipper.bucketing import ConsistentHashPercentageBucketer, Percentage
 
 
 class TestGetType(unittest.TestCase):
