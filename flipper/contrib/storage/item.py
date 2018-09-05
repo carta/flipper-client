@@ -1,6 +1,4 @@
-from datetime import datetime
 import json
-from typing import Optional
 
 from flipper.bucketing import NoOpBucketer
 

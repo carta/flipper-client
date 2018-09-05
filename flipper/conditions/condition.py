@@ -2,7 +2,6 @@ from collections import defaultdict
 from typing import Any, Dict
 
 from .check import Check
-from .operators import Operator
 
 
 class Condition:

@@ -158,8 +158,6 @@ class TestToDict(BaseTest):
             derp__not_in=[8, 1000],
         )
 
-        actual = condition.to_dict()
-
         expected = {
             "foo": [{"variable": "foo", "value": True, "operator": None}],
             "bar": [{"variable": "bar", "value": False, "operator": None}],

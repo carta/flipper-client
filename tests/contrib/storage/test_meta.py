@@ -1,5 +1,4 @@
 from datetime import datetime
-import json
 import unittest
 from uuid import uuid4
 

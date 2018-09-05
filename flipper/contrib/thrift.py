@@ -7,7 +7,6 @@ from flipper_thrift.python.feature_flag_store.ttypes import (
 
 from .interface import AbstractFeatureFlagStore
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
-from .util.date import now
 
 
 class ThriftRPCFeatureFlagStore(AbstractFeatureFlagStore):

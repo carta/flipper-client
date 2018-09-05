@@ -1,4 +1,4 @@
-from typing import Iterator, Optional, List
+from typing import Iterator, Optional
 
 from lruttl import LRUCache
 

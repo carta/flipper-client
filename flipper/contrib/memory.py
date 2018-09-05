@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Iterator, Optional
 
 from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError

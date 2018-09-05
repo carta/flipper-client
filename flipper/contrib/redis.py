@@ -1,5 +1,4 @@
-from datetime import datetime
-from typing import Iterator, Optional, List
+from typing import Iterator, Optional
 
 from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta

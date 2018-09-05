@@ -26,9 +26,9 @@ class TestValue(unittest.TestCase):
         self.assertEqual(final_value, percentage.value)
 
     @patch("flipper.bucketing.percentage.linear_ramp_percentage.datetime")
-    def test_returns_a_value_that_is_linearly_interpolated_between_initial_and_final_value_by_time(
+    def test_returns_a_value_that_is_linearly_interpolated_between_initial_and_final_value_by_time(  # noqa: E501
         self, mock_datetime
-    ):  # noqa: E501
+    ):
         now = datetime(2018, 1, 1)
 
         mock_datetime.now.return_value = now

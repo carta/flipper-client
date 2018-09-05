@@ -13,6 +13,13 @@ install-dev:
 	pre-commit install-hooks
 
 
+virtualenv: virtualenv-install
+
+
+virtualenv-install:
+	@pyenv virtualenv -p python3.6 3.6.5 flipper-client
+
+
 thrift:
 	thrift -r --gen py -out ${THRIFT_PYTHON} ${THRIFT_DIR}/*.thrift
 

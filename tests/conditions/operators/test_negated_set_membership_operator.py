@@ -1,5 +1,4 @@
 import unittest
-from uuid import uuid4
 
 from flipper.conditions.operators.negated_set_membership_operator import (
     NegatedSetMembershipOperator

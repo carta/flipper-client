@@ -1,5 +1,4 @@
 import unittest
-from uuid import uuid4
 
 from flipper.conditions.operators.less_than_or_equal_to_operator import (
     LessThanOrEqualToOperator

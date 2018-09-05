@@ -1,7 +1,6 @@
 import unittest
-from unittest.mock import MagicMock
 
-from flipper.bucketing import Percentage, NoOpBucketer
+from flipper.bucketing import NoOpBucketer
 
 
 class TestGetType(unittest.TestCase):

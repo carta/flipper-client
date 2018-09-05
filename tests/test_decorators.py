@@ -3,7 +3,6 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 from flipper import decorators, FeatureFlagClient, MemoryFeatureFlagStore
-from flipper.flag import FeatureFlag
 
 
 class BaseTest(unittest.TestCase):

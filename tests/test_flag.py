@@ -115,8 +115,6 @@ class TestDestroy(BaseTest):
         store.delete.assert_called_once_with(self.name)
 
     def test_raises_for_nonexistent_flag(self):
-        feature_name = self.txt()
-
         with self.assertRaises(FlagDoesNotExistError):
             self.flag.destroy()
 
@@ -147,8 +145,6 @@ class TestEnable(BaseTest):
         store.set.assert_called_once_with(self.name, True)
 
     def test_raises_for_nonexistent_flag(self):
-        feature_name = self.txt()
-
         with self.assertRaises(FlagDoesNotExistError):
             self.flag.enable()
 

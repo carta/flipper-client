@@ -163,7 +163,6 @@ class TestSetMeta(BaseTest):
         self.store.create(feature_name)
 
         client_data = {self.txt(): self.txt()}
-        created_date = self.date()
         meta = FeatureFlagStoreMeta(self.date(), client_data)
 
         self.store.set_meta(feature_name, meta)

@@ -374,7 +374,6 @@ class TestGetClientData(BaseTest):
 
     def test_raises_for_nonexistent_flag(self):
         feature_name = self.txt()
-        client_data = {self.txt(): self.txt()}
 
         with self.assertRaises(FlagDoesNotExistError):
             self.client.get_client_data(feature_name)

@@ -30,7 +30,7 @@ class TestToDict(BaseTest):
         )
         self.assertEqual(is_enabled, item.to_dict()["is_enabled"])
 
-    def test_includes_correct_is_enabled_when_true(self):
+    def test_includes_correct_is_enabled_when_false(self):
         is_enabled = False
         item = FeatureFlagStoreItem(
             self.txt(), is_enabled, FeatureFlagStoreMeta(self.now, {})
