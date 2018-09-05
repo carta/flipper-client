@@ -4,3 +4,7 @@ repos:
     rev: master
     hooks:
       - id: black
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: master
+    hooks:
+      - id: flake8
