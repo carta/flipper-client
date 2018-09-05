@@ -1,0 +1,6 @@
+exclude: ^flipper_thrift|flipper_client\.egg_info|build$
+repos:
+  - repo: https://github.com/ambv/black
+    rev: master
+    hooks:
+      - id: black

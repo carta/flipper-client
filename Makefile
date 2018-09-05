@@ -9,6 +9,8 @@ install:
 
 install-dev:
 	pip install -e .[dev]
+	pre-commit install
+	pre-commit install-hooks
 
 
 thrift:
@@ -30,3 +32,7 @@ version:
 
 publish: build
 	cloudsmith push python carta/pip dist/flipper_client-${PKG_VERSION}-py3-none-any.whl
+
+
+hooks:
+	pre-commit run --all-files

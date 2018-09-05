@@ -24,7 +24,7 @@ multi_line_output = 5
 not_skip = __init__.py
 sections = FUTURE,STDLIB,DJANGO,THIRDPARTY,FIRSTPARTY,LOCALFOLDER
 
-[*.yml]
+[*.yml,*.yaml]
 indent_size = 2
 
 [Makefile]
