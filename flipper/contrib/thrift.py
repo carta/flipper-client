@@ -3,7 +3,7 @@
    See: https://github.com/ambv/black/issues/250
 """
 import json
-from typing import Any, Dict, Iterator, Optional
+from typing import Any, Dict, Iterator, Optional  # noqa: F401
 
 from flipper_thrift.python.feature_flag_store.ttypes import (
     FeatureFlagStoreItem as TFeatureFlagStoreItem
@@ -32,7 +32,7 @@ class ThriftRPCFeatureFlagStore(AbstractFeatureFlagStore):
         )
 
     def _meta_from_thrift(self, item: TFeatureFlagStoreItem) -> FeatureFlagStoreMeta:
-        client_data: Dict[str, Any] = {}
+        client_data = {}  # type: Dict[str, Any]
         if item.meta.client_data is not None:
             client_data = json.loads(item.meta.client_data)
 

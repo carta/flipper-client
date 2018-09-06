@@ -36,14 +36,14 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
         for item in data:
             serialized = item["Value"]
 
-            deserialized: FeatureFlagStoreItem
+            deserialized = None  # type: Optional[FeatureFlagStoreItem]
 
             if serialized is not None:
                 deserialized = FeatureFlagStoreItem.deserialize(serialized)
 
             self._set_item_in_cache(item["Key"], deserialized)
 
-    def _set_item_in_cache(self, key: str, item: FeatureFlagStoreItem):
+    def _set_item_in_cache(self, key: str, item: Optional[FeatureFlagStoreItem]):
         self._cache[key] = item
 
     def create(
