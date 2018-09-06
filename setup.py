@@ -11,7 +11,7 @@ requirements = [
 
 setup(
     name="flipper-client",
-    version="0.2.0",
+    version="0.2.1",
     packages=find_packages(),
     license="MIT",
     long_description=open("README.md").read(),

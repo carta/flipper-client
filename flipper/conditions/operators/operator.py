@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from .equality_operator import EqualityOperator
 from .greater_than_operator import GreaterThanOperator
@@ -11,7 +11,7 @@ from .set_membership_operator import SetMembershipOperator
 
 
 class Operator:
-    OPERATOR_MAP: Dict[Optional[str], Any] = {
+    OPERATOR_MAP = {
         EqualityOperator.SYMBOL: EqualityOperator,
         GreaterThanOperator.SYMBOL: GreaterThanOperator,
         GreaterThanOrEqualToOperator.SYMBOL: GreaterThanOrEqualToOperator,
@@ -20,7 +20,7 @@ class Operator:
         NegationOperator.SYMBOL: NegationOperator,
         SetMembershipOperator.SYMBOL: SetMembershipOperator,
         NegatedSetMembershipOperator.SYMBOL: NegatedSetMembershipOperator,
-    }
+    }  # Dict[Optional[str], Any]
 
     class InvalidSymbolError(Exception):
         pass
@@ -28,6 +28,6 @@ class Operator:
     @classmethod
     def factory(cls, operator_symbol: Optional[str]):
         try:
-            return cls.OPERATOR_MAP[operator_symbol]()
+            return cls.OPERATOR_MAP[operator_symbol]()  # type: ignore
         except KeyError:
             raise cls.InvalidSymbolError("Operator not supported: %s" % operator_symbol)

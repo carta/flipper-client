@@ -11,11 +11,11 @@ BucketerTypes = Union[
 
 
 class BucketerFactory:
-    BUCKETER_MAP: Dict[str, BucketerTypes] = {
+    BUCKETER_MAP = {
         ConsistentHashPercentageBucketer.get_type(): ConsistentHashPercentageBucketer,
         NoOpBucketer.get_type(): NoOpBucketer,
         PercentageBucketer.get_type(): PercentageBucketer,
-    }
+    }  # type: Dict[str, BucketerTypes]
 
     class InvalidBucketerTypeError(Exception):
         pass

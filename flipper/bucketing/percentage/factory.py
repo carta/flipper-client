@@ -8,10 +8,10 @@ PercentageTypes = Union[Type[LinearRampPercentage], Type[Percentage]]
 
 
 class PercentageFactory:
-    PERCENTAGE_MAP: Dict[str, PercentageTypes] = {
+    PERCENTAGE_MAP = {
         LinearRampPercentage.get_type(): LinearRampPercentage,
         Percentage.get_type(): Percentage,
-    }
+    }  # type: Dict[str, PercentageTypes]
 
     class InvalidPercentageTypeError(Exception):
         pass
