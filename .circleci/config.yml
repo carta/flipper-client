@@ -5,7 +5,7 @@ jobs:
       - image: circleci/python:3
     steps:
       - checkout
-      - run: pipenv install -e .[dev]
+      - run: pipenv install --skip-lock -e .[dev]
       - run: pipenv run pytest tests
 workflows:
   version: 2
