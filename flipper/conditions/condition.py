@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from .check import Check
 
@@ -8,8 +8,8 @@ class Condition:
     def __init__(self, **checks):
         self._checks = self._parse_checks(checks)
 
-    def _parse_checks(self, checks: Dict[str, Any]) -> Dict[str, Check]:
-        parsed_checks = defaultdict(list)
+    def _parse_checks(self, checks: Dict[str, Any]) -> Dict[str, List[Check]]:
+        parsed_checks = defaultdict(list)  # type: Dict[str, List[Check]]
         for check_key, check_value in checks.items():
             check = Check.factory(check_key, check_value)
             parsed_checks[check.variable].append(check)

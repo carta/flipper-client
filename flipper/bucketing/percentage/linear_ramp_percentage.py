@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, cast
 
 from .base import AbstractPercentage
 
@@ -11,7 +11,7 @@ class LinearRampPercentage(AbstractPercentage):
         final_value: float = 1.0,
         ramp_duration: int = 3600,
         initial_time: Optional[int] = None,
-    ):
+    ) -> None:
         self._initial_value = initial_value
         self._final_value = final_value
         self._ramp_duration = ramp_duration
@@ -48,10 +48,10 @@ class LinearRampPercentage(AbstractPercentage):
         }
 
     @classmethod
-    def from_dict(cls, fields: Dict[str, Any]) -> "Percentage":
+    def from_dict(cls, fields: Dict[str, Any]) -> "LinearRampPercentage":
         return cls(
-            initial_value=fields.get("initial_value"),
-            final_value=fields.get("final_value"),
-            ramp_duration=fields.get("ramp_duration"),
+            initial_value=cast(float, fields.get("initial_value", 0.0)),
+            final_value=cast(float, fields.get("final_value", 1.0)),
+            ramp_duration=cast(int, fields.get("ramp_duration", 3600)),
             initial_time=fields.get("initial_time"),
         )

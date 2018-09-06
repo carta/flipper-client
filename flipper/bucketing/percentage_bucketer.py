@@ -6,7 +6,7 @@ from .percentage import AbstractPercentage, Percentage, PercentageFactory
 
 
 class PercentageBucketer(AbstractBucketer):
-    def __init__(self, percentage: AbstractPercentage = None):
+    def __init__(self, percentage: AbstractPercentage = None) -> None:
         self._percentage = percentage or Percentage()
 
     @classmethod

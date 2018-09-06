@@ -6,7 +6,9 @@ from .meta import FeatureFlagStoreMeta
 
 
 class FeatureFlagStoreItem:
-    def __init__(self, feature_name: str, is_enabled: bool, meta: FeatureFlagStoreMeta):
+    def __init__(
+        self, feature_name: str, is_enabled: bool, meta: FeatureFlagStoreMeta
+    ) -> None:
         self.feature_name = feature_name
         self._is_enabled = is_enabled
         self._meta = meta

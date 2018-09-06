@@ -12,7 +12,7 @@ class FeatureFlagStoreMeta:
         client_data: Optional[dict] = None,
         conditions: Optional[List[Condition]] = None,
         bucketer: Optional[AbstractBucketer] = None,
-    ):
+    ) -> None:
         self.created_date = created_date
         self.client_data = client_data or {}
         self.conditions = conditions or []

@@ -1,4 +1,4 @@
-from typing import Iterator, Optional
+from typing import Iterator, Optional, cast
 
 from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
@@ -13,7 +13,7 @@ class RedisFeatureFlagStore(AbstractFeatureFlagStore):
     def create(
         self,
         feature_name: str,
-        is_enabled: Optional[bool] = False,
+        is_enabled: bool = False,
         client_data: Optional[dict] = None,
     ) -> FeatureFlagStoreItem:
         item = FeatureFlagStoreItem(
@@ -25,7 +25,7 @@ class RedisFeatureFlagStore(AbstractFeatureFlagStore):
         self._redis.set(self._key_name(item.feature_name), item.serialize())
         return item
 
-    def get(self, feature_name: str) -> FeatureFlagStoreItem:
+    def get(self, feature_name: str) -> Optional[FeatureFlagStoreItem]:
         serialized = self._redis.get(self._key_name(feature_name))
         if not serialized:
             return None
@@ -60,7 +60,7 @@ class RedisFeatureFlagStore(AbstractFeatureFlagStore):
             if limit is not None and visited > limit + offset:
                 return
 
-            yield self.get(feature_name)
+            yield cast(FeatureFlagStoreItem, self.get(feature_name))
 
     def _list_keys(self) -> Iterator[str]:
         keys = self._redis.scan_iter(match=self._make_scan_wildcard_match())

@@ -1,14 +1,18 @@
-from typing import Any, Dict
+from typing import Any, Dict, Type, Union
 
 from .base import AbstractBucketer
 from .consistent_hash_percentage_bucketer import ConsistentHashPercentageBucketer
 from .noop_bucketer import NoOpBucketer
 from .percentage_bucketer import PercentageBucketer
 
+BucketerTypes = Union[
+    Type[ConsistentHashPercentageBucketer], Type[NoOpBucketer], Type[PercentageBucketer]
+]
+
 
 class BucketerFactory:
-    BUCKETER_MAP = {
-        ConsistentHashPercentageBucketer.get_type(): ConsistentHashPercentageBucketer,  # noqa: E501
+    BUCKETER_MAP: Dict[str, BucketerTypes] = {
+        ConsistentHashPercentageBucketer.get_type(): ConsistentHashPercentageBucketer,
         NoOpBucketer.get_type(): NoOpBucketer,
         PercentageBucketer.get_type(): PercentageBucketer,
     }

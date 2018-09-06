@@ -1,6 +1,6 @@
 import logging
 import threading
-from typing import Iterator, Optional, Tuple
+from typing import Iterator, Optional, Tuple, cast
 
 from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
@@ -36,7 +36,7 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
         for item in data:
             serialized = item["Value"]
 
-            deserialized = None
+            deserialized: FeatureFlagStoreItem
 
             if serialized is not None:
                 deserialized = FeatureFlagStoreItem.deserialize(serialized)
@@ -49,7 +49,7 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
     def create(
         self,
         feature_name: str,
-        is_enabled: Optional[bool] = False,
+        is_enabled: bool = False,
         client_data: Optional[dict] = None,
     ) -> FeatureFlagStoreItem:
         item = FeatureFlagStoreItem(
@@ -64,7 +64,7 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
 
         return item
 
-    def get(self, feature_name: str) -> FeatureFlagStoreItem:
+    def get(self, feature_name: str) -> Optional[FeatureFlagStoreItem]:
         return self._cache.get(self._make_key(feature_name))
 
     def _make_key(self, feature_name: str) -> str:
@@ -95,7 +95,7 @@ class ConsulFeatureFlagStore(AbstractFeatureFlagStore):
             feature_names = feature_names[:limit]
 
         for feature_name in feature_names:
-            yield self.get(feature_name)
+            yield cast(FeatureFlagStoreItem, self.get(feature_name))
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
         existing = self.get(feature_name)

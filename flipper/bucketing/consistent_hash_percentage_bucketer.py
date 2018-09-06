@@ -1,6 +1,6 @@
 import hashlib
 import json
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 from .percentage import PercentageFactory
 from .percentage_bucketer import PercentageBucketer
@@ -15,7 +15,7 @@ class ConsistentHashPercentageBucketer(PercentageBucketer):
     def get_type(cls) -> str:
         return "ConsistentHashPercentageBucketer"
 
-    def check(self, **checks) -> bool:
+    def check(self, randomizer=None, **checks) -> bool:
         if self._percentage == 0:
             return False
 
@@ -39,7 +39,7 @@ class ConsistentHashPercentageBucketer(PercentageBucketer):
             return True
         return key in self._key_whitelist
 
-    def _sort_checks(self, checks: Dict[str, Any]) -> Tuple[str, Any]:
+    def _sort_checks(self, checks: Dict[str, Any]) -> List[Tuple[str, Any]]:
         return sorted(checks.items(), key=lambda x: x[0])
 
     def _score_hash(self, hashed) -> float:

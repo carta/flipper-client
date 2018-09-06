@@ -1,10 +1,10 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from .base import AbstractPercentage
 
 
 class Percentage(AbstractPercentage):
-    def __init__(self, value: float = 1.0):
+    def __init__(self, value: Optional[float] = 1.0) -> None:
         self._value = value
 
     @classmethod

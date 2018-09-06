@@ -1,3 +1,4 @@
+import numbers
 from abc import ABCMeta, abstractmethod
 from typing import Any, Dict
 
@@ -5,12 +6,12 @@ from typing import Any, Dict
 class AbstractPercentage(metaclass=ABCMeta):
     @property
     @abstractmethod
-    def value(self, **checks) -> float:
+    def value(self) -> float:
         pass
 
-    @classmethod
+    @staticmethod
     @abstractmethod
-    def get_type(cls) -> str:
+    def get_type() -> str:
         pass
 
     @abstractmethod
@@ -22,17 +23,25 @@ class AbstractPercentage(metaclass=ABCMeta):
     def from_dict(cls, fields: Dict[str, Any]) -> "AbstractPercentage":
         pass
 
-    def __gt__(self, comparison: float) -> bool:
+    def __gt__(self, comparison) -> bool:
+        self._assert_is_valid_comparison_type(comparison)
         return self.value > comparison
 
-    def __ge__(self, comparison: float) -> bool:
+    def _assert_is_valid_comparison_type(self, comparison) -> None:
+        assert isinstance(comparison, numbers.Number)
+
+    def __ge__(self, comparison) -> bool:
+        self._assert_is_valid_comparison_type(comparison)
         return self.value >= comparison
 
-    def __lt__(self, comparison: float) -> bool:
+    def __lt__(self, comparison) -> bool:
+        self._assert_is_valid_comparison_type(comparison)
         return self.value < comparison
 
-    def __le__(self, comparison: float) -> bool:
+    def __le__(self, comparison) -> bool:
+        self._assert_is_valid_comparison_type(comparison)
         return self.value <= comparison
 
-    def __eq__(self, comparison: float) -> bool:
+    def __eq__(self, comparison) -> bool:
+        self._assert_is_valid_comparison_type(comparison)
         return self.value == comparison

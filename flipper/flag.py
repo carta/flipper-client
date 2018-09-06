@@ -1,7 +1,9 @@
+from typing import cast
+
 from .bucketing.base import AbstractBucketer
 from .conditions import Condition
 from .contrib.interface import AbstractFeatureFlagStore
-from .contrib.storage import FeatureFlagStoreMeta
+from .contrib.storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 
 
 class FlagDoesNotExistError(Exception):
@@ -19,7 +21,7 @@ def flag_must_exist(fn):
 
 
 class FeatureFlag:
-    def __init__(self, feature_name: str, store: AbstractFeatureFlagStore):
+    def __init__(self, feature_name: str, store: AbstractFeatureFlagStore) -> None:
         self.name = feature_name
         self._store = store
 
@@ -62,7 +64,7 @@ class FeatureFlag:
 
     @flag_must_exist
     def get_meta(self) -> dict:
-        return self._store.get(self.name).meta
+        return cast(FeatureFlagStoreItem, self._store.get(self.name)).meta
 
     @flag_must_exist
     def set_bucketer(self, bucketer: AbstractBucketer):

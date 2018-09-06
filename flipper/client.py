@@ -7,7 +7,7 @@ from .flag import FeatureFlag
 
 
 class FeatureFlagClient:
-    def __init__(self, store: AbstractFeatureFlagStore):
+    def __init__(self, store: AbstractFeatureFlagStore) -> None:
         self._store = store
 
     def is_enabled(self, feature_name: str, **conditions) -> bool:
@@ -16,7 +16,7 @@ class FeatureFlagClient:
     def create(
         self,
         feature_name: str,
-        is_enabled: Optional[bool] = False,
+        is_enabled: bool = False,
         client_data: Optional[dict] = None,
     ) -> FeatureFlag:
         self._store.create(feature_name, is_enabled=is_enabled, client_data=client_data)

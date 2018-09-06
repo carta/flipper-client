@@ -1,12 +1,14 @@
-from typing import Any, Dict
+from typing import Any, Dict, Type, Union
 
 from .base import AbstractPercentage
 from .linear_ramp_percentage import LinearRampPercentage
 from .percentage import Percentage
 
+PercentageTypes = Union[Type[LinearRampPercentage], Type[Percentage]]
+
 
 class PercentageFactory:
-    PERCENTAGE_MAP = {
+    PERCENTAGE_MAP: Dict[str, PercentageTypes] = {
         LinearRampPercentage.get_type(): LinearRampPercentage,
         Percentage.get_type(): Percentage,
     }

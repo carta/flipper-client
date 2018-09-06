@@ -7,14 +7,14 @@ class AbstractBucketer(metaclass=ABCMeta):
     def check(self, **checks) -> bool:
         pass
 
-    @classmethod
+    @staticmethod
     @abstractmethod
-    def get_type(cls) -> str:
+    def get_type() -> str:
         pass
 
     @abstractmethod
     def to_dict(self) -> Dict[str, Any]:
-        return {"type": self.__class__.get_type()}
+        return {"type": self.get_type()}
 
     @classmethod
     @abstractmethod

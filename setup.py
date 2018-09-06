@@ -29,6 +29,7 @@ setup(
             "pre-commit",
             "isort",
             "flake8",
+            "mypy",
         ]
     },
 )

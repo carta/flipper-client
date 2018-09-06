@@ -43,3 +43,7 @@ publish: build
 
 hooks:
 	pre-commit run --all-files
+
+
+mypy:
+	@mypy --follow-imports=silent --ignore-missing-imports flipper

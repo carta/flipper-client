@@ -10,7 +10,7 @@ DEFAULT_TTL = None
 
 
 class CachedFeatureFlagStore(AbstractFeatureFlagStore):
-    def __init__(self, store: AbstractFeatureFlagStore, **cache_options):
+    def __init__(self, store: AbstractFeatureFlagStore, **cache_options) -> None:
         self._cache = LRUCache(cache_options.get("size", DEFAULT_SIZE))
         self._store = store
         self._cache_options = {"ttl": None, **cache_options}
@@ -18,7 +18,7 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
     def create(
         self,
         feature_name: str,
-        is_enabled: Optional[bool] = False,
+        is_enabled: bool = False,
         client_data: Optional[dict] = None,
     ) -> FeatureFlagStoreItem:
         item = self._store.create(
@@ -27,7 +27,7 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
         self._cache.set(feature_name, item, **self._cache_options)
         return item
 
-    def get(self, feature_name: str) -> FeatureFlagStoreItem:
+    def get(self, feature_name: str) -> Optional[FeatureFlagStoreItem]:
         if feature_name in self._cache:
             return self._cache[feature_name]
 

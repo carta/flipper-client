@@ -9,13 +9,13 @@ class AbstractFeatureFlagStore(metaclass=ABCMeta):
     def create(
         self,
         feature_name: str,
-        is_enabled: Optional[bool] = False,
+        is_enabled: bool = False,
         client_data: Optional[dict] = None,
     ):
         pass
 
     @abstractmethod
-    def get(self, feature_name: str) -> FeatureFlagStoreItem:
+    def get(self, feature_name: str) -> Optional[FeatureFlagStoreItem]:
         pass
 
     @abstractmethod

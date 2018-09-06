@@ -1,12 +1,13 @@
 from typing import Any, Tuple
 
 from .operators import Operator
+from .operators.interface import AbstractOperator
 
 OPERATOR_DELIMITER = "__"
 
 
 class Check:
-    def __init__(self, variable: str, value: any, operator: Operator):
+    def __init__(self, variable: str, value: Any, operator: AbstractOperator) -> None:
         self._variable = variable
         self._value = value
         self._operator = operator
@@ -32,7 +33,7 @@ class Check:
         return cls(variable, check_value, operator)
 
     @classmethod
-    def _parse_check_key(cls, check_key: str) -> Tuple[str, Operator]:
+    def _parse_check_key(cls, check_key: str) -> Tuple[str, AbstractOperator]:
         variable, raw_operator = check_key, None
 
         try:

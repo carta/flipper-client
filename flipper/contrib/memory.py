@@ -1,4 +1,4 @@
-from typing import Iterator, Optional
+from typing import Iterator, Optional, cast
 
 from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
@@ -12,7 +12,7 @@ class MemoryFeatureFlagStore(AbstractFeatureFlagStore):
     def create(
         self,
         feature_name: str,
-        is_enabled: Optional[bool] = False,
+        is_enabled: bool = False,
         client_data: Optional[dict] = None,
     ) -> FeatureFlagStoreItem:
         item = FeatureFlagStoreItem(
@@ -24,7 +24,7 @@ class MemoryFeatureFlagStore(AbstractFeatureFlagStore):
         self._memory[item.feature_name] = item
         return item
 
-    def get(self, feature_name: str) -> FeatureFlagStoreItem:
+    def get(self, feature_name: str) -> Optional[FeatureFlagStoreItem]:
         return self._memory.get(feature_name)
 
     def set(self, feature_name: str, is_enabled: bool):
@@ -52,7 +52,7 @@ class MemoryFeatureFlagStore(AbstractFeatureFlagStore):
             feature_names = feature_names[:limit]
 
         for feature_name in feature_names:
-            yield self.get(feature_name)
+            yield cast(FeatureFlagStoreItem, self.get(feature_name))
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
         existing = self.get(feature_name)

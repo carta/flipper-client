@@ -1,3 +1,5 @@
+from typing import Any, Dict, Optional
+
 from .equality_operator import EqualityOperator
 from .greater_than_operator import GreaterThanOperator
 from .greater_than_or_equal_to_operator import GreaterThanOrEqualToOperator
@@ -9,7 +11,7 @@ from .set_membership_operator import SetMembershipOperator
 
 
 class Operator:
-    OPERATOR_MAP = {
+    OPERATOR_MAP: Dict[Optional[str], Any] = {
         EqualityOperator.SYMBOL: EqualityOperator,
         GreaterThanOperator.SYMBOL: GreaterThanOperator,
         GreaterThanOrEqualToOperator.SYMBOL: GreaterThanOrEqualToOperator,
@@ -24,7 +26,7 @@ class Operator:
         pass
 
     @classmethod
-    def factory(cls, operator_symbol: str):
+    def factory(cls, operator_symbol: Optional[str]):
         try:
             return cls.OPERATOR_MAP[operator_symbol]()
         except KeyError:
