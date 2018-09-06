@@ -24,7 +24,7 @@ class FeatureFlagStoreItem:
         return json.dumps(self.to_dict()).encode("utf-8")
 
     @classmethod
-    def deserialize(cls, serialized: bytes):
+    def deserialize(cls, serialized: bytes) -> "FeatureFlagStoreItem":
         deserialized = json.loads(serialized.decode("utf-8"))
 
         return cls(
