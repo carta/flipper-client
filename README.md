@@ -56,6 +56,17 @@ Example:
 flag = features.create(MY_FEATURE)
 ```
 
+**`exists(feature_name: str) -> bool`**
+
+Check if a feature flag already exists by name. Feature flag names must be unique.
+
+Example:
+
+```python
+ if not features.exists(MY_FEATURE):
+    features.create(MY_FEATURE)
+```
+
 **`get(feature_name: str) -> FeatureFlag`**
 
 Returns an instance of `FeatureFlag` for the requested flag.

@@ -225,6 +225,19 @@ class TestDisable(BaseTest):
             self.client.disable(feature_name)
 
 
+class TestExists(BaseTest):
+    def test_exists_is_false_when_feature_does_not_exist(self):
+        feature_name = self.txt()
+
+        self.assertFalse(self.client.exists(feature_name))
+
+    def test_exists_is_true_when_feature_does_exist(self):
+        feature_name = self.txt()
+        self.client.create(feature_name)
+
+        self.assertTrue(self.client.exists(feature_name))
+
+
 class TestList(BaseTest):
     def test_calls_backend_with_correct_args(self):
         self.store.list = MagicMock()
