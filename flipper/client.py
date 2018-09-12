@@ -22,6 +22,9 @@ class FeatureFlagClient:
         self._store.create(feature_name, is_enabled=is_enabled, client_data=client_data)
         return self.get(feature_name)
 
+    def exists(self, feature_name: str) -> bool:
+        return self._store.get(feature_name) is not None
+
     def get(self, feature_name: str) -> FeatureFlag:
         return FeatureFlag(feature_name, self._store)
 
