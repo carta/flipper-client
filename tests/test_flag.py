@@ -89,6 +89,16 @@ class TestIsEnabled(BaseTest):
         bucketer.check.assert_called_with(foo=True)
 
 
+class TestExists(BaseTest):
+    def test_when_object_does_not_exist_returns_false(self):
+        self.assertFalse(self.flag.exists())
+
+    def test_when_object_does_exist_returns_true(self):
+        self.store.create(self.name)
+
+        self.assertTrue(self.flag.exists())
+
+
 class TestDestroy(BaseTest):
     def test_object_remains_instance_of_flag_class(self):
         self.store.create(self.name)

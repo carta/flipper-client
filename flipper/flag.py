@@ -12,8 +12,7 @@ class FlagDoesNotExistError(Exception):
 
 def flag_must_exist(fn):
     def wrapper(self, *args, **kwargs):
-        item = self._store.get(self.name)
-        if item is None:
+        if not self.exists():
             raise FlagDoesNotExistError()
         return fn(self, *args, **kwargs)
 
@@ -30,6 +29,9 @@ class FeatureFlag:
         if item is None:
             return default
         return item.is_enabled(**conditions)
+
+    def exists(self):
+        return self._store.get(self.name) is not None
 
     @flag_must_exist
     def enable(self):
