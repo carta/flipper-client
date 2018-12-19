@@ -1,5 +1,6 @@
 import unittest
 from datetime import datetime
+from time import sleep
 from unittest.mock import MagicMock
 from uuid import uuid4
 
@@ -105,6 +106,26 @@ class TestGet(BaseTest):
         self.slow.set(feature_name, False)
 
         self.assertFalse(self.fast.get(feature_name).is_enabled())
+
+    def test_avoids_race_condition_where_cache_can_return_none_at_end_of_ttl(self):
+        feature_name = self.txt()
+
+        fast = CachedFeatureFlagStore(self.slow, ttl=0.01)
+
+        fast.create(feature_name)
+
+        get = fast._cache.get
+
+        def slow_get(key):
+            result = get(key)
+            sleep(0.02)
+            return result
+
+        fast._cache.get = slow_get
+
+        fast.set(feature_name, 1)
+
+        self.assertIsNotNone(fast.get(feature_name))
 
 
 class TestSet(BaseTest):
