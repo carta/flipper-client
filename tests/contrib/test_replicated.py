@@ -22,40 +22,6 @@ class BaseTest(unittest.TestCase):
 
 
 class TestCreate(BaseTest):
-    def test_when_asynch_is_true_creates_flag_in_primary_and_replicas(self):
-        feature_name = self.txt()
-
-        self.store.create(feature_name, is_enabled=True, asynch=True)
-
-        self.assertTrue(
-            all(
-                [
-                    self.primary.get(feature_name).is_enabled(),
-                    *[
-                        replica.get(feature_name).is_enabled()
-                        for replica in self.replicas
-                    ],
-                ]
-            )
-        )
-
-    def test_when_asynch_is_false_creates_flag_in_primary_and_replicas(self):
-        feature_name = self.txt()
-
-        self.store.create(feature_name, is_enabled=True, asynch=False)
-
-        self.assertTrue(
-            all(
-                [
-                    self.primary.get(feature_name).is_enabled(),
-                    *[
-                        replica.get(feature_name).is_enabled()
-                        for replica in self.replicas
-                    ],
-                ]
-            )
-        )
-
     def test_forwards_all_arguments_to_stores(self):
         feature_name = self.txt()
 
@@ -93,7 +59,7 @@ class TestGet(BaseTest):
         replicas = [MagicMock(), MagicMock(), MagicMock()]
         store = ReplicatedFeatureFlagStore(primary, *replicas)
 
-        store.create(feature_name)
+        store.create(feature_name, asynch=False)
 
         args = (feature_name,)
         kwargs = {}
@@ -106,28 +72,10 @@ class TestGet(BaseTest):
 
 
 class TestSet(BaseTest):
-    def test_when_asynch_is_true_sets_value_in_primary_and_replicas(self):
-        feature_name = self.txt()
-
-        self.store.create(feature_name, is_enabled=False)
-        self.store.set(feature_name, True, asynch=True)
-
-        self.assertTrue(
-            all(
-                [
-                    self.primary.get(feature_name).is_enabled(),
-                    *[
-                        replica.get(feature_name).is_enabled()
-                        for replica in self.replicas
-                    ],
-                ]
-            )
-        )
-
     def test_when_asynch_is_false_sets_value_in_primary_and_replicas(self):
         feature_name = self.txt()
 
-        self.store.create(feature_name, is_enabled=False)
+        self.store.create(feature_name, is_enabled=False, asynch=False)
         self.store.set(feature_name, True, asynch=False)
 
         self.assertTrue(
@@ -149,7 +97,7 @@ class TestSet(BaseTest):
         replicas = [MagicMock(), MagicMock(), MagicMock()]
         store = ReplicatedFeatureFlagStore(primary, *replicas)
 
-        store.create(feature_name)
+        store.create(feature_name, asynch=False)
 
         args = (feature_name, True)
         kwargs = {}
@@ -162,25 +110,10 @@ class TestSet(BaseTest):
 
 
 class TestDelete(BaseTest):
-    def test_when_asynch_is_true_deletes_in_primary_and_replicas(self):
-        feature_name = self.txt()
-
-        self.store.create(feature_name, is_enabled=False)
-        self.store.delete(feature_name, asynch=True)
-
-        self.assertFalse(
-            any(
-                [
-                    self.primary.get(feature_name),
-                    *[replica.get(feature_name) for replica in self.replicas],
-                ]
-            )
-        )
-
     def test_when_asynch_is_false_deletes_in_primary_and_replicas(self):
         feature_name = self.txt()
 
-        self.store.create(feature_name, is_enabled=False)
+        self.store.create(feature_name, is_enabled=False, asynch=False)
         self.store.delete(feature_name, asynch=False)
 
         self.assertFalse(
@@ -199,7 +132,7 @@ class TestDelete(BaseTest):
         replicas = [MagicMock(), MagicMock(), MagicMock()]
         store = ReplicatedFeatureFlagStore(primary, *replicas)
 
-        store.create(feature_name)
+        store.create(feature_name, asynch=False)
 
         args = (feature_name,)
         kwargs = {}
@@ -215,7 +148,7 @@ class TestList(BaseTest):
     def test_reads_value_from_primary_store(self):
         feature_name = self.txt()
 
-        self.store.create(feature_name, is_enabled=True)
+        self.store.create(feature_name, is_enabled=True, asynch=False)
 
         for replica in self.replicas:
             replica.delete(feature_name)
@@ -231,7 +164,7 @@ class TestList(BaseTest):
         replicas = [MagicMock(), MagicMock(), MagicMock()]
         store = ReplicatedFeatureFlagStore(primary, *replicas)
 
-        store.create(feature_name)
+        store.create(feature_name, asynch=False)
 
         args = ()
         kwargs = {"limit": 10, "offset": 0}
@@ -244,32 +177,12 @@ class TestList(BaseTest):
 
 
 class TestSetMeta(BaseTest):
-    def test_when_asynch_is_true_sets_meta_in_primary_and_replicas(self):
-        feature_name = self.txt()
-
-        meta = FeatureFlagStoreMeta(datetime(2018, 5, 4))
-
-        self.store.create(feature_name)
-        self.store.set_meta(feature_name, meta, asynch=True)
-
-        self.assertTrue(
-            all(
-                [
-                    self.primary.get(feature_name).meta == meta.to_dict(),
-                    *[
-                        replica.get(feature_name).meta == meta.to_dict()
-                        for replica in self.replicas
-                    ],
-                ]
-            )
-        )
-
     def test_when_asynch_is_false_sets_meta_in_primary_and_replicas(self):
         feature_name = self.txt()
 
         meta = FeatureFlagStoreMeta(datetime(2018, 5, 4))
 
-        self.store.create(feature_name)
+        self.store.create(feature_name, asynch=False)
         self.store.set_meta(feature_name, meta, asynch=False)
 
         self.assertTrue(
@@ -293,7 +206,7 @@ class TestSetMeta(BaseTest):
         replicas = [MagicMock(), MagicMock(), MagicMock()]
         store = ReplicatedFeatureFlagStore(primary, *replicas)
 
-        store.create(feature_name)
+        store.create(feature_name, asynch=False)
 
         args = (feature_name, meta)
         kwargs = {}
