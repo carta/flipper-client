@@ -677,6 +677,37 @@ if __name__ == '__main__':
     TServer.TSimpleServer(processor, transport, tfactory, pfactory)
 ```
 
+## Usage with Replicated backend
+
+The `ReplicatedFeatureFlagStore` is meant for cases where you have a primary store and one or more secondary stores that you want to replicate your writes to. For example, if you wanted to write to redis, but also record these writes to an auditing system somewhere else.
+
+This store takes a primary store, which must be an instance of `AbstractFeatureFlagStore`, and then 0 or more other instances to act as the replicas.
+
+When you do any write operations, such as `create`, `set`, `delete`, or `set_meta`, these actions are first performed on the primary store, and then repeated on each of the secondary stores. **Important: no attempt is made to provide transaction-style consistency or rollbacks across writes**. Read operations will always pull from the primary store.
+
+By default, the write operations are replicated asynchronously. To replicate synchronously, pass `asynch=False` to any of the methods.
+
+
+```python
+import redis
+from flipper import (
+    FeatureFlagClient,
+    RedisFeatureFlagStore,
+    ReplicatedFeatureFlagStore,
+)
+
+
+primary_redis = redis.StrictRedis(host='localhost', port=6379, db=0)
+backup_redis = redis.StrictRedis(host='localhost', port=6379, db=1)
+
+primary = RedisFeatureFlagStore(primary_redis, base_key='feature-flags')
+replica = RedisFeatureFlagStore(backup_redis, base_key='feature-flags')
+
+store = ReplicatedFeatureFlagStore(primary, replica)
+
+client = FeatureFlagClient(store)
+```
+
 # Creating a custom backend
 
 Don't see the backend you like? You can easily implement your own. If you define a class that implements the `AbstractFeatureFlagStore` interface, located in `flipper.contrib.store` then you can pass an instance of it to the `FeatureFlagClient` constructor.

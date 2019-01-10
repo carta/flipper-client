@@ -6,6 +6,7 @@ from .contrib import (
     ConsulFeatureFlagStore,
     MemoryFeatureFlagStore,
     RedisFeatureFlagStore,
+    ReplicatedFeatureFlagStore,
     ThriftRPCFeatureFlagStore,
 )
 from .flag import FlagDoesNotExistError
@@ -19,5 +20,6 @@ __all__ = [
     "FlagDoesNotExistError",
     "MemoryFeatureFlagStore",
     "RedisFeatureFlagStore",
+    "ReplicatedFeatureFlagStore",
     "ThriftRPCFeatureFlagStore",
 ]
