@@ -44,12 +44,10 @@ class ReplicatedFeatureFlagStore(AbstractFeatureFlagStore):
         threads = []
 
         for replica in self._replicas:
-            if asynch is False:
-                fn(replica, *args, **kwargs)
-            else:
-                threads.append(
-                    self._start_thread(fn, args=(replica, *args), kwargs=kwargs)
-                )
+            threads.append(self._start_thread(fn, args=(replica, *args), kwargs=kwargs))
+
+        if asynch is False:
+            return
 
         for thread in threads:
             thread.join(timeout=self._replication_timeout)
@@ -58,6 +56,7 @@ class ReplicatedFeatureFlagStore(AbstractFeatureFlagStore):
         self, fn: Callable, args: Tuple = (), kwargs: Dict = {}
     ) -> Thread:
         thread = Thread(target=fn, args=args, kwargs=kwargs)
+        thread.daemon = True
         thread.start()
         return thread
 
