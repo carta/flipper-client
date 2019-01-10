@@ -24,15 +24,17 @@ class ReplicatedFeatureFlagStore(AbstractFeatureFlagStore):
         client_data: Optional[dict] = None,
         asynch: Optional[bool] = True,
     ) -> None:
-        def create(store, *args, **kwargs):
+        def perform_create_on_store(store, *args, **kwargs):
             store.create(*args, **kwargs)
 
         args = (feature_name,)
         kwargs = {"is_enabled": is_enabled, "client_data": client_data}
 
-        create(self._primary, *args, **kwargs)
+        perform_create_on_store(self._primary, *args, **kwargs)
 
-        self._replicate(create, asynch=asynch, args=args, kwargs=kwargs)
+        self._replicate(
+            perform_create_on_store, asynch=asynch, args=args, kwargs=kwargs
+        )
 
     def _replicate(
         self,
@@ -66,22 +68,22 @@ class ReplicatedFeatureFlagStore(AbstractFeatureFlagStore):
     def set(
         self, feature_name: str, is_enabled: bool, asynch: Optional[bool] = True
     ) -> None:
-        def set_(store, *args, **kwargs):
+        def perform_set_on_store(store, *args, **kwargs):
             store.set(*args, **kwargs)
 
         args = (feature_name, is_enabled)
 
-        set_(self._primary, *args)
+        perform_set_on_store(self._primary, *args)
 
-        self._replicate(set_, asynch=asynch, args=args)
+        self._replicate(perform_set_on_store, asynch=asynch, args=args)
 
     def delete(self, feature_name: str, asynch: Optional[bool] = True) -> None:
-        def delete(store, *args, **kwargs):
+        def perform_delete_on_store(store, *args, **kwargs):
             store.delete(*args, **kwargs)
 
-        delete(self._primary, feature_name)
+        perform_delete_on_store(self._primary, feature_name)
 
-        self._replicate(delete, asynch=asynch, args=(feature_name,))
+        self._replicate(perform_delete_on_store, asynch=asynch, args=(feature_name,))
 
     def list(self, *args, **kwargs) -> Iterator[FeatureFlagStoreItem]:
         return self._primary.list(*args, **kwargs)
@@ -92,11 +94,11 @@ class ReplicatedFeatureFlagStore(AbstractFeatureFlagStore):
         meta: FeatureFlagStoreMeta,
         asynch: Optional[bool] = True,
     ) -> None:
-        def set_meta(store, *args, **kwargs):
+        def perform_set_meta_on_store(store, *args, **kwargs):
             store.set_meta(*args, **kwargs)
 
         args = (feature_name, meta)
 
-        set_meta(self._primary, *args)
+        perform_set_meta_on_store(self._primary, *args)
 
-        self._replicate(set_meta, asynch=asynch, args=args)
+        self._replicate(perform_set_meta_on_store, asynch=asynch, args=args)
