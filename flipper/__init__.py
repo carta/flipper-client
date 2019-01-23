@@ -7,6 +7,7 @@ from .contrib import (
     MemoryFeatureFlagStore,
     RedisFeatureFlagStore,
     ReplicatedFeatureFlagStore,
+    S3FeatureFlagStore,
     ThriftRPCFeatureFlagStore,
 )
 from .flag import FlagDoesNotExistError
@@ -21,5 +22,6 @@ __all__ = [
     "MemoryFeatureFlagStore",
     "RedisFeatureFlagStore",
     "ReplicatedFeatureFlagStore",
+    "S3FeatureFlagStore",
     "ThriftRPCFeatureFlagStore",
 ]

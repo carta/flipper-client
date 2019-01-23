@@ -6,6 +6,7 @@ requirements = [
     "python-consul~=1.0.1",
     "redis~=2.10.6",
     "thrift~=0.11.0",
+    "boto3~=1.9.83",
 ]
 
 
@@ -30,6 +31,7 @@ setup(
             "isort",
             "flake8",
             "mypy",
+            "moto",
         ]
     },
 )

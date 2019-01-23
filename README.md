@@ -708,6 +708,25 @@ store = ReplicatedFeatureFlagStore(primary, replica)
 client = FeatureFlagClient(store)
 ```
 
+## Usage with S3 backend
+
+To store flag data in S3, use the `S3FeatureFlagStore`. Simply create the bucket, initialize a `boto3` (not `boto`) S3 client, and launch an instance of `S3FeatureFlagStore`, passing the client and the bucket name. The store will write to the root of the bucket using the flag name as the object key. For example usage, take a look at the tests. For more information on working with boto3, see [the documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html).
+
+Keep in mind that S3 is not an ideal choice for a production backend due to higher latency when compared to something like redis. However, it can be useful when used with [`ReplicatedFeatureFlagStore`](#usage-with-replicated-backend) as a replica for cold storage and backups. That way if your hot storage gets wiped out you have a backup or if you need an easy way to copy all the feature flag data it can be retrieved from S3.
+
+
+```python
+import boto3
+from flipper import FeatureFlagClient, S3FeatureFlagStore
+
+
+s3 = boto3.client('s3')
+
+store = S3FeatureFlagStore(s3, 'my-flipper-bucket')
+
+client = FeatureFlagClient(store)
+```
+
 # Creating a custom backend
 
 Don't see the backend you like? You can easily implement your own. If you define a class that implements the `AbstractFeatureFlagStore` interface, located in `flipper.contrib.store` then you can pass an instance of it to the `FeatureFlagClient` constructor.
