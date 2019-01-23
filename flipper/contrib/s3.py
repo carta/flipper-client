@@ -58,7 +58,7 @@ class S3FeatureFlagStore(AbstractFeatureFlagStore):
     ) -> Iterator[FeatureFlagStoreItem]:
         visited = 0
 
-        for key in self._list_objects(limit):
+        for key in self._list_object_keys():
             visited += 1
 
             if visited <= offset:
@@ -68,35 +68,12 @@ class S3FeatureFlagStore(AbstractFeatureFlagStore):
 
             yield cast(FeatureFlagStoreItem, self.get(key))
 
-    def _list_objects(self, limit: Optional[int]):
-        continuation_token = None
+    def _list_object_keys(self) -> Iterator[str]:
+        paginator = self._client.get_paginator("list_objects_v2")
 
-        while True:
-            response = self._client.list_objects_v2(
-                **self._make_kwargs_for_list_objects_api_call(limit, continuation_token)
-            )
-
-            for result in response["Contents"]:
-                yield result["Key"]
-
-            if response["IsTruncated"] is False:
-                return
-
-            continuation_token = response["NextContinuationToken"]
-
-    def _make_kwargs_for_list_objects_api_call(
-        self, limit: Optional[int], continuation_token: Optional[str]
-    ) -> dict:
-        if limit is None:
-            limit = self._page_size
-        limit = min(limit, self._page_size)
-
-        kwargs = {"Bucket": self._bucket_name, "MaxKeys": limit}
-
-        if continuation_token is not None:
-            kwargs["ContinuationToken"] = continuation_token
-
-        return kwargs
+        for page in paginator.paginate(Bucket=self._bucket_name):
+            for content in page.get("Contents", []):
+                yield content["Key"]
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta) -> None:
         existing = self.get(feature_name)
