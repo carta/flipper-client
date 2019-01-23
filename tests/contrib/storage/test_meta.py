@@ -52,7 +52,6 @@ class TestFromDict(BaseTest):
         bucketer = PercentageBucketer(percentage=Percentage(0.3))
         json = {"created_date": self.now, "bucketer": bucketer.to_dict()}
         meta = FeatureFlagStoreMeta.from_dict(json)
-        print(meta.bucketer._percentage)
         self.assertEqual(bucketer.to_dict(), meta.bucketer.to_dict())
 
 

@@ -61,9 +61,9 @@ class S3FeatureFlagStore(AbstractFeatureFlagStore):
         for key in self._list_object_keys():
             visited += 1
 
-            if visited <= offset:
+            if self._has_not_exceeded_list_offset(visited, offset):
                 continue
-            if limit is not None and visited > limit + offset:
+            if self._has_reached_end_of_list(limit, offset, visited):
                 return
 
             yield cast(FeatureFlagStoreItem, self.get(key))
@@ -74,6 +74,14 @@ class S3FeatureFlagStore(AbstractFeatureFlagStore):
         for page in paginator.paginate(Bucket=self._bucket_name):
             for content in page.get("Contents", []):
                 yield content["Key"]
+
+    def _has_not_exceeded_list_offset(self, visited: int, offset: int) -> bool:
+        return visited <= offset
+
+    def _has_reached_end_of_list(
+        self, limit: Optional[int], offset: int, visited: int
+    ) -> bool:
+        return limit is not None and visited > limit + offset
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta) -> None:
         existing = self.get(feature_name)
