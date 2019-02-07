@@ -4,14 +4,13 @@ from typing import Callable, Dict, Iterator, Optional, Tuple
 from .interface import AbstractFeatureFlagStore
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 
+StoreType = AbstractFeatureFlagStore
+
 
 class ReplicatedFeatureFlagStore(AbstractFeatureFlagStore):
-    def __init__(  # type: ignore
-        self,
-        primary: AbstractFeatureFlagStore,
-        *replicas: AbstractFeatureFlagStore,
-        replication_timeout=1,
-    ):
+    def __init__(
+        self, primary: StoreType, *replicas: StoreType, replication_timeout=1
+    ) -> None:
         self._primary = primary
         self._replicas = replicas
         self._stores = [primary] + list(replicas)

@@ -6,9 +6,9 @@ from .util.date import now
 
 
 class S3FeatureFlagStore(AbstractFeatureFlagStore):
-    def __init__(  # type: ignore
+    def __init__(
         self, client, bucket_name: str, page_size: Optional[int] = 1000
-    ):
+    ) -> None:
         self._client = client
         self._bucket_name = bucket_name
         self._page_size = page_size
