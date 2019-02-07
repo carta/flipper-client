@@ -6,12 +6,12 @@ from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 
 
 class ReplicatedFeatureFlagStore(AbstractFeatureFlagStore):
-    def __init__(
+    def __init__(  # type: ignore
         self,
         primary: AbstractFeatureFlagStore,
         *replicas: AbstractFeatureFlagStore,
         replication_timeout=1,
-    ) -> None:
+    ):
         self._primary = primary
         self._replicas = replicas
         self._stores = [primary] + list(replicas)
