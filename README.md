@@ -747,3 +747,23 @@ brew install thrift
 ```
 
 Then simply run `make thrift`. Remember to commit the results of the compilation step.
+
+# System requirements
+
+This project requires python version 3 or greater.
+
+# Open Source
+
+This library is made availble as open source under the Apache 2.0 license. This is not an officially supported Carta product.
+
+## Development status
+
+This project is actively maintained by the maintainers listed in the MAINTAINERS file. There are no major items on the project roadmap at this time, however bug fixes and new features may be added from time time. We are open to contributions from the community as well.
+
+## Contacts
+
+The project maintainers can be reached via email at adam.savitzky@carta.com or luis.montiel@carta.com.
+
+## Discussion
+
+We use github issues for discussing features, bugs, and other project related issues.
