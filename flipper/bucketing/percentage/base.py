@@ -41,7 +41,8 @@ class AbstractPercentage(metaclass=ABCMeta):
         return self.value > comparison
 
     def _assert_is_valid_comparison_type(self, comparison) -> None:
-        assert isinstance(comparison, numbers.Number)
+        if isinstance(comparison, numbers.Number) is False:
+            raise ValueError
 
     def __ge__(self, comparison) -> bool:
         self._assert_is_valid_comparison_type(comparison)

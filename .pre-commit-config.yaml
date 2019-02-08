@@ -38,3 +38,8 @@ repos:
         exclude: flipper_thrift|flipper_client\.egg_info|build|.circleci
       - id: flake8
         exclude: flipper_thrift|flipper_client\.egg_info|build|.circleci
+  - repo: https://github.com/PyCQA/bandit
+    rev: master
+    hooks:
+      - id: bandit
+        files: flipper

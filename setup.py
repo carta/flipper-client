@@ -32,7 +32,7 @@ setup(
             "flake8",
             "mypy",
             "moto",
-            "copyright",
+            "bandit",
         ]
     },
 )

@@ -34,7 +34,7 @@ class ConsistentHashPercentageBucketer(PercentageBucketer):
 
         serialized = self._serialize_checks(checks)
 
-        hashed = hashlib.sha1(serialized)
+        hashed = hashlib.sha1(serialized)  # nosec
         score = self._score_hash(hashed)
 
         return score <= self._percentage
