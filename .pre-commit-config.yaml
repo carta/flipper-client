@@ -42,4 +42,4 @@ repos:
     rev: master
     hooks:
       - id: bandit
-        files: flipper
+        files: ^flipper$
