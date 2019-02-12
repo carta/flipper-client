@@ -47,3 +47,16 @@ hooks:
 
 mypy:
 	@mypy --follow-imports=silent --ignore-missing-imports flipper
+
+
+circleci-install:
+	brew install circleci
+	circleci setup
+
+
+validate-circleci:
+	circleci config validate
+
+
+exec-circleci: validate-circleci
+	circleci local execute

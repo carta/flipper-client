@@ -26,7 +26,7 @@ setup(
             "setuptools",
             "wheel",
             "ipdb",
-            "black",
+            "black==18.6b4",
             "pre-commit",
             "isort",
             "flake8",

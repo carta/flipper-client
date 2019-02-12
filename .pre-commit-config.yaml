@@ -8,7 +8,7 @@ repos:
             - --follow-imports=silent
             - --ignore-missing-imports
   - repo: https://github.com/ambv/black
-    rev: master
+    rev: 18.6b4
     hooks:
       - id: black
         exclude: flipper_thrift|flipper_client\.egg_info|build|.circleci
