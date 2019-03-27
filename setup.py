@@ -22,7 +22,6 @@ setup(
             "pytest~=3.6.2",
             "ipython",
             "thrift",
-            "cloudsmith-cli",
             "setuptools",
             "wheel",
             "ipdb",
@@ -33,6 +32,7 @@ setup(
             "mypy",
             "moto",
             "bandit",
+            "twine",
         ]
     },
 )

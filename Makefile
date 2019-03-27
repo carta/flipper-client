@@ -38,7 +38,7 @@ version:
 
 
 publish: build
-	cloudsmith push python carta/pip dist/flipper_client-${PKG_VERSION}-py3-none-any.whl
+	twine upload dist/*
 
 
 hooks:
