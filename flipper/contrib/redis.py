@@ -21,7 +21,7 @@ from .util.date import now
 class RedisFeatureFlagStore(AbstractFeatureFlagStore):
     def __init__(self, redis, base_key="features"):
         self._redis = redis
-        self.base_key = "features"
+        self.base_key = base_key
 
     def create(
         self,
