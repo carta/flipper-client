@@ -92,7 +92,7 @@ class RedisFeatureFlagStore(AbstractFeatureFlagStore):
         if existing is None:
             raise FlagDoesNotExistError(
                 "Feature %s does not exist" % feature_name
-            )  # noqa: E501
+            )
 
         item = FeatureFlagStoreItem(feature_name, existing.raw_is_enabled, meta)
 
