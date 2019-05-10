@@ -12,9 +12,9 @@ requirements = [
 
 setup(
     name="flipper-client",
-    version="0.2.8",
+    version="0.2.9",
     packages=find_packages(),
-    license="MIT",
+    license="Apache License 2.0",
     long_description=open("README.md").read(),
     install_requires=requirements,
     extras_require={
@@ -35,4 +35,5 @@ setup(
             "twine",
         ]
     },
+    classifiers=["License :: OSI Approved :: Apache Software License"],
 )
