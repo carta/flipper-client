@@ -41,13 +41,6 @@ class Iface(object):
         """
         pass
 
-    def Delete(self, feature_name):
-        """
-        Parameters:
-         - feature_name
-        """
-        pass
-
     def Get(self, feature_name):
         """
         Parameters:
@@ -63,11 +56,10 @@ class Iface(object):
         """
         pass
 
-    def SetMeta(self, feature_name, meta):
+    def Delete(self, feature_name):
         """
         Parameters:
          - feature_name
-         - meta
         """
         pass
 
@@ -76,6 +68,14 @@ class Iface(object):
         Parameters:
          - limit
          - offset
+        """
+        pass
+
+    def SetMeta(self, feature_name, meta):
+        """
+        Parameters:
+         - feature_name
+         - meta
         """
         pass
 
@@ -95,7 +95,7 @@ class Client(Iface):
          - client_data
         """
         self.send_Create(feature_name, is_enabled, client_data)
-        self.recv_Create()
+        return self.recv_Create()
 
     def send_Create(self, feature_name, is_enabled, client_data):
         self._oprot.writeMessageBegin('Create', TMessageType.CALL, self._seqid)
@@ -118,36 +118,11 @@ class Client(Iface):
         result = Create_result()
         result.read(iprot)
         iprot.readMessageEnd()
-        return
-
-    def Delete(self, feature_name):
-        """
-        Parameters:
-         - feature_name
-        """
-        self.send_Delete(feature_name)
-        self.recv_Delete()
-
-    def send_Delete(self, feature_name):
-        self._oprot.writeMessageBegin('Delete', TMessageType.CALL, self._seqid)
-        args = Delete_args()
-        args.feature_name = feature_name
-        args.write(self._oprot)
-        self._oprot.writeMessageEnd()
-        self._oprot.trans.flush()
-
-    def recv_Delete(self):
-        iprot = self._iprot
-        (fname, mtype, rseqid) = iprot.readMessageBegin()
-        if mtype == TMessageType.EXCEPTION:
-            x = TApplicationException()
-            x.read(iprot)
-            iprot.readMessageEnd()
-            raise x
-        result = Delete_result()
-        result.read(iprot)
-        iprot.readMessageEnd()
-        return
+        if result.success is not None:
+            return result.success
+        if result.error is not None:
+            raise result.error
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "Create failed: unknown result")
 
     def Get(self, feature_name):
         """
@@ -178,6 +153,8 @@ class Client(Iface):
         iprot.readMessageEnd()
         if result.success is not None:
             return result.success
+        if result.error is not None:
+            raise result.error
         raise TApplicationException(TApplicationException.MISSING_RESULT, "Get failed: unknown result")
 
     def Set(self, feature_name, is_enabled):
@@ -209,27 +186,27 @@ class Client(Iface):
         result = Set_result()
         result.read(iprot)
         iprot.readMessageEnd()
+        if result.error is not None:
+            raise result.error
         return
 
-    def SetMeta(self, feature_name, meta):
+    def Delete(self, feature_name):
         """
         Parameters:
          - feature_name
-         - meta
         """
-        self.send_SetMeta(feature_name, meta)
-        self.recv_SetMeta()
+        self.send_Delete(feature_name)
+        self.recv_Delete()
 
-    def send_SetMeta(self, feature_name, meta):
-        self._oprot.writeMessageBegin('SetMeta', TMessageType.CALL, self._seqid)
-        args = SetMeta_args()
+    def send_Delete(self, feature_name):
+        self._oprot.writeMessageBegin('Delete', TMessageType.CALL, self._seqid)
+        args = Delete_args()
         args.feature_name = feature_name
-        args.meta = meta
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
 
-    def recv_SetMeta(self):
+    def recv_Delete(self):
         iprot = self._iprot
         (fname, mtype, rseqid) = iprot.readMessageBegin()
         if mtype == TMessageType.EXCEPTION:
@@ -237,9 +214,11 @@ class Client(Iface):
             x.read(iprot)
             iprot.readMessageEnd()
             raise x
-        result = SetMeta_result()
+        result = Delete_result()
         result.read(iprot)
         iprot.readMessageEnd()
+        if result.error is not None:
+            raise result.error
         return
 
     def List(self, limit, offset):
@@ -273,7 +252,42 @@ class Client(Iface):
         iprot.readMessageEnd()
         if result.success is not None:
             return result.success
+        if result.error is not None:
+            raise result.error
         raise TApplicationException(TApplicationException.MISSING_RESULT, "List failed: unknown result")
+
+    def SetMeta(self, feature_name, meta):
+        """
+        Parameters:
+         - feature_name
+         - meta
+        """
+        self.send_SetMeta(feature_name, meta)
+        self.recv_SetMeta()
+
+    def send_SetMeta(self, feature_name, meta):
+        self._oprot.writeMessageBegin('SetMeta', TMessageType.CALL, self._seqid)
+        args = SetMeta_args()
+        args.feature_name = feature_name
+        args.meta = meta
+        args.write(self._oprot)
+        self._oprot.writeMessageEnd()
+        self._oprot.trans.flush()
+
+    def recv_SetMeta(self):
+        iprot = self._iprot
+        (fname, mtype, rseqid) = iprot.readMessageBegin()
+        if mtype == TMessageType.EXCEPTION:
+            x = TApplicationException()
+            x.read(iprot)
+            iprot.readMessageEnd()
+            raise x
+        result = SetMeta_result()
+        result.read(iprot)
+        iprot.readMessageEnd()
+        if result.error is not None:
+            raise result.error
+        return
 
 
 class Processor(Iface, TProcessor):
@@ -281,11 +295,11 @@ class Processor(Iface, TProcessor):
         self._handler = handler
         self._processMap = {}
         self._processMap["Create"] = Processor.process_Create
-        self._processMap["Delete"] = Processor.process_Delete
         self._processMap["Get"] = Processor.process_Get
         self._processMap["Set"] = Processor.process_Set
-        self._processMap["SetMeta"] = Processor.process_SetMeta
+        self._processMap["Delete"] = Processor.process_Delete
         self._processMap["List"] = Processor.process_List
+        self._processMap["SetMeta"] = Processor.process_SetMeta
 
     def process(self, iprot, oprot):
         (name, type, seqid) = iprot.readMessageBegin()
@@ -308,10 +322,13 @@ class Processor(Iface, TProcessor):
         iprot.readMessageEnd()
         result = Create_result()
         try:
-            self._handler.Create(args.feature_name, args.is_enabled, args.client_data)
+            result.success = self._handler.Create(args.feature_name, args.is_enabled, args.client_data)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
+        except FlipperException as error:
+            msg_type = TMessageType.REPLY
+            result.error = error
         except TApplicationException as ex:
             logging.exception('TApplication exception in handler')
             msg_type = TMessageType.EXCEPTION
@@ -321,29 +338,6 @@ class Processor(Iface, TProcessor):
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
         oprot.writeMessageBegin("Create", msg_type, seqid)
-        result.write(oprot)
-        oprot.writeMessageEnd()
-        oprot.trans.flush()
-
-    def process_Delete(self, seqid, iprot, oprot):
-        args = Delete_args()
-        args.read(iprot)
-        iprot.readMessageEnd()
-        result = Delete_result()
-        try:
-            self._handler.Delete(args.feature_name)
-            msg_type = TMessageType.REPLY
-        except TTransport.TTransportException:
-            raise
-        except TApplicationException as ex:
-            logging.exception('TApplication exception in handler')
-            msg_type = TMessageType.EXCEPTION
-            result = ex
-        except Exception:
-            logging.exception('Unexpected exception in handler')
-            msg_type = TMessageType.EXCEPTION
-            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("Delete", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
@@ -358,6 +352,9 @@ class Processor(Iface, TProcessor):
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
+        except FlipperException as error:
+            msg_type = TMessageType.REPLY
+            result.error = error
         except TApplicationException as ex:
             logging.exception('TApplication exception in handler')
             msg_type = TMessageType.EXCEPTION
@@ -381,6 +378,9 @@ class Processor(Iface, TProcessor):
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
+        except FlipperException as error:
+            msg_type = TMessageType.REPLY
+            result.error = error
         except TApplicationException as ex:
             logging.exception('TApplication exception in handler')
             msg_type = TMessageType.EXCEPTION
@@ -394,16 +394,19 @@ class Processor(Iface, TProcessor):
         oprot.writeMessageEnd()
         oprot.trans.flush()
 
-    def process_SetMeta(self, seqid, iprot, oprot):
-        args = SetMeta_args()
+    def process_Delete(self, seqid, iprot, oprot):
+        args = Delete_args()
         args.read(iprot)
         iprot.readMessageEnd()
-        result = SetMeta_result()
+        result = Delete_result()
         try:
-            self._handler.SetMeta(args.feature_name, args.meta)
+            self._handler.Delete(args.feature_name)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
+        except FlipperException as error:
+            msg_type = TMessageType.REPLY
+            result.error = error
         except TApplicationException as ex:
             logging.exception('TApplication exception in handler')
             msg_type = TMessageType.EXCEPTION
@@ -412,7 +415,7 @@ class Processor(Iface, TProcessor):
             logging.exception('Unexpected exception in handler')
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("SetMeta", msg_type, seqid)
+        oprot.writeMessageBegin("Delete", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
@@ -427,6 +430,9 @@ class Processor(Iface, TProcessor):
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
+        except FlipperException as error:
+            msg_type = TMessageType.REPLY
+            result.error = error
         except TApplicationException as ex:
             logging.exception('TApplication exception in handler')
             msg_type = TMessageType.EXCEPTION
@@ -436,6 +442,32 @@ class Processor(Iface, TProcessor):
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
         oprot.writeMessageBegin("List", msg_type, seqid)
+        result.write(oprot)
+        oprot.writeMessageEnd()
+        oprot.trans.flush()
+
+    def process_SetMeta(self, seqid, iprot, oprot):
+        args = SetMeta_args()
+        args.read(iprot)
+        iprot.readMessageEnd()
+        result = SetMeta_result()
+        try:
+            self._handler.SetMeta(args.feature_name, args.meta)
+            msg_type = TMessageType.REPLY
+        except TTransport.TTransportException:
+            raise
+        except FlipperException as error:
+            msg_type = TMessageType.REPLY
+            result.error = error
+        except TApplicationException as ex:
+            logging.exception('TApplication exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = ex
+        except Exception:
+            logging.exception('Unexpected exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
+        oprot.writeMessageBegin("SetMeta", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
@@ -452,7 +484,7 @@ class Create_args(object):
     """
 
 
-    def __init__(self, feature_name=None, is_enabled=False, client_data=None,):
+    def __init__(self, feature_name=None, is_enabled=None, client_data=None,):
         self.feature_name = feature_name
         self.is_enabled = is_enabled
         self.client_data = client_data
@@ -523,13 +555,22 @@ all_structs.append(Create_args)
 Create_args.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'feature_name', 'UTF8', None, ),  # 1
-    (2, TType.BOOL, 'is_enabled', None, False, ),  # 2
+    (2, TType.BOOL, 'is_enabled', None, None, ),  # 2
     (3, TType.STRING, 'client_data', 'UTF8', None, ),  # 3
 )
 
 
 class Create_result(object):
+    """
+    Attributes:
+     - success
+     - error
+    """
 
+
+    def __init__(self, success=None, error=None,):
+        self.success = success
+        self.error = error
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -540,6 +581,18 @@ class Create_result(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
+            if fid == 0:
+                if ftype == TType.STRUCT:
+                    self.success = FeatureFlagStoreItem()
+                    self.success.read(iprot)
+                else:
+                    iprot.skip(ftype)
+            elif fid == 1:
+                if ftype == TType.STRUCT:
+                    self.error = FlipperException()
+                    self.error.read(iprot)
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -550,6 +603,14 @@ class Create_result(object):
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
         oprot.writeStructBegin('Create_result')
+        if self.success is not None:
+            oprot.writeFieldBegin('success', TType.STRUCT, 0)
+            self.success.write(oprot)
+            oprot.writeFieldEnd()
+        if self.error is not None:
+            oprot.writeFieldBegin('error', TType.STRUCT, 1)
+            self.error.write(oprot)
+            oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
 
@@ -568,110 +629,8 @@ class Create_result(object):
         return not (self == other)
 all_structs.append(Create_result)
 Create_result.thrift_spec = (
-)
-
-
-class Delete_args(object):
-    """
-    Attributes:
-     - feature_name
-    """
-
-
-    def __init__(self, feature_name=None,):
-        self.feature_name = feature_name
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRING:
-                    self.feature_name = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('Delete_args')
-        if self.feature_name is not None:
-            oprot.writeFieldBegin('feature_name', TType.STRING, 1)
-            oprot.writeString(self.feature_name.encode('utf-8') if sys.version_info[0] == 2 else self.feature_name)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-all_structs.append(Delete_args)
-Delete_args.thrift_spec = (
-    None,  # 0
-    (1, TType.STRING, 'feature_name', 'UTF8', None, ),  # 1
-)
-
-
-class Delete_result(object):
-
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('Delete_result')
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-all_structs.append(Delete_result)
-Delete_result.thrift_spec = (
+    (0, TType.STRUCT, 'success', [FeatureFlagStoreItem, None], None, ),  # 0
+    (1, TType.STRUCT, 'error', [FlipperException, None], None, ),  # 1
 )
 
 
@@ -740,11 +699,13 @@ class Get_result(object):
     """
     Attributes:
      - success
+     - error
     """
 
 
-    def __init__(self, success=None,):
+    def __init__(self, success=None, error=None,):
         self.success = success
+        self.error = error
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -761,6 +722,12 @@ class Get_result(object):
                     self.success.read(iprot)
                 else:
                     iprot.skip(ftype)
+            elif fid == 1:
+                if ftype == TType.STRUCT:
+                    self.error = FlipperException()
+                    self.error.read(iprot)
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -774,6 +741,10 @@ class Get_result(object):
         if self.success is not None:
             oprot.writeFieldBegin('success', TType.STRUCT, 0)
             self.success.write(oprot)
+            oprot.writeFieldEnd()
+        if self.error is not None:
+            oprot.writeFieldBegin('error', TType.STRUCT, 1)
+            self.error.write(oprot)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -794,6 +765,7 @@ class Get_result(object):
 all_structs.append(Get_result)
 Get_result.thrift_spec = (
     (0, TType.STRUCT, 'success', [FeatureFlagStoreItem, None], None, ),  # 0
+    (1, TType.STRUCT, 'error', [FlipperException, None], None, ),  # 1
 )
 
 
@@ -871,7 +843,14 @@ Set_args.thrift_spec = (
 
 
 class Set_result(object):
+    """
+    Attributes:
+     - error
+    """
 
+
+    def __init__(self, error=None,):
+        self.error = error
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -882,6 +861,12 @@ class Set_result(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
+            if fid == 1:
+                if ftype == TType.STRUCT:
+                    self.error = FlipperException()
+                    self.error.read(iprot)
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -892,6 +877,10 @@ class Set_result(object):
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
         oprot.writeStructBegin('Set_result')
+        if self.error is not None:
+            oprot.writeFieldBegin('error', TType.STRUCT, 1)
+            self.error.write(oprot)
+            oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
 
@@ -910,20 +899,20 @@ class Set_result(object):
         return not (self == other)
 all_structs.append(Set_result)
 Set_result.thrift_spec = (
+    None,  # 0
+    (1, TType.STRUCT, 'error', [FlipperException, None], None, ),  # 1
 )
 
 
-class SetMeta_args(object):
+class Delete_args(object):
     """
     Attributes:
      - feature_name
-     - meta
     """
 
 
-    def __init__(self, feature_name=None, meta=None,):
+    def __init__(self, feature_name=None,):
         self.feature_name = feature_name
-        self.meta = meta
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -939,9 +928,66 @@ class SetMeta_args(object):
                     self.feature_name = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.meta = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('Delete_args')
+        if self.feature_name is not None:
+            oprot.writeFieldBegin('feature_name', TType.STRING, 1)
+            oprot.writeString(self.feature_name.encode('utf-8') if sys.version_info[0] == 2 else self.feature_name)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(Delete_args)
+Delete_args.thrift_spec = (
+    None,  # 0
+    (1, TType.STRING, 'feature_name', 'UTF8', None, ),  # 1
+)
+
+
+class Delete_result(object):
+    """
+    Attributes:
+     - error
+    """
+
+
+    def __init__(self, error=None,):
+        self.error = error
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.STRUCT:
+                    self.error = FlipperException()
+                    self.error.read(iprot)
                 else:
                     iprot.skip(ftype)
             else:
@@ -953,14 +999,10 @@ class SetMeta_args(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('SetMeta_args')
-        if self.feature_name is not None:
-            oprot.writeFieldBegin('feature_name', TType.STRING, 1)
-            oprot.writeString(self.feature_name.encode('utf-8') if sys.version_info[0] == 2 else self.feature_name)
-            oprot.writeFieldEnd()
-        if self.meta is not None:
-            oprot.writeFieldBegin('meta', TType.STRING, 2)
-            oprot.writeString(self.meta.encode('utf-8') if sys.version_info[0] == 2 else self.meta)
+        oprot.writeStructBegin('Delete_result')
+        if self.error is not None:
+            oprot.writeFieldBegin('error', TType.STRUCT, 1)
+            self.error.write(oprot)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -978,54 +1020,10 @@ class SetMeta_args(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(SetMeta_args)
-SetMeta_args.thrift_spec = (
+all_structs.append(Delete_result)
+Delete_result.thrift_spec = (
     None,  # 0
-    (1, TType.STRING, 'feature_name', 'UTF8', None, ),  # 1
-    (2, TType.STRING, 'meta', 'UTF8', None, ),  # 2
-)
-
-
-class SetMeta_result(object):
-
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('SetMeta_result')
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-all_structs.append(SetMeta_result)
-SetMeta_result.thrift_spec = (
+    (1, TType.STRUCT, 'error', [FlipperException, None], None, ),  # 1
 )
 
 
@@ -1106,11 +1104,13 @@ class List_result(object):
     """
     Attributes:
      - success
+     - error
     """
 
 
-    def __init__(self, success=None,):
+    def __init__(self, success=None, error=None,):
         self.success = success
+        self.error = error
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -1124,12 +1124,18 @@ class List_result(object):
             if fid == 0:
                 if ftype == TType.LIST:
                     self.success = []
-                    (_etype3, _size0) = iprot.readListBegin()
-                    for _i4 in range(_size0):
-                        _elem5 = FeatureFlagStoreItem()
-                        _elem5.read(iprot)
-                        self.success.append(_elem5)
+                    (_etype26, _size23) = iprot.readListBegin()
+                    for _i27 in range(_size23):
+                        _elem28 = FeatureFlagStoreItem()
+                        _elem28.read(iprot)
+                        self.success.append(_elem28)
                     iprot.readListEnd()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 1:
+                if ftype == TType.STRUCT:
+                    self.error = FlipperException()
+                    self.error.read(iprot)
                 else:
                     iprot.skip(ftype)
             else:
@@ -1145,9 +1151,13 @@ class List_result(object):
         if self.success is not None:
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
-            for iter6 in self.success:
-                iter6.write(oprot)
+            for iter29 in self.success:
+                iter29.write(oprot)
             oprot.writeListEnd()
+            oprot.writeFieldEnd()
+        if self.error is not None:
+            oprot.writeFieldBegin('error', TType.STRUCT, 1)
+            self.error.write(oprot)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -1168,6 +1178,143 @@ class List_result(object):
 all_structs.append(List_result)
 List_result.thrift_spec = (
     (0, TType.LIST, 'success', (TType.STRUCT, [FeatureFlagStoreItem, None], False), None, ),  # 0
+    (1, TType.STRUCT, 'error', [FlipperException, None], None, ),  # 1
+)
+
+
+class SetMeta_args(object):
+    """
+    Attributes:
+     - feature_name
+     - meta
+    """
+
+
+    def __init__(self, feature_name=None, meta=None,):
+        self.feature_name = feature_name
+        self.meta = meta
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.STRING:
+                    self.feature_name = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.STRUCT:
+                    self.meta = FeatureFlagStoreMeta()
+                    self.meta.read(iprot)
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('SetMeta_args')
+        if self.feature_name is not None:
+            oprot.writeFieldBegin('feature_name', TType.STRING, 1)
+            oprot.writeString(self.feature_name.encode('utf-8') if sys.version_info[0] == 2 else self.feature_name)
+            oprot.writeFieldEnd()
+        if self.meta is not None:
+            oprot.writeFieldBegin('meta', TType.STRUCT, 2)
+            self.meta.write(oprot)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(SetMeta_args)
+SetMeta_args.thrift_spec = (
+    None,  # 0
+    (1, TType.STRING, 'feature_name', 'UTF8', None, ),  # 1
+    (2, TType.STRUCT, 'meta', [FeatureFlagStoreMeta, None], None, ),  # 2
+)
+
+
+class SetMeta_result(object):
+    """
+    Attributes:
+     - error
+    """
+
+
+    def __init__(self, error=None,):
+        self.error = error
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.STRUCT:
+                    self.error = FlipperException()
+                    self.error.read(iprot)
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('SetMeta_result')
+        if self.error is not None:
+            oprot.writeFieldBegin('error', TType.STRUCT, 1)
+            self.error.write(oprot)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(SetMeta_result)
+SetMeta_result.thrift_spec = (
+    None,  # 0
+    (1, TType.STRUCT, 'error', [FlipperException, None], None, ),  # 1
 )
 fix_spec(all_structs)
 del all_structs

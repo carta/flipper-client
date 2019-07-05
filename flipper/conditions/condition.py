@@ -11,6 +11,7 @@
 # CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
+import copy
 from collections import defaultdict
 from typing import Any, Dict, List
 
@@ -20,6 +21,10 @@ from .check import Check
 class Condition:
     def __init__(self, **checks):
         self._checks = self._parse_checks(checks)
+
+    @property
+    def checks(self) -> Dict[str, List[Check]]:
+        return copy.deepcopy(self._checks)
 
     def _parse_checks(self, checks: Dict[str, Any]) -> Dict[str, List[Check]]:
         parsed_checks = defaultdict(list)  # type: Dict[str, List[Check]]

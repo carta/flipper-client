@@ -29,6 +29,223 @@ from thrift.transport import TTransport
 all_structs = []
 
 
+class ErrorCode(object):
+    NOT_FOUND = 0
+
+    _VALUES_TO_NAMES = {
+        0: "NOT_FOUND",
+    }
+
+    _NAMES_TO_VALUES = {
+        "NOT_FOUND": 0,
+    }
+
+
+class FlipperException(TException):
+    """
+    Attributes:
+     - code
+     - message
+    """
+
+
+    def __init__(self, code=None, message="",):
+        self.code = code
+        self.message = message
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.I32:
+                    self.code = iprot.readI32()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.STRING:
+                    self.message = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('FlipperException')
+        if self.code is not None:
+            oprot.writeFieldBegin('code', TType.I32, 1)
+            oprot.writeI32(self.code)
+            oprot.writeFieldEnd()
+        if self.message is not None:
+            oprot.writeFieldBegin('message', TType.STRING, 2)
+            oprot.writeString(self.message.encode('utf-8') if sys.version_info[0] == 2 else self.message)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
+class ConditionCheck(object):
+    """
+    Attributes:
+     - variable
+     - value
+     - operator
+    """
+
+
+    def __init__(self, variable=None, value=None, operator=None,):
+        self.variable = variable
+        self.value = value
+        self.operator = operator
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.STRING:
+                    self.variable = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.STRING:
+                    self.value = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.STRUCT:
+                    self.operator = ConditionOperator()
+                    self.operator.read(iprot)
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('ConditionCheck')
+        if self.variable is not None:
+            oprot.writeFieldBegin('variable', TType.STRING, 1)
+            oprot.writeString(self.variable.encode('utf-8') if sys.version_info[0] == 2 else self.variable)
+            oprot.writeFieldEnd()
+        if self.value is not None:
+            oprot.writeFieldBegin('value', TType.STRING, 2)
+            oprot.writeString(self.value.encode('utf-8') if sys.version_info[0] == 2 else self.value)
+            oprot.writeFieldEnd()
+        if self.operator is not None:
+            oprot.writeFieldBegin('operator', TType.STRUCT, 3)
+            self.operator.write(oprot)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
+class ConditionOperator(object):
+    """
+    Attributes:
+     - symbol
+    """
+
+
+    def __init__(self, symbol=None,):
+        self.symbol = symbol
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.STRING:
+                    self.symbol = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('ConditionOperator')
+        if self.symbol is not None:
+            oprot.writeFieldBegin('symbol', TType.STRING, 1)
+            oprot.writeString(self.symbol.encode('utf-8') if sys.version_info[0] == 2 else self.symbol)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
 class FeatureFlagStoreItem(object):
     """
     Attributes:
@@ -94,12 +311,6 @@ class FeatureFlagStoreItem(object):
         oprot.writeStructEnd()
 
     def validate(self):
-        if self.feature_name is None:
-            raise TProtocolException(message='Required field feature_name is unset!')
-        if self.is_enabled is None:
-            raise TProtocolException(message='Required field is_enabled is unset!')
-        if self.meta is None:
-            raise TProtocolException(message='Required field meta is unset!')
         return
 
     def __repr__(self):
@@ -119,12 +330,16 @@ class FeatureFlagStoreMeta(object):
     Attributes:
      - created_date
      - client_data
+     - conditions
+     - bucketer
     """
 
 
-    def __init__(self, created_date=None, client_data=None,):
+    def __init__(self, created_date=None, client_data=None, conditions=None, bucketer=None,):
         self.created_date = created_date
         self.client_data = client_data
+        self.conditions = conditions
+        self.bucketer = bucketer
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -145,6 +360,33 @@ class FeatureFlagStoreMeta(object):
                     self.client_data = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.LIST:
+                    self.conditions = []
+                    (_etype3, _size0) = iprot.readListBegin()
+                    for _i4 in range(_size0):
+                        _elem5 = {}
+                        (_ktype7, _vtype8, _size6) = iprot.readMapBegin()
+                        for _i10 in range(_size6):
+                            _key11 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                            _val12 = []
+                            (_etype16, _size13) = iprot.readListBegin()
+                            for _i17 in range(_size13):
+                                _elem18 = ConditionCheck()
+                                _elem18.read(iprot)
+                                _val12.append(_elem18)
+                            iprot.readListEnd()
+                            _elem5[_key11] = _val12
+                        iprot.readMapEnd()
+                        self.conditions.append(_elem5)
+                    iprot.readListEnd()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 4:
+                if ftype == TType.STRING:
+                    self.bucketer = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -163,12 +405,28 @@ class FeatureFlagStoreMeta(object):
             oprot.writeFieldBegin('client_data', TType.STRING, 2)
             oprot.writeString(self.client_data.encode('utf-8') if sys.version_info[0] == 2 else self.client_data)
             oprot.writeFieldEnd()
+        if self.conditions is not None:
+            oprot.writeFieldBegin('conditions', TType.LIST, 3)
+            oprot.writeListBegin(TType.MAP, len(self.conditions))
+            for iter19 in self.conditions:
+                oprot.writeMapBegin(TType.STRING, TType.LIST, len(iter19))
+                for kiter20, viter21 in iter19.items():
+                    oprot.writeString(kiter20.encode('utf-8') if sys.version_info[0] == 2 else kiter20)
+                    oprot.writeListBegin(TType.STRUCT, len(viter21))
+                    for iter22 in viter21:
+                        iter22.write(oprot)
+                    oprot.writeListEnd()
+                oprot.writeMapEnd()
+            oprot.writeListEnd()
+            oprot.writeFieldEnd()
+        if self.bucketer is not None:
+            oprot.writeFieldBegin('bucketer', TType.STRING, 4)
+            oprot.writeString(self.bucketer.encode('utf-8') if sys.version_info[0] == 2 else self.bucketer)
+            oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
 
     def validate(self):
-        if self.created_date is None:
-            raise TProtocolException(message='Required field created_date is unset!')
         return
 
     def __repr__(self):
@@ -181,6 +439,24 @@ class FeatureFlagStoreMeta(object):
 
     def __ne__(self, other):
         return not (self == other)
+all_structs.append(FlipperException)
+FlipperException.thrift_spec = (
+    None,  # 0
+    (1, TType.I32, 'code', None, None, ),  # 1
+    (2, TType.STRING, 'message', 'UTF8', "", ),  # 2
+)
+all_structs.append(ConditionCheck)
+ConditionCheck.thrift_spec = (
+    None,  # 0
+    (1, TType.STRING, 'variable', 'UTF8', None, ),  # 1
+    (2, TType.STRING, 'value', 'UTF8', None, ),  # 2
+    (3, TType.STRUCT, 'operator', [ConditionOperator, None], None, ),  # 3
+)
+all_structs.append(ConditionOperator)
+ConditionOperator.thrift_spec = (
+    None,  # 0
+    (1, TType.STRING, 'symbol', 'UTF8', None, ),  # 1
+)
 all_structs.append(FeatureFlagStoreItem)
 FeatureFlagStoreItem.thrift_spec = (
     None,  # 0
@@ -193,6 +469,8 @@ FeatureFlagStoreMeta.thrift_spec = (
     None,  # 0
     (1, TType.I64, 'created_date', None, None, ),  # 1
     (2, TType.STRING, 'client_data', 'UTF8', None, ),  # 2
+    (3, TType.LIST, 'conditions', (TType.MAP, (TType.STRING, 'UTF8', TType.LIST, (TType.STRUCT, [ConditionCheck, None], False), False), False), None, ),  # 3
+    (4, TType.STRING, 'bucketer', 'UTF8', None, ),  # 4
 )
 fix_spec(all_structs)
 del all_structs
