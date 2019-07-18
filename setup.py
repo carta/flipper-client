@@ -16,6 +16,7 @@ setup(
     packages=find_packages(),
     license="Apache License 2.0",
     long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     install_requires=requirements,
     extras_require={
         "dev": [
