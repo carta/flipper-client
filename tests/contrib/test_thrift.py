@@ -4,10 +4,13 @@ from datetime import datetime
 from unittest.mock import MagicMock
 from uuid import uuid4
 
-from flipper import ThriftRPCFeatureFlagStore
+from flipper import Condition, ThriftRPCFeatureFlagStore
+from flipper.bucketing import ConsistentHashPercentageBucketer, LinearRampPercentage
 from flipper.contrib.storage import FeatureFlagStoreMeta
 from flipper.contrib.util.date import now
 from flipper_thrift.python.feature_flag_store.ttypes import (
+    ConditionCheck as TConditionCheck,
+    ConditionOperator as TConditionOperator,
     FeatureFlagStoreItem as TFeatureFlagStoreItem,
     FeatureFlagStoreMeta as TFeatureFlagStoreMeta,
 )
@@ -15,14 +18,33 @@ from flipper_thrift.python.feature_flag_store.ttypes import (
 
 class BaseTest(unittest.TestCase):
     def setUp(self):
+        self.meta = TFeatureFlagStoreMeta(
+            created_date=now(),
+            client_data='{"foo": 30}',
+            conditions=[
+                {
+                    "foo": [
+                        TConditionCheck(
+                            variable="foo",
+                            value="99",
+                            operator=TConditionOperator(symbol="lte"),
+                        )
+                    ]
+                }
+            ],
+            bucketer=json.dumps(
+                ConsistentHashPercentageBucketer(
+                    key_whitelist=["baz"], percentage=LinearRampPercentage()
+                ).to_dict()
+            ),
+        )
+
         class FakeThriftClient:
             Create = MagicMock()
             Delete = MagicMock()
             Get = MagicMock(
                 return_value=TFeatureFlagStoreItem(
-                    feature_name=self.txt(),
-                    is_enabled=False,
-                    meta=TFeatureFlagStoreMeta(created_date=now(), client_data="{}"),
+                    feature_name=self.txt(), is_enabled=False, meta=self.meta
                 )
             )
             Set = MagicMock()
@@ -89,6 +111,29 @@ class TestGet(BaseTest):
 
         self.client.Get.assert_called_once_with(feature_name)
 
+    def test_converts_metadata_properly(self):
+        feature_name = self.txt()
+
+        self.store.create(feature_name, is_enabled=True)
+
+        item = self.store.get(feature_name)
+
+        expected = FeatureFlagStoreMeta(
+            created_date=self.meta.created_date,
+            client_data=json.loads(self.meta.client_data),
+            conditions=[Condition(foo__lte=99)],
+            bucketer=ConsistentHashPercentageBucketer(
+                key_whitelist=["baz"],
+                percentage=LinearRampPercentage(
+                    initial_time=json.loads(self.meta.bucketer)["percentage"][
+                        "initial_time"
+                    ]
+                ),
+            ),
+        )
+
+        self.assertEqual(expected.to_dict(), item.meta)
+
 
 class TestSet(BaseTest):
     def test_calls_rpc_client_with_correct_args(self):
@@ -116,10 +161,33 @@ class TestSetMeta(BaseTest):
         client_data = {self.txt(): self.txt()}
         created_date = self.date()
 
-        meta = FeatureFlagStoreMeta(created_date, client_data)
+        meta = FeatureFlagStoreMeta(
+            created_date,
+            client_data,
+            conditions=[Condition(foo__lte=99)],
+            bucketer=ConsistentHashPercentageBucketer(
+                key_whitelist=["baz"], percentage=LinearRampPercentage()
+            ),
+        )
 
         self.store.set_meta(feature_name, meta)
 
         self.client.SetMeta.assert_called_once_with(
-            feature_name, json.dumps(meta.to_dict())
+            feature_name,
+            TFeatureFlagStoreMeta(
+                created_date=meta.created_date,
+                client_data=json.dumps(client_data),
+                conditions=[
+                    {
+                        "foo": [
+                            TConditionCheck(
+                                variable="foo",
+                                value="99",
+                                operator=TConditionOperator(symbol="lte"),
+                            )
+                        ]
+                    }
+                ],
+                bucketer=json.dumps(meta.bucketer.to_dict()),
+            ),
         )

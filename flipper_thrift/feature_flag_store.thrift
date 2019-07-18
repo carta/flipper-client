@@ -11,24 +11,55 @@
 # CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-service FeatureFlagStore {
-    void Create(1: string feature_name, 2: bool is_enabled = false, 3: string client_data),
-    void Delete(1: string feature_name),
-    FeatureFlagStoreItem Get(1: string feature_name),
-    void Set(1: string feature_name, 2: bool is_enabled)
-    void SetMeta(1: string feature_name, 2: string meta)
-    list<FeatureFlagStoreItem> List(1: i64 limit, 2: i64 offset)
+
+namespace java com.carta.flipper
+
+exception FlipperException {
+    1: optional ErrorCode code;
+    2: optional string message = "";
 }
 
+enum ErrorCode {
+    NOT_FOUND
+}
+
+typedef string JSON
+
+typedef map<string, list<ConditionCheck>> Condition
+
+struct ConditionCheck {
+    1: optional string variable;
+    2: optional JSON value;
+    3: optional ConditionOperator operator;
+}
+
+struct ConditionOperator {
+    1: optional string symbol;
+}
 
 struct FeatureFlagStoreItem {
-    1: required string feature_name;
-    2: required bool is_enabled;
-    3: required FeatureFlagStoreMeta meta;
+    1: optional string feature_name;
+    2: optional bool is_enabled;
+    3: optional FeatureFlagStoreMeta meta;
 }
 
-
 struct FeatureFlagStoreMeta {
-    1: required i64 created_date;
-    2: optional string client_data;
+    1: optional i64 created_date;
+    2: optional JSON client_data;
+    3: optional list<Condition> conditions;
+    4: optional JSON bucketer;
+}
+
+service FeatureFlagStore {
+    FeatureFlagStoreItem Create(1: string feature_name, 2: bool is_enabled, 3: JSON client_data) throws (1: FlipperException error),
+
+    FeatureFlagStoreItem Get(1: string feature_name) throws (1: FlipperException error),
+
+    void Set(1: string feature_name, 2: bool is_enabled) throws (1: FlipperException error),
+
+    void Delete(1: string feature_name) throws (1: FlipperException error),
+
+    list<FeatureFlagStoreItem> List(1: i64 limit, 2: i64 offset) throws (1: FlipperException error),
+
+    void SetMeta(1: string feature_name, 2: FeatureFlagStoreMeta meta) throws (1: FlipperException error)
 }
