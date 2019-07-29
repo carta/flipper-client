@@ -28,8 +28,10 @@ jobs:
 
       - run:
           name: run tests
+          context: org-global
           command: |
             . venv/bin/activate
+            env
             pytest tests
       - run:
           name: run hooks
