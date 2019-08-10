@@ -50,9 +50,11 @@ class ThriftRPCFeatureFlagStore(AbstractFeatureFlagStore):
             if e.code == self._ttypes.ErrorCode.NOT_FOUND:
                 return None
             raise
+        return self._convert_titem_to_item(item)
 
+    def _convert_titem_to_item(self, item) -> FeatureFlagStoreItem:
         return FeatureFlagStoreItem(
-            feature_name, item.is_enabled, self._convert_tmeta_to_meta(item.meta)
+            item.feature_name, item.is_enabled, self._convert_tmeta_to_meta(item.meta)
         )
 
     def _convert_tmeta_to_meta(self, tmeta) -> FeatureFlagStoreMeta:
@@ -100,7 +102,10 @@ class ThriftRPCFeatureFlagStore(AbstractFeatureFlagStore):
     def list(
         self, limit: Optional[int] = None, offset: int = 0
     ) -> Iterator[FeatureFlagStoreItem]:
-        return self._client.List(limit, offset)
+        return (
+            self._convert_titem_to_item(item)
+            for item in self._client.List(limit, offset)
+        )
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
         try:

@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from flipper import Condition, ThriftRPCFeatureFlagStore
 from flipper.bucketing import ConsistentHashPercentageBucketer, LinearRampPercentage
-from flipper.contrib.storage import FeatureFlagStoreMeta
+from flipper.contrib.storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 from flipper.contrib.util.date import now
 from flipper_thrift.python.feature_flag_store.ttypes import (
     ConditionCheck as TConditionCheck,
@@ -49,6 +49,19 @@ class BaseTest(unittest.TestCase):
             )
             Set = MagicMock()
             SetMeta = MagicMock()
+            List = MagicMock(
+                return_value=[
+                    TFeatureFlagStoreItem(
+                        feature_name=self.txt(), is_enabled=False, meta=self.meta
+                    ),
+                    TFeatureFlagStoreItem(
+                        feature_name=self.txt(), is_enabled=False, meta=self.meta
+                    ),
+                    TFeatureFlagStoreItem(
+                        feature_name=self.txt(), is_enabled=False, meta=self.meta
+                    ),
+                ]
+            )
 
         self.client = FakeThriftClient()
         self.store = ThriftRPCFeatureFlagStore(self.client)
@@ -133,6 +146,16 @@ class TestGet(BaseTest):
         )
 
         self.assertEqual(expected.to_dict(), item.meta)
+
+
+class TestList(BaseTest):
+    def test_every_item_is_instance_of_feature_flag_item(self):
+        for i in range(10):
+            self.store.create(str(i))
+
+        self.assertTrue(
+            all(isinstance(item, FeatureFlagStoreItem) for item in self.store.list())
+        )
 
 
 class TestSet(BaseTest):
