@@ -40,7 +40,11 @@ class BaseTest(unittest.TestCase):
         )
 
         class FakeThriftClient:
-            Create = MagicMock()
+            Create = MagicMock(
+                return_value=TFeatureFlagStoreItem(
+                    feature_name=self.txt(), is_enabled=False, meta=self.meta
+                )
+            )
             Delete = MagicMock()
             Get = MagicMock(
                 return_value=TFeatureFlagStoreItem(
