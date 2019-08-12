@@ -211,5 +211,4 @@ class TestFromDict(BaseTest):
     def _compare(self, expected, actual):
         for key, checks in expected.items():
             for check in checks:
-                print(check, actual[key])
                 self.assertTrue(check in actual[key])
