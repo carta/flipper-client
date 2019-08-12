@@ -116,7 +116,17 @@ class TestCreate(BaseTest):
 
         self.store.create(feature_name, is_enabled=True)
 
-        self.client.Create.assert_called_once_with(feature_name, True, None)
+        self.client.Create.assert_called_once_with(feature_name, True, "{}")
+
+    def test_when_client_data_is_supplied_it_is_serialized_as_string(self):
+        feature_name = self.txt()
+        client_data = {"foo": "bar"}
+
+        self.store.create(feature_name, is_enabled=False, client_data=client_data)
+
+        self.client.Create.assert_called_once_with(
+            feature_name, False, '{"foo": "bar"}'
+        )
 
 
 class TestGet(BaseTest):

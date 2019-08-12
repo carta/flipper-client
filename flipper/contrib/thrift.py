@@ -41,7 +41,9 @@ class ThriftRPCFeatureFlagStore(AbstractFeatureFlagStore):
         is_enabled: bool = False,
         client_data: Optional[dict] = None,
     ):
-        item = self._client.Create(feature_name, is_enabled, client_data)
+        item = self._client.Create(
+            feature_name, is_enabled, json.dumps(client_data or {})
+        )
         return self._convert_titem_to_item(item)
 
     def get(self, feature_name: str) -> Optional[FeatureFlagStoreItem]:
