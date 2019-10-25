@@ -11,17 +11,28 @@
 # CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from typing import Iterator, Optional, cast
+from typing import Iterator, Optional
+
+from redis import Redis
 
 from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 from .util.date import now
+from .util.iter import batchify
+
+DEFAULT_LIST_METHOD_BATCH_SIZE = 100
 
 
 class RedisFeatureFlagStore(AbstractFeatureFlagStore):
-    def __init__(self, redis, base_key="features"):
+    def __init__(
+        self,
+        redis: Redis,
+        base_key: str = "features",
+        list_method_batch_size: int = DEFAULT_LIST_METHOD_BATCH_SIZE,
+    ) -> None:
         self._redis = redis
         self.base_key = "features"
+        self.list_method_batch_size = list_method_batch_size
 
     def create(
         self,
@@ -63,9 +74,20 @@ class RedisFeatureFlagStore(AbstractFeatureFlagStore):
     def list(
         self, limit: Optional[int] = None, offset: int = 0
     ) -> Iterator[FeatureFlagStoreItem]:
+        all_feature_keys = self._enumerate_feature_keys(limit, offset)
+
+        for batch_of_keys in batchify(all_feature_keys, self.list_method_batch_size):
+            results = self._redis.mget(list(batch_of_keys))
+
+            for serialized in results:
+                yield FeatureFlagStoreItem.deserialize(serialized)
+
+    def _enumerate_feature_keys(
+        self, limit: Optional[int] = None, offset: int = 0
+    ) -> Iterator[str]:
         visited = 0
 
-        for feature_name in self._list_keys():
+        for feature_key in self._scan_redis_for_feature_keys():
             visited += 1
 
             if visited <= offset:
@@ -73,15 +95,12 @@ class RedisFeatureFlagStore(AbstractFeatureFlagStore):
             if limit is not None and visited > limit + offset:
                 return
 
-            yield cast(FeatureFlagStoreItem, self.get(feature_name))
+            yield feature_key
 
-    def _list_keys(self) -> Iterator[str]:
+    def _scan_redis_for_feature_keys(self) -> Iterator[str]:
         keys = self._redis.scan_iter(match=self._make_scan_wildcard_match())
         for key in keys:
-            yield self._feature_name(key.decode("utf-8"))
-
-    def _feature_name(self, key_name: str) -> str:
-        return key_name.replace("%s/" % self.base_key, "")
+            yield key.decode("utf-8")
 
     def _make_scan_wildcard_match(self) -> str:
         return "%s/*" % self.base_key

@@ -224,6 +224,23 @@ class TestList(BaseTest):
         for feature_name in actual:
             self.assertTrue(feature_name in feature_names)
 
+    def test_when_batch_size_is_set_to_a_value_smaller_than_number_of_keys_still_returns_everything(  # noqa: E501
+        self
+    ):
+        feature_names = [self.txt() for _ in range(10)]
+
+        store = RedisFeatureFlagStore(self.redis, list_method_batch_size=3)
+
+        for name in feature_names:
+            store.create(name)
+
+        results = store.list()
+        actual = [item.feature_name for item in results]
+
+        self.assertEqual(len(feature_names), len(actual))
+        for feature_name in actual:
+            self.assertTrue(feature_name in feature_names)
+
 
 class TestSetMeta(BaseTest):
     def test_sets_client_data_correctly(self):
