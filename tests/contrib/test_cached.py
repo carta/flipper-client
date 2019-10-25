@@ -145,6 +145,16 @@ class TestSet(BaseTest):
 
         self.assertTrue(self.slow.get(feature_name))
 
+    def test_when_instantiated_with_size_does_not_fail(self):
+        feature_name = self.txt()
+
+        slow = MemoryFeatureFlagStore()
+        fast = CachedFeatureFlagStore(slow, size=10)
+
+        fast.set(feature_name, True)
+
+        self.assertTrue(slow.get(feature_name))
+
 
 class TestDelete(BaseTest):
     def test_sets_value_to_false(self):
