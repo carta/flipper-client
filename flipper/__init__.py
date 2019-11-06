@@ -23,7 +23,7 @@ from .contrib import (
     S3FeatureFlagStore,
     ThriftRPCFeatureFlagStore,
 )
-from .flag import FlagDoesNotExistError
+from .exceptions import FlagDoesNotExistError
 
 __all__ = [
     "CachedFeatureFlagStore",
