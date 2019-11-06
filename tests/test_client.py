@@ -5,6 +5,7 @@ from uuid import uuid4
 from flipper import Condition, FeatureFlagClient, MemoryFeatureFlagStore
 from flipper.bucketing import Percentage, PercentageBucketer
 from flipper.contrib.storage import FeatureFlagStoreMeta
+from flipper.events import EventType, FlipperEventEmitter
 from flipper.exceptions import FlagDoesNotExistError
 from flipper.flag import FeatureFlag
 
@@ -128,6 +129,40 @@ class TestCreate(BaseTest):
 
         self.assertTrue(self.client.is_enabled(feature_name))
 
+    def test_emits_pre_create_event_with_correct_args(self):
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.PRE_CREATE, f=listener)
+
+        feature_name = self.txt()
+        client_data = {"x": 10}
+
+        self.client.events = events
+        self.client.create(feature_name, is_enabled=True, client_data=client_data)
+
+        listener.assert_called_with(
+            feature_name, is_enabled=True, client_data=client_data
+        )
+
+    def test_emits_post_create_event_with_correct_args(self):
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.POST_CREATE, f=listener)
+
+        feature_name = self.txt()
+        client_data = {"x": 10}
+
+        self.client.events = events
+        self.client.create(feature_name, is_enabled=True, client_data=client_data)
+
+        listener.assert_called_with(
+            feature_name, is_enabled=True, client_data=client_data
+        )
+
 
 class TestGet(BaseTest):
     def test_returns_instance_of_feature_flag_class(self):
@@ -175,6 +210,34 @@ class TestDestroy(BaseTest):
         with self.assertRaises(FlagDoesNotExistError):
             self.client.destroy(feature_name)
 
+    def test_emits_pre_destroy_event(self):
+        feature_name = self.txt()
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.PRE_DESTROY, f=listener)
+
+        self.client.events = events
+        self.client.create(feature_name)
+        self.client.destroy(feature_name)
+
+        listener.assert_called_once_with(feature_name)
+
+    def test_emits_post_destroy_event(self):
+        feature_name = self.txt()
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.POST_DESTROY, f=listener)
+
+        self.client.events = events
+        self.client.create(feature_name)
+        self.client.destroy(feature_name)
+
+        listener.assert_called_once_with(feature_name)
+
 
 class TestEnable(BaseTest):
     def test_is_enabled_will_be_true(self):
@@ -200,6 +263,34 @@ class TestEnable(BaseTest):
         with self.assertRaises(FlagDoesNotExistError):
             self.client.enable(feature_name)
 
+    def test_emits_pre_enable_event(self):
+        feature_name = self.txt()
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.PRE_ENABLE, f=listener)
+
+        self.client.events = events
+        self.client.create(feature_name)
+        self.client.enable(feature_name)
+
+        listener.assert_called_once_with(feature_name)
+
+    def test_emits_post_enable_event(self):
+        feature_name = self.txt()
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.POST_ENABLE, f=listener)
+
+        self.client.events = events
+        self.client.create(feature_name)
+        self.client.enable(feature_name)
+
+        listener.assert_called_once_with(feature_name)
+
 
 class TestDisable(BaseTest):
     def test_is_enabled_will_be_false(self):
@@ -224,6 +315,34 @@ class TestDisable(BaseTest):
 
         with self.assertRaises(FlagDoesNotExistError):
             self.client.disable(feature_name)
+
+    def test_emits_pre_disable_event(self):
+        feature_name = self.txt()
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.PRE_DISABLE, f=listener)
+
+        self.client.events = events
+        self.client.create(feature_name)
+        self.client.disable(feature_name)
+
+        listener.assert_called_once_with(feature_name)
+
+    def test_emits_post_disable_event(self):
+        feature_name = self.txt()
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.POST_DISABLE, f=listener)
+
+        self.client.events = events
+        self.client.create(feature_name)
+        self.client.disable(feature_name)
+
+        listener.assert_called_once_with(feature_name)
 
 
 class TestExists(BaseTest):
@@ -374,6 +493,42 @@ class TestSetClientData(BaseTest):
         with self.assertRaises(FlagDoesNotExistError):
             self.client.set_client_data(feature_name, client_data)
 
+    def test_emits_pre_set_client_data_event(self):
+        feature_name = self.txt()
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.PRE_SET_CLIENT_DATA, f=listener)
+
+        existing_data = {"existing_key": self.txt()}
+
+        self.client.events = events
+        self.client.create(feature_name, client_data=existing_data)
+
+        new_data = {"existing_key": self.txt(), "new_key": self.txt()}
+        self.client.set_client_data(feature_name, new_data)
+
+        listener.assert_called_once_with(feature_name, new_data)
+
+    def test_emits_post_set_client_data_event(self):
+        feature_name = self.txt()
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.POST_SET_CLIENT_DATA, f=listener)
+
+        existing_data = {"existing_key": self.txt()}
+
+        self.client.events = events
+        self.client.create(feature_name, client_data=existing_data)
+
+        new_data = {"existing_key": self.txt(), "new_key": self.txt()}
+        self.client.set_client_data(feature_name, new_data)
+
+        listener.assert_called_once_with(feature_name, new_data)
+
 
 class TestGetClientData(BaseTest):
     def test_gets_expected_key_value_pairs(self):
@@ -447,6 +602,40 @@ class TestAddCondition(BaseTest):
 
         self.assertEqual(2, len(meta["conditions"]))
 
+    def test_emits_pre_add_condition_event(self):
+        feature_name = self.txt()
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.PRE_ADD_CONDITION, f=listener)
+
+        condition_checks = {self.txt(): True}
+        condition = Condition(**condition_checks)
+
+        self.client.events = events
+        self.store.create(feature_name)
+        self.client.add_condition(feature_name, condition)
+
+        listener.assert_called_once_with(feature_name, condition)
+
+    def test_emits_post_add_condition_event(self):
+        feature_name = self.txt()
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.POST_ADD_CONDITION, f=listener)
+
+        condition_checks = {self.txt(): True}
+        condition = Condition(**condition_checks)
+
+        self.client.events = events
+        self.store.create(feature_name)
+        self.client.add_condition(feature_name, condition)
+
+        listener.assert_called_once_with(feature_name, condition)
+
 
 class TestSetBucketer(BaseTest):
     def test_bucketer_gets_included_in_meta(self):
@@ -461,3 +650,37 @@ class TestSetBucketer(BaseTest):
         meta = self.client.get_meta(feature_name)
 
         self.assertEqual(bucketer.to_dict(), meta["bucketer"])
+
+    def test_emits_pre_set_bucketer_event(self):
+        feature_name = self.txt()
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.PRE_SET_BUCKETER, f=listener)
+
+        percentage_value = 0.1
+        bucketer = PercentageBucketer(percentage=Percentage(percentage_value))
+
+        self.client.events = events
+        self.store.create(feature_name)
+        self.client.set_bucketer(feature_name, bucketer)
+
+        listener.assert_called_once_with(feature_name, bucketer)
+
+    def test_emits_post_set_bucketer_event(self):
+        feature_name = self.txt()
+        events = FlipperEventEmitter()
+
+        listener = MagicMock()
+
+        events.on(EventType.POST_SET_BUCKETER, f=listener)
+
+        percentage_value = 0.1
+        bucketer = PercentageBucketer(percentage=Percentage(percentage_value))
+
+        self.client.events = events
+        self.store.create(feature_name)
+        self.client.set_bucketer(feature_name, bucketer)
+
+        listener.assert_called_once_with(feature_name, bucketer)

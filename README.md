@@ -733,6 +733,115 @@ Don't see the backend you like? You can easily implement your own. If you define
 
 Pull requests welcome.
 
+# Events
+
+Flipper ships with a system for hooking into events. It is set up as an event emitter. You can register subscribers with the event emitter in order to react to events. The supported events are:
+
+- `PRE_CREATE`
+- `POST_CREATE`
+- `PRE_ENABLE`
+- `POST_ENABLE`
+- `PRE_DISABLE`
+- `POST_DISABLE`
+- `PRE_DESTROY`
+- `POST_DESTROY`
+- `PRE_ADD_CONDITION`
+- `POST_ADD_CONDITION`
+- `PRE_SET_CLIENT_DATA`
+- `POST_SET_CLIENT_DATA`
+- `PRE_SET_BUCKETER`
+- `POST_SET_BUCKETER`
+
+To register for these events, simply register listeners with the `events` property of `FeatureFlagClient` and use it like an [event emitter](https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter).
+
+```python
+from flipper import FeatureFlagClient, MemoryFeatureFlagStore
+from flipper.events import EventType
+
+
+def on_post_create(feature_name, is_enabled, client_data):
+    print(feature_name, is_enabled, client_data)
+
+
+client = FeatureFlagClient(MemoryFeatureFlagStore())
+client.events.on(EventType.POST_CREATE, f=on_post_create)
+
+client.create('HOMEPAGE_AB_TEST', is_enabled=True, client_data={"creator": "adambom"})
+# > HOMEPAGE_AB_TEST True {"creator": "adambom"}
+```
+
+The event emitter also works as a decorator:
+
+```python
+client.events.on(EventType.POST_CREATE)
+def on_post_create(feature_name, is_enabled, client_data):
+    print(feature_name, is_enabled, client_data)
+```
+
+You can substitute your own event emitter for the default by setting the events property. The custom event emitter must implement `flipper.events.IEventEmitter`.
+
+```python
+client.events = MyCustomEventEmitter()
+```
+
+For the full usage of `FlipperEventEmitter` see the [pyee documentation](https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter).
+
+## Subscribers
+
+Flipper also exposes a `FlipperEventSubscriber` interface. It allows you to implement a method for each event type. You can then register this subscriber with the event emitter and it will call the appropriate methods. The event emitter exposes the methods `register_subscriber` and `remove_subscriber` for this purpose. For example:
+
+```python
+import logging
+
+from flipper import FeatureFlagClient, MemoryFeatureFlagStore
+from flipper.events import FlipperEventSubscriber
+
+
+class LoggingEventSubscriber(FlipperEventSubscriber):
+    def __init__(self, logger):
+        self._logger = logger
+
+    def on_post_create(self, feature_name, is_enabled, client_data):
+        self._logger.info("flipper.create", extra={
+            "feature_name": feature_name,
+            "is_enabled": is_enabled,
+            "client_data": client_data,
+        })
+
+    def on_post_enable(self, feature_name):
+        self._logger.info("flipper.enable", extra={"feature_name": feature_name})
+
+    def on_post_disable(self, feature_name):
+        self._logger.info("flipper.disable", extra={"feature_name": feature_name})
+
+    def on_post_destroy(self, feature_name):
+        self._logger.info("flipper.destroy", extra={"feature_name": feature_name})
+
+    def on_post_add_condition(self, feature_name, condition):
+        self._logger.info("flipper.add_condition", extra={
+            "feature_name": feature_name,
+            "condition": condition.to_dict(),
+        })
+
+    def on_post_set_client_data(self, feature_name, client_data):
+        self._logger.info("flipper.set_client_data", extra={
+            "feature_name": feature_name,
+            "client_data": client_data,
+        })
+
+    def on_post_set_bucketer(self, feature_name, bucketer):
+        self._logger.info("flipper.set_bucketer", extra={
+            "feature_name": feature_name,
+            "bucketer": bucketer.to_dict(),
+        })
+
+
+logger = logging.getLogger("application")
+
+client = FeatureFlagClient(MemoryFeatureFlagStore())
+client.events.register_subscriber(LoggingEventSubscriber(logger))
+```
+
 # Development
 
 Clone the repo and run `make install-dev` to get the environment set up. Test are run with the `pytest` command.
