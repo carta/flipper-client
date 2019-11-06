@@ -4,15 +4,18 @@ from uuid import uuid4
 
 from flipper import Condition, MemoryFeatureFlagStore
 from flipper.bucketing import Percentage, PercentageBucketer
+from flipper.client import FeatureFlagClient
 from flipper.contrib.storage import FeatureFlagStoreMeta
-from flipper.flag import FeatureFlag, FlagDoesNotExistError
+from flipper.exceptions import FlagDoesNotExistError
+from flipper.flag import FeatureFlag
 
 
 class BaseTest(unittest.TestCase):
     def setUp(self):
         self.name = self.txt()
         self.store = MemoryFeatureFlagStore()
-        self.flag = FeatureFlag(self.name, self.store)
+        self.client = FeatureFlagClient(self.store)
+        self.flag = FeatureFlag(self.name, self.client)
 
     def txt(self):
         return uuid4().hex
@@ -115,14 +118,12 @@ class TestDestroy(BaseTest):
 
         self.assertFalse(self.flag.is_enabled())
 
-    def test_store_is_called_with_correct_args(self):
-        store = MagicMock()
-        store.delete = MagicMock()
-        flag = FeatureFlag(self.name, store)
-        self.store.create(self.name)
+    def test_client_is_called_with_correct_args(self):
+        client = MagicMock()
+        flag = FeatureFlag(self.name, client)
         flag.destroy()
 
-        store.delete.assert_called_once_with(self.name)
+        client.destroy.assert_called_once_with(self.name)
 
     def test_raises_for_nonexistent_flag(self):
         with self.assertRaises(FlagDoesNotExistError):
@@ -145,14 +146,12 @@ class TestEnable(BaseTest):
 
         self.assertTrue(self.flag.is_enabled())
 
-    def test_store_is_called_with_correct_args(self):
-        store = MagicMock()
-        store.set = MagicMock()
-        self.store.create(self.name)
-        flag = FeatureFlag(self.name, store)
+    def test_client_is_called_with_correct_args(self):
+        client = MagicMock()
+        flag = FeatureFlag(self.name, client)
         flag.enable()
 
-        store.set.assert_called_once_with(self.name, True)
+        client.enable.assert_called_once_with(self.name)
 
     def test_raises_for_nonexistent_flag(self):
         with self.assertRaises(FlagDoesNotExistError):
@@ -173,14 +172,12 @@ class TestDisable(BaseTest):
 
         self.assertFalse(self.flag.is_enabled())
 
-    def test_store_is_called_with_correct_args(self):
-        self.store.create(self.name)
-        store = MagicMock()
-        store.set = MagicMock()
-        flag = FeatureFlag(self.name, store)
+    def test_client_is_called_with_correct_args(self):
+        client = MagicMock()
+        flag = FeatureFlag(self.name, client)
         flag.disable()
 
-        store.set.assert_called_once_with(self.name, False)
+        client.disable.assert_called_once_with(self.name)
 
     def test_raises_for_nonexistent_flag(self):
         with self.assertRaises(FlagDoesNotExistError):

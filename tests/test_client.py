@@ -5,7 +5,8 @@ from uuid import uuid4
 from flipper import Condition, FeatureFlagClient, MemoryFeatureFlagStore
 from flipper.bucketing import Percentage, PercentageBucketer
 from flipper.contrib.storage import FeatureFlagStoreMeta
-from flipper.flag import FeatureFlag, FlagDoesNotExistError
+from flipper.exceptions import FlagDoesNotExistError
+from flipper.flag import FeatureFlag
 
 
 class BaseTest(unittest.TestCase):

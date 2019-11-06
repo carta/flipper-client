@@ -27,7 +27,7 @@ from ..bucketing import BucketerFactory
 from ..bucketing.base import AbstractBucketer
 from ..conditions import Condition
 from ..conditions.check import Check
-from ..flag import FlagDoesNotExistError
+from ..exceptions import FlagDoesNotExistError
 
 
 class ThriftRPCFeatureFlagStore(AbstractFeatureFlagStore):
