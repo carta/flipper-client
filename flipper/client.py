@@ -17,6 +17,7 @@ from .bucketing.base import AbstractBucketer
 from .conditions import Condition
 from .contrib.interface import AbstractFeatureFlagStore
 from .contrib.storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
+from .events import EventType, FlipperEventEmitter, IEventEmitter
 from .exceptions import FlagDoesNotExistError
 from .flag import FeatureFlag
 
@@ -33,6 +34,15 @@ def flag_must_exist(fn):
 class FeatureFlagClient:
     def __init__(self, store: AbstractFeatureFlagStore) -> None:
         self._store = store
+        self._event_emitter = FlipperEventEmitter()  # type: IEventEmitter
+
+    def get_events(self) -> IEventEmitter:
+        return self._event_emitter
+
+    def set_events(self, event_emitter: IEventEmitter):
+        self._event_emitter = event_emitter
+
+    events = property(get_events, set_events)
 
     def create(
         self,
@@ -40,7 +50,22 @@ class FeatureFlagClient:
         is_enabled: bool = False,
         client_data: Optional[dict] = None,
     ) -> FeatureFlag:
+        self._event_emitter.emit(
+            EventType.PRE_CREATE,
+            feature_name,
+            is_enabled=is_enabled,
+            client_data=client_data,
+        )
+
         self._store.create(feature_name, is_enabled=is_enabled, client_data=client_data)
+
+        self._event_emitter.emit(
+            EventType.POST_CREATE,
+            feature_name,
+            is_enabled=is_enabled,
+            client_data=client_data,
+        )
+
         return self.get(feature_name)
 
     def is_enabled(self, feature_name: str, default=False, **conditions) -> bool:
@@ -63,15 +88,21 @@ class FeatureFlagClient:
 
     @flag_must_exist
     def enable(self, feature_name: str):
+        self._event_emitter.emit(EventType.PRE_ENABLE, feature_name)
         self._store.set(feature_name, True)
+        self._event_emitter.emit(EventType.POST_ENABLE, feature_name)
 
     @flag_must_exist
     def disable(self, feature_name: str):
+        self._event_emitter.emit(EventType.PRE_DISABLE, feature_name)
         self._store.set(feature_name, False)
+        self._event_emitter.emit(EventType.POST_DISABLE, feature_name)
 
     @flag_must_exist
     def destroy(self, feature_name: str):
+        self._event_emitter.emit(EventType.PRE_DESTROY, feature_name)
         self._store.delete(feature_name)
+        self._event_emitter.emit(EventType.POST_DESTROY, feature_name)
 
     @flag_must_exist
     def add_condition(self, feature_name: str, condition: Condition):
@@ -79,7 +110,9 @@ class FeatureFlagClient:
 
         meta.conditions.append(condition)
 
+        self._event_emitter.emit(EventType.PRE_ADD_CONDITION, feature_name, condition)
         self._store.set_meta(feature_name, meta)
+        self._event_emitter.emit(EventType.POST_ADD_CONDITION, feature_name, condition)
 
     @flag_must_exist
     def set_client_data(self, feature_name: str, client_data: dict):
@@ -87,7 +120,13 @@ class FeatureFlagClient:
 
         meta.update(client_data=client_data)
 
+        self._event_emitter.emit(
+            EventType.PRE_SET_CLIENT_DATA, feature_name, meta.client_data
+        )
         self._store.set_meta(feature_name, meta)
+        self._event_emitter.emit(
+            EventType.POST_SET_CLIENT_DATA, feature_name, meta.client_data
+        )
 
     def get_client_data(self, feature_name: str) -> dict:
         return self.get_meta(feature_name)["client_data"]
@@ -102,4 +141,6 @@ class FeatureFlagClient:
 
         meta.update(bucketer=bucketer)
 
+        self._event_emitter.emit(EventType.PRE_SET_BUCKETER, feature_name, bucketer)
         self._store.set_meta(feature_name, meta)
+        self._event_emitter.emit(EventType.POST_SET_BUCKETER, feature_name, bucketer)
