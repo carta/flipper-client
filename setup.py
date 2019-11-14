@@ -13,7 +13,7 @@ requirements = [
 
 setup(
     name="flipper-client",
-    version="1.0.5",
+    version="1.0.6",
     packages=find_packages(),
     license="Apache License 2.0",
     long_description=open("README.md").read(),
