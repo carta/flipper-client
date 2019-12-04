@@ -31,7 +31,7 @@ class RedisFeatureFlagStore(AbstractFeatureFlagStore):
         list_method_batch_size: int = DEFAULT_LIST_METHOD_BATCH_SIZE,
     ) -> None:
         self._redis = redis
-        self.base_key = "features"
+        self.base_key = base_key
         self.list_method_batch_size = list_method_batch_size
 
     def create(
