@@ -11,7 +11,7 @@
 # CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from typing import Iterator, Optional, cast
+from typing import Iterator, Optional, cast, Iterable
 
 from .bucketing.base import AbstractBucketer
 from .conditions import Condition
@@ -144,3 +144,23 @@ class FeatureFlagClient:
         self._event_emitter.emit(EventType.PRE_SET_BUCKETER, feature_name, bucketer)
         self._store.set_meta(feature_name, meta)
         self._event_emitter.emit(EventType.POST_SET_BUCKETER, feature_name, bucketer)
+
+    @flag_must_exist
+    def set_conditions(self, feature_name: str,
+                       conditions: Iterable[Condition]):
+        '''
+        This method will set the conditions to the feature flag.
+        Contrary to `add_conditions` it will not append the condition, but will
+        update the whole condition set the the new values provided.
+        '''
+        meta = FeatureFlagStoreMeta.from_dict(self.get_meta(feature_name))
+
+        meta.conditions = list(conditions)
+
+        self._event_emitter.emit(EventType.PRE_SET_CONDITIONS,
+                                 feature_name,
+                                 conditions)
+        self._store.set_meta(feature_name, meta)
+        self._event_emitter.emit(EventType.POST_SET_CONDITIONS,
+                                 feature_name,
+                                 conditions)

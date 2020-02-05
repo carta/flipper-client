@@ -10,7 +10,7 @@
 # under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 # CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable
 
 from .bucketing.base import AbstractBucketer
 from .conditions import Condition
@@ -53,3 +53,6 @@ class FeatureFlag:
 
     def set_bucketer(self, bucketer: AbstractBucketer):
         self._client.set_bucketer(self.name, bucketer)
+
+    def set_conditions(self, conditions: Iterable[Condition]):
+        self._client.set_conditions(self.name, conditions)

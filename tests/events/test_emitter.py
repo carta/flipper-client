@@ -39,6 +39,12 @@ class DummySubscriber(FlipperEventSubscriber):
     def on_post_add_condition(self, *args, **kwargs):
         self._mock.on_post_add_condition(*args, **kwargs)
 
+    def on_pre_set_conditions(self, *args, **kwargs):
+        self._mock.on_pre_set_conditions(*args, **kwargs)
+
+    def on_post_set_conditions(self, *args, **kwargs):
+        self._mock.on_post_set_conditions(*args, **kwargs)
+
     def on_pre_set_client_data(self, *args, **kwargs):
         self._mock.on_pre_set_client_data(*args, **kwargs)
 
