@@ -11,7 +11,7 @@
 # CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from typing import Optional, Iterable
+from typing import Iterable, Optional
 
 from flipper.bucketing.base import AbstractBucketer
 from flipper.conditions import Condition
@@ -52,12 +52,10 @@ class FlipperEventSubscriber:
     def on_post_add_condition(self, flag_name: str, condition: Condition):
         pass
 
-    def on_pre_set_conditions(self, flag_name: str,
-                              conditions: Iterable[Condition]):
+    def on_pre_set_conditions(self, flag_name: str, conditions: Iterable[Condition]):
         pass
 
-    def on_post_set_conditions(self, flag_name: str,
-                               conditions: Iterable[Condition]):
+    def on_post_set_conditions(self, flag_name: str, conditions: Iterable[Condition]):
         pass
 
     def on_pre_set_client_data(self, flag_name: str, client_data: dict):

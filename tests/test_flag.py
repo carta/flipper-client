@@ -253,8 +253,7 @@ class TestSetClientData(BaseTest):
 
         item = self.store.get(self.name)
 
-        self.assertEqual({**existing_data, **new_data},
-                         item.meta["client_data"])
+        self.assertEqual({**existing_data, **new_data}, item.meta["client_data"])
 
     def test_can_override_existing_values(self):
         existing_data = {"existing_key": self.txt()}
@@ -361,19 +360,10 @@ class TestSetConditions(BaseTest):
         self.flag.add_condition(overriden_condition)
         self.flag.set_conditions(new_conditions)
 
-        conditions_array = self.flag.get_meta()['conditions']
+        conditions_array = self.flag.get_meta()["conditions"]
         expected_conditions_array = [
-            {
-                'new_value': [
-                    {'variable': 'new_value', 'value': True, 'operator': None},
-                ],
-            },
-            {
-
-                'id': [
-                    {'variable': 'id', 'value': [1, 2], 'operator': 'in'},
-                ]
-            }
+            {"new_value": [{"variable": "new_value", "value": True, "operator": None}]},
+            {"id": [{"variable": "id", "value": [1, 2], "operator": "in"}]},
         ]
 
         self.assertEqual(expected_conditions_array, conditions_array)
