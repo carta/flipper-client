@@ -30,6 +30,9 @@ class EventType(enum.Enum):
     PRE_ADD_CONDITION = "pre_add_condition"
     POST_ADD_CONDITION = "post_add_condition"
 
+    PRE_SET_CONDITIONS = "pre_set_conditions"
+    POST_SET_CONDITIONS = "post_set_conditions"
+
     PRE_SET_CLIENT_DATA = "pre_set_client_data"
     POST_SET_CLIENT_DATA = "post_set_client_data"
 

@@ -747,6 +747,8 @@ Flipper ships with a system for hooking into events. It is set up as an event em
 - `POST_DESTROY`
 - `PRE_ADD_CONDITION`
 - `POST_ADD_CONDITION`
+- `PRE_SET_CONDITIONS`
+- `POST_SET_CONDITIONS`
 - `PRE_SET_CLIENT_DATA`
 - `POST_SET_CLIENT_DATA`
 - `PRE_SET_BUCKETER`

@@ -1,11 +1,12 @@
 import unittest
+from typing import Iterable, List, Tuple
 from unittest.mock import MagicMock
 from uuid import uuid4
 
 from flipper import Condition, FeatureFlagClient, MemoryFeatureFlagStore
 from flipper.bucketing import Percentage, PercentageBucketer
 from flipper.contrib.storage import FeatureFlagStoreMeta
-from flipper.events import EventType, FlipperEventEmitter
+from flipper.events import EventType, FlipperEventEmitter, FlipperEventSubscriber
 from flipper.exceptions import FlagDoesNotExistError
 from flipper.flag import FeatureFlag
 
@@ -684,3 +685,50 @@ class TestSetBucketer(BaseTest):
         self.client.set_bucketer(feature_name, bucketer)
 
         listener.assert_called_once_with(feature_name, bucketer)
+
+
+class TestSetConditions(BaseTest):
+    class Subscriber(FlipperEventSubscriber):
+        def __init__(self) -> None:
+            super().__init__()
+            self.events = []  # type: List[Tuple[str, str, Iterable[Condition]]]
+
+        def on_pre_set_conditions(self, flag_name: str, conditions):
+            self.events.append(("pre_set_conditions", flag_name, conditions))
+
+        def on_post_set_conditions(self, flag_name: str, conditions):
+            self.events.append(("post_set_conditions", flag_name, conditions))
+
+    def setUp(self):
+        super().setUp()
+        self.subscriber = self.Subscriber()
+        self.client.events.register_subscriber(self.subscriber)
+
+    def test_overrides_previous_conditions(self):
+        feature_name = "FLAG"
+        overriden_condition = Condition(value=True)
+        new_conditions = [Condition(new_value=True), Condition(id__in=[1, 2])]
+        self.client.create(feature_name)
+
+        self.client.add_condition(feature_name, overriden_condition)
+        self.client.set_conditions(feature_name, new_conditions)
+
+        conditions_array = self.client.get_meta(feature_name)["conditions"]
+        expected_conditions_array = [
+            {"new_value": [{"variable": "new_value", "value": True, "operator": None}]},
+            {"id": [{"variable": "id", "value": [1, 2], "operator": "in"}]},
+        ]
+
+        self.assertEqual(expected_conditions_array, conditions_array)
+
+    def test_events_are_emitted(self):
+        feature_name = "FLAG"
+        new_conditions = [Condition(new_value=True), Condition(id__in=[1, 2])]
+
+        self.client.create(feature_name)
+
+        self.client.set_conditions(feature_name, new_conditions)
+        assert self.subscriber.events == [
+            ("pre_set_conditions", feature_name, new_conditions),
+            ("post_set_conditions", feature_name, new_conditions),
+        ]

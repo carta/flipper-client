@@ -349,3 +349,21 @@ class TestSetBucketer(BaseTest):
         meta = self.flag.get_meta()
 
         self.assertEqual(bucketer.to_dict(), meta["bucketer"])
+
+
+class TestSetConditions(BaseTest):
+    def test_overrides_previous_conditions(self):
+        self.store.create(self.name)
+        overriden_condition = Condition(value=True)
+        new_conditions = [Condition(new_value=True), Condition(id__in=[1, 2])]
+
+        self.flag.add_condition(overriden_condition)
+        self.flag.set_conditions(new_conditions)
+
+        conditions_array = self.flag.get_meta()["conditions"]
+        expected_conditions_array = [
+            {"new_value": [{"variable": "new_value", "value": True, "operator": None}]},
+            {"id": [{"variable": "id", "value": [1, 2], "operator": "in"}]},
+        ]
+
+        self.assertEqual(expected_conditions_array, conditions_array)
