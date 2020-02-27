@@ -93,7 +93,7 @@ class TestGet(BaseTest):
 
         fast.get(feature_name)
 
-        self.slow.get.asssert_not_called()
+        self.slow.get.assert_not_called()
 
     def test_does_will_call_slow_store_after_ttl_expired(self):
         feature_name = self.txt()
