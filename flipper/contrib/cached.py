@@ -13,7 +13,7 @@
 
 from typing import Iterator, Optional
 
-from lruttl import LRUCache
+from cachetools import LRUCache, TTLCache
 
 from .interface import AbstractFeatureFlagStore
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
@@ -29,7 +29,10 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
         size: int = DEFAULT_SIZE,
         ttl: Optional[int] = None,
     ) -> None:
-        self._cache = LRUCache(size)
+        if ttl is not None:
+            self._cache = TTLCache(size, ttl)
+        else:
+            self._cache = LRUCache(size)
         self._store = store
         self._ttl = ttl
 
@@ -42,7 +45,7 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
         item = self._store.create(
             feature_name, is_enabled=is_enabled, client_data=client_data
         )
-        self._cache.set(feature_name, item, ttl=self._ttl)
+        self._cache[feature_name] = item
         return item
 
     def get(self, feature_name: str) -> Optional[FeatureFlagStoreItem]:
@@ -51,17 +54,17 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
             return cached
 
         item = self._store.get(feature_name)
-        self._cache.set(feature_name, item, ttl=self._ttl)
+        self._cache[feature_name] = item
 
         return item
 
     def set(self, feature_name: str, is_enabled: bool):
         self._store.set(feature_name, is_enabled)
-        self._cache.set(feature_name, self._store.get(feature_name), ttl=self._ttl)
+        self._cache[feature_name] = self._store.get(feature_name)
 
     def delete(self, feature_name: str):
         self._store.delete(feature_name)
-        self._cache.set(feature_name, None, -1)
+        self._cache.pop(feature_name, None)
 
     def list(
         self, limit: Optional[int] = None, offset: int = 0
@@ -70,4 +73,4 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta):
         self._store.set_meta(feature_name, meta)
-        self._cache.set(feature_name, self._store.get(feature_name), ttl=self._ttl)
+        self._cache[feature_name] = self._store.get(feature_name)
