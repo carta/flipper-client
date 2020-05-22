@@ -127,6 +127,19 @@ class TestGet(BaseTest):
 
         self.assertIsNotNone(fast.get(feature_name))
 
+    def test_it_should_be_able_to_cache_flags_that_do_not_exist(self):
+        slow = MagicMock()
+        fast = CachedFeatureFlagStore(slow)
+
+        feature_name = self.txt()
+
+        fast.get(feature_name)
+        fast.get(feature_name)
+        fast.get(feature_name)
+        fast.get(feature_name)
+
+        slow.get.assert_called_once_with(feature_name)
+
 
 class TestSet(BaseTest):
     def test_sets_value_correctly(self):

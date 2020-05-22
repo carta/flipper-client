@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 requirements = [
     "fakeredis~=0.11.0",
-    "lru-ttl~=0.0.6",
+    "cachetools~=4.1.0",
     "python-consul~=1.0.1",
     "redis~=2.10.6",
     "thrift~=0.11.0",
