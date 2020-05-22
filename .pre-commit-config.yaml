@@ -27,6 +27,11 @@ repos:
     hooks:
       - id: insert-license
         files: flipper|flipper_thrift
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.7.7
+    hooks:
+      - id: flake8
+        exclude: flipper_thrift|flipper_client\.egg_info|build|.circleci
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: master
     hooks:
@@ -35,8 +40,6 @@ repos:
       - id: trailing-whitespace
         exclude: flipper_thrift|flipper_client\.egg_info|build|.circleci
       - id: check-ast
-        exclude: flipper_thrift|flipper_client\.egg_info|build|.circleci
-      - id: flake8
         exclude: flipper_thrift|flipper_client\.egg_info|build|.circleci
   - repo: https://github.com/PyCQA/bandit
     rev: master
