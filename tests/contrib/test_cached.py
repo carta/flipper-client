@@ -131,6 +131,8 @@ class TestGet(BaseTest):
         slow = MagicMock()
         fast = CachedFeatureFlagStore(slow)
 
+        slow.get.return_value = None
+
         feature_name = self.txt()
 
         fast.get(feature_name)
