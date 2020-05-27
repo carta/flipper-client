@@ -49,9 +49,8 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
         return item
 
     def get(self, feature_name: str) -> Optional[FeatureFlagStoreItem]:
-        cached = self._cache.get(feature_name)
-        if cached is not None:
-            return cached
+        if feature_name in self._cache:
+            return self._cache[feature_name]
 
         item = self._store.get(feature_name)
         self._cache[feature_name] = item
