@@ -114,14 +114,23 @@ class TestGet(BaseTest):
 
         fast.create(feature_name)
 
-        get = fast._cache.get
+        class CacheWrapper:
+            def __init__(self, wrapped):
+                self.wrapped = wrapped
 
-        def slow_get(key):
-            result = get(key)
-            sleep(0.02)
-            return result
+            def __contains__(self, key):
+                result = key in self.wrapped
+                sleep(0.02)
+                return result
 
-        fast._cache.get = slow_get
+            def __getitem__(self, key):
+                return self.wrapped[key]
+
+            def __setitem__(self, key, value):
+                self.wrapped[key] = value
+
+        cache = fast._cache
+        fast._cache = CacheWrapper(cache)
 
         fast.set(feature_name, 1)
 

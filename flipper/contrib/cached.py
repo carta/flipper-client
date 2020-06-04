@@ -49,8 +49,10 @@ class CachedFeatureFlagStore(AbstractFeatureFlagStore):
         return item
 
     def get(self, feature_name: str) -> Optional[FeatureFlagStoreItem]:
-        if feature_name in self._cache:
+        try:
             return self._cache[feature_name]
+        except KeyError:
+            pass
 
         item = self._store.get(feature_name)
         self._cache[feature_name] = item
