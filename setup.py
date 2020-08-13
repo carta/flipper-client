@@ -1,7 +1,6 @@
 from setuptools import find_packages, setup
 
 requirements = [
-    "fakeredis~=0.11.0",
     "cachetools~=4.1.0",
     "python-consul~=1.0.1",
     "redis>=2.10.6,<4",
@@ -21,6 +20,7 @@ setup(
     install_requires=requirements,
     extras_require={
         "dev": [
+            "fakeredis~=0.11.0",
             "pytest~=3.6.2",
             "ipython",
             "thrift",
