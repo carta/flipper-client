@@ -553,7 +553,7 @@ client = FeatureFlagClient(store)
 
 ## Usage with Redis backend
 
-To connect flipper to redis just create an instance of `StrictRedis` and supply it to the `RedisFeatureFlagStore` backend. Features will be tracked under the base key your provide (default is `features`).
+To connect flipper to redis just create an instance of `Redis` and supply it to the `RedisFeatureFlagStore` backend. Features will be tracked under the base key your provide (default is `features`).
 
 Keep in mind, this will do a network call every time a feature flag is checked, so you may want to add a local in-memory cache (see below).
 
@@ -563,7 +563,7 @@ import redis
 from flipper import FeatureFlagClient, RedisFeatureFlagStore
 
 
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
+r = redis.Redis(host='localhost', port=6379, db=0)
 
 # default base_key is 'features'
 store = RedisFeatureFlagStore(r, base_key='feature-flags')
@@ -584,7 +584,7 @@ from flipper import (
 )
 
 
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
+r = redis.Redis(host='localhost', port=6379, db=0)
 
 store = RedisFeatureFlagStore(r)
 
@@ -697,8 +697,8 @@ from flipper import (
 )
 
 
-primary_redis = redis.StrictRedis(host='localhost', port=6379, db=0)
-backup_redis = redis.StrictRedis(host='localhost', port=6379, db=1)
+primary_redis = redis.Redis(host='localhost', port=6379, db=0)
+backup_redis = redis.Redis(host='localhost', port=6379, db=1)
 
 primary = RedisFeatureFlagStore(primary_redis, base_key='feature-flags')
 replica = RedisFeatureFlagStore(backup_redis, base_key='feature-flags')

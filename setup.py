@@ -1,10 +1,9 @@
 from setuptools import find_packages, setup
 
 requirements = [
-    "fakeredis~=0.11.0",
     "cachetools~=4.1.0",
     "python-consul~=1.0.1",
-    "redis~=2.10.6",
+    "redis>=2.10.6,<4",
     "thrift~=0.13.0",
     "boto3~=1.9.83",
     "pyee==6.0.0",
@@ -13,7 +12,7 @@ requirements = [
 
 setup(
     name="flipper-client",
-    version="1.2.3",
+    version="1.2.4",
     packages=find_packages(),
     license="Apache License 2.0",
     long_description=open("README.md").read(),
@@ -21,6 +20,7 @@ setup(
     install_requires=requirements,
     extras_require={
         "dev": [
+            "fakeredis~=0.11.0",
             "pytest~=3.6.2",
             "ipython",
             "thrift",
