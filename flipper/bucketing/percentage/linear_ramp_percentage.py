@@ -48,8 +48,8 @@ class LinearRampPercentage(AbstractPercentage):
         return (self._final_value - self._initial_value) / self._ramp_duration
 
     @property
-    def dt(self) -> int:
-        return (datetime.now() - self._initial_time).seconds
+    def dt(self) -> float:
+        return (datetime.now() - self._initial_time).total_seconds()
 
     def to_dict(self) -> Dict[str, Any]:
         return {
