@@ -54,6 +54,35 @@ class TestValue(unittest.TestCase):
 
         self.assertEqual(expected, percentage.value)
 
+    @patch("flipper.bucketing.percentage.linear_ramp_percentage.datetime")
+    def test_when_ramp_duration_is_longer_than_one_hour_and_ramp_has_completed_it_computes_value_correctly(  # noqa: E501
+        self, mock_datetime
+    ):
+        now = datetime(2020, 10, 28)
+
+        mock_datetime.now.return_value = now
+        mock_datetime.fromtimestamp = datetime.fromtimestamp
+
+        initial_value = 0.1
+        final_value = 1
+        ramp_duration = 1601314960
+        expected_percentage = 1
+
+        dt = timedelta(seconds=ramp_duration * expected_percentage)
+        initial_time = int((now - dt).timestamp())
+
+        percentage = LinearRampPercentage(
+            initial_value=initial_value,
+            final_value=final_value,
+            ramp_duration=ramp_duration,
+            initial_time=initial_time,
+        )
+
+        value_delta = final_value - initial_value
+        expected = value_delta * expected_percentage + initial_value
+
+        self.assertEqual(expected, percentage.value)
+
 
 class TestToDict(unittest.TestCase):
     def test_returns_correct_values(self):
