@@ -5,14 +5,14 @@ requirements = [
     "python-consul~=1.0.1",
     "redis>=2.10.6,<4",
     "thrift~=0.13.0",
-    "boto3~=1.9.83",
+    "boto3>=1.9.83,<2",
     "pyee==6.0.0",
 ]
 
 
 setup(
     name="flipper-client",
-    version="1.2.5",
+    version="1.2.6,
     packages=find_packages(),
     license="Apache License 2.0",
     long_description=open("README.md").read(),
