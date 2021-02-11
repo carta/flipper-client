@@ -63,7 +63,13 @@ class FeatureFlagStoreItem:
         return True
 
     def _all_conditions_satisfied(self, **conditions) -> bool:
-        return all(c.check(**conditions) for c in self._meta.conditions)
+        """
+        Independent calls to add_condition works like an OR
+
+        flag.add_condition(Condition(is_horse_lover=True))
+        flag.add_condition(Condition(horse_type__in=['Stallion', 'Mare'])
+        """
+        return any(c.check(**conditions) for c in self._meta.conditions)
 
     def _has_bucketer(self) -> bool:
         return self._meta.bucketer.get_type() != NoOpBucketer.get_type()

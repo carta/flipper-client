@@ -150,7 +150,7 @@ features.get_meta(MY_FEATURE)
 
 **`add_condition(feature_name: str, condition: Condition) -> void`**
 
-Adds a condition to for enabled checks, such that `is_enabled` will only return true if all the conditions are satisfied when it is called.
+Adds a condition to for enabled checks, such that `is_enabled` will return true if any of the conditions are satisfied when it is called.
 
 Example:
 
@@ -163,6 +163,28 @@ features.add_condition(MY_FEATURE, Condition(is_administrator=True))
 features.is_enabled(MY_FEATURE, is_administrator=True) # returns True
 features.is_enabled(MY_FEATURE, is_administrator=False) # returns False
 
+```
+
+If a check has one Condition with multiple checks, both need to be satisfied for `is_enabled` to return true.
+
+```python
+flag.add_condition(
+    Condition(
+        is_horse_lover=True,
+        horse_type__in=['Stallion', 'Mare'],
+    )
+)
+
+flag.is_enabled(is_horse_lover=True, horse_type__in=['Stallion', 'Mare'])
+```
+
+If a check has multiple conditions, `is_enabled` will return TRUE if any of them is satisfied (OR operation).
+
+```python
+flag.add_condition(Condition(is_horse_lover=True))
+flag.add_condition(Condition(horse_type__in=['Stallion', 'Mare'])
+
+flag.is_enabled(is_horse_lover=True, horse_type__in=['Stallion', 'Mare'])
 ```
 
 **`set_bucketer(feature_name: str, bucketer: Bucketer) -> void`**

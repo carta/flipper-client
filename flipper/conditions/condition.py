@@ -34,6 +34,16 @@ class Condition:
         return parsed_checks
 
     def check(self, **checks) -> bool:
+        """
+        When a Condition has multiple checks it works like an AND
+
+        flag.add_condition(
+            Condition(
+                is_horse_lover=True,
+                horse_type__in=['Stallion', 'Mare'],
+            )
+        )
+        """
         for check_name, check_value in checks.items():
             checkers = self._checks[check_name]
 
