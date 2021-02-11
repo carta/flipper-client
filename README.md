@@ -175,7 +175,7 @@ flag.add_condition(
     )
 )
 
-flag.is_enabled(is_horse_lover=True, horse_type__in=['Stallion', 'Mare'])
+flag.is_enabled(is_horse_lover=True, horse_type='Stallion')
 ```
 
 If a check has multiple conditions, `is_enabled` will return TRUE if any of them is satisfied (OR operation).
@@ -184,7 +184,7 @@ If a check has multiple conditions, `is_enabled` will return TRUE if any of them
 flag.add_condition(Condition(is_horse_lover=True))
 flag.add_condition(Condition(horse_type__in=['Stallion', 'Mare'])
 
-flag.is_enabled(is_horse_lover=True, horse_type__in=['Stallion', 'Mare'])
+flag.is_enabled(is_horse_lover=True, horse_type='Stallion')
 ```
 
 **`set_bucketer(feature_name: str, bucketer: Bucketer) -> void`**
