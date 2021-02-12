@@ -158,6 +158,20 @@ class TestCheck(BaseTest):
 
         self.assertTrue(condition.check(foo=True, bar=False, herp=20, derp=5))
 
+    def test_returns_true_when_a_check_is_removed_but_other_checks_are_met(self):
+        condition = Condition(
+            foo=True,
+            baz__gt=99,
+            baz__lt=103,
+            herp__gte=10,
+            herp__lte=20,
+            derp__ne=2,
+            derp__in=[2, 43, 5, 8],
+            derp__not_in=[8, 1000],
+        )
+
+        self.assertTrue(condition.check(foo=True, bar=False, baz=101, herp=20, derp=5))
+
 
 class TestToDict(BaseTest):
     def test_includes_all_checks(self):
