@@ -8,6 +8,7 @@ install:
 
 
 install-dev:
+    pip install --upgrade pip
 	pip install -e .[dev]
 	pre-commit install
 	pre-commit install-hooks
