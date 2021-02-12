@@ -167,6 +167,8 @@ features.is_enabled(MY_FEATURE, is_administrator=False) # returns False
 
 If a check has one Condition with multiple checks, both need to be satisfied for `is_enabled` to return true.
 
+Example:
+
 ```python
 flag.add_condition(
     Condition(
@@ -175,16 +177,18 @@ flag.add_condition(
     )
 )
 
-flag.is_enabled(is_horse_lover=True, horse_type='Stallion')
+flag.is_enabled(is_horse_lover=False, horse_type='Stallion') # returns False
 ```
 
 If a check has multiple conditions, `is_enabled` will return TRUE if any of them is satisfied.
+
+Example:
 
 ```python
 flag.add_condition(Condition(is_horse_lover=True))
 flag.add_condition(Condition(horse_type__in=['Stallion', 'Mare'])
 
-flag.is_enabled(is_horse_lover=True, horse_type='Stallion')
+flag.is_enabled(is_horse_lover=False, horse_type='Stallion') # returns True
 ```
 
 **`set_bucketer(feature_name: str, bucketer: Bucketer) -> void`**
