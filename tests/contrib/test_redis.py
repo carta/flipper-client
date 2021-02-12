@@ -11,7 +11,7 @@ from flipper.contrib.storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 
 class BaseTest(unittest.TestCase):
     def setUp(self):
-        self.redis = fakeredis.FakeStrictRedis(singleton=False)
+        self.redis = fakeredis.FakeRedis()
         self.store = RedisFeatureFlagStore(self.redis)
 
     def txt(self):

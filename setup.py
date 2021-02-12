@@ -1,18 +1,18 @@
 from setuptools import find_packages, setup
 
 requirements = [
-    "cachetools~=4.1.0",
-    "python-consul~=1.0.1",
+    "cachetools~=4.1",
+    "python-consul~=1.0",
     "redis>=2.10.6,<4",
-    "thrift~=0.13.0",
-    "boto3>=1.9.83,<2",
-    "pyee==6.0.0",
+    "thrift~=0.13",
+    "boto3~=1.9",
+    "pyee~=6.0",
 ]
 
 
 setup(
     name="flipper-client",
-    version="1.2.6,
+    version="1.2.7",
     packages=find_packages(),
     license="Apache License 2.0",
     long_description=open("README.md").read(),
@@ -20,8 +20,9 @@ setup(
     install_requires=requirements,
     extras_require={
         "dev": [
-            "fakeredis~=0.11.0",
-            "pytest~=3.6.2",
+            "six>=1.12",
+            "fakeredis~=1.0",
+            "pytest~=3.6",
             "ipython",
             "thrift",
             "setuptools",
