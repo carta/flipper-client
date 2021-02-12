@@ -180,7 +180,7 @@ flag.add_condition(
 flag.is_enabled(is_horse_lover=False, horse_type='Stallion') # returns False
 ```
 
-If a check has multiple conditions, `is_enabled` will return TRUE if any of them is satisfied.
+If a check has multiple conditions, `is_enabled` will return true if any of them is satisfied.
 
 Example:
 
