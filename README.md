@@ -165,7 +165,7 @@ features.is_enabled(MY_FEATURE, is_administrator=False) # returns False
 
 ```
 
-If a check has one Condition with multiple checks, both need to be satisfied for `is_enabled` to return true.
+If a flag has one Condition with multiple checks, both need to be satisfied for `is_enabled` to return true.
 
 Example:
 
@@ -180,7 +180,7 @@ flag.add_condition(
 flag.is_enabled(is_horse_lover=False, horse_type='Stallion') # returns False
 ```
 
-If a check has multiple conditions, `is_enabled` will return true if any of them is satisfied.
+If a flag has multiple conditions, `is_enabled` will return true if any of them is satisfied.
 
 Example:
 
