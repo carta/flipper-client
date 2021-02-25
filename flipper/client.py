@@ -98,7 +98,6 @@ class FeatureFlagClient:
         self._store.set(feature_name, False)
         self._event_emitter.emit(EventType.POST_DISABLE, feature_name)
 
-    @flag_must_exist
     def destroy(self, feature_name: str):
         self._event_emitter.emit(EventType.PRE_DESTROY, feature_name)
         self._store.delete(feature_name)

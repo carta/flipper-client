@@ -125,9 +125,12 @@ class TestDestroy(BaseTest):
 
         client.destroy.assert_called_once_with(self.name)
 
-    def test_raises_for_nonexistent_flag(self):
-        with self.assertRaises(FlagDoesNotExistError):
-            self.flag.destroy()
+    def test_client_is_called_for_nonexistent_flag(self):
+        client = MagicMock()
+        flag = FeatureFlag(self.name, client)
+        flag.destroy()
+
+        client.destroy.assert_called_once_with(self.name)
 
 
 class TestEnable(BaseTest):

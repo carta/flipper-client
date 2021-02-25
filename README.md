@@ -219,6 +219,7 @@ flag.disable()
 **`destroy() -> void`**
 
 Destroys the flag. Subsequent calls to `is_enabled` should return false.
+What happens when the flag does not exist is left up to the underlying store as an implementation detail.
 
 Example:
 

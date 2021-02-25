@@ -205,11 +205,12 @@ class TestDestroy(BaseTest):
 
         self.assertFalse(self.client.is_enabled(feature_name))
 
-    def test_raises_for_nonexistent_flag(self):
+    def test_noops_for_nonexistent_flag(self):
         feature_name = self.txt()
 
-        with self.assertRaises(FlagDoesNotExistError):
-            self.client.destroy(feature_name)
+        self.client.destroy(feature_name)
+
+        self.assertFalse(self.client.exists(feature_name))
 
     def test_emits_pre_destroy_event(self):
         feature_name = self.txt()
