@@ -18,5 +18,6 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           CLOUDSMITH_PIP: ${{ secrets.CLOUDSMITH_PIP }}
           CLOUDSMITH_PIP_TEST: ${{ secrets.CLOUDSMITH_PIP_TEST }}
+          CLOUDSMITH_MAVEN_RELEASES: ${{ secrets.CLOUDSMITH_MAVEN_RELEASES }}
         with:
           command: monitor --org=core-infrastructure-y30 --project-name=flipper-client_python-3.8 --file=./build/python/setup.py --skip-unresolved=false
