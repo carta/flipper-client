@@ -1,0 +1,22 @@
+name: Snyk monitor - python-3.8
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  snyk-monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/python-3.8@master
+        env:
+          COMMAND: "pip install --index-url=https://dl.cloudsmith.io/${{secrets.CLOUDSMITH_PIP}}/carta/pip/python/index/ --extra-index-url=https://dl.cloudsmith.io/${{secrets.CLOUDSMITH_PIP_TEST}}/carta/pip-test/python/index/ --editable ./build/python/"
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          CLOUDSMITH_PIP: ${{ secrets.CLOUDSMITH_PIP }}
+          CLOUDSMITH_PIP_TEST: ${{ secrets.CLOUDSMITH_PIP_TEST }}
+        with:
+          command: monitor --org=core-infrastructure-y30 --project-name=flipper-client_python-3.8 --file=./build/python/setup.py --skip-unresolved=false
