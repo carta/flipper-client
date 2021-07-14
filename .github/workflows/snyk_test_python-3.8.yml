@@ -16,7 +16,10 @@ jobs:
         with:
           node-version: 12.x
       - name: Installing snyk-delta
-        run: npm i -g snyk-delta
+        run: |
+          if [ ! -f "/opt/hostedtoolcache/node/12.22.1/x64/bin/snyk-delta" ]; then
+              npm i -g snyk-delta
+          fi
 
       - name: Use python3.8
         uses: actions/setup-python@v2
