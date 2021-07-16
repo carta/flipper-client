@@ -1,0 +1,20 @@
+name: Snyk - Jira
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */4 * * *'
+
+jobs:
+  snyk-jira-tickets:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: wget
+      uses: wei/wget@v1
+      with:
+        args: -O snyk-jira-sync https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases/download/0.8.0/snyk-jira-sync-linux
+    - name: Set permissons
+      run: sudo chmod -R +x snyk-jira-sync
+    - name: Create Jira tickets
+      run: ./snyk-jira-sync -orgID="c3b4154f-555f-4c13-9284-de06d25b4c03" -token="${{ secrets.SNYK_TOKEN }}" -jiraProjectID="10114" -projectID="" -assigneeId="5dae6b030e6b1e0c35596d23" -priorityScoreThreshold=800 -jiraTicketType="Security Vulnerability"
