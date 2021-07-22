@@ -11,13 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/python-3.8@master
+
+      - name: Use python3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: Install dependencies
+        run: "pip install --index-url=https://dl.cloudsmith.io/${{secrets.CLOUDSMITH_PIP}}/carta/pip/python/index/ --extra-index-url=https://dl.cloudsmith.io/${{secrets.CLOUDSMITH_PIP_TEST}}/carta/pip-test/python/index/ --editable ./build/python/"
         env:
-          COMMAND: "pip install --index-url=https://dl.cloudsmith.io/${{secrets.CLOUDSMITH_PIP}}/carta/pip/python/index/ --extra-index-url=https://dl.cloudsmith.io/${{secrets.CLOUDSMITH_PIP_TEST}}/carta/pip-test/python/index/ --editable ./build/python/"
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           CLOUDSMITH_PIP: ${{ secrets.CLOUDSMITH_PIP }}
           CLOUDSMITH_PIP_TEST: ${{ secrets.CLOUDSMITH_PIP_TEST }}
           CLOUDSMITH_MAVEN_RELEASES: ${{ secrets.CLOUDSMITH_MAVEN_RELEASES }}
-        with:
-          command: monitor --org=core-infrastructure-y30 --project-name=flipper-client_python-3.8 --file=./build/python/setup.py --skip-unresolved=false
+      - uses: snyk/actions/setup@master
+      - name: Snyk Monitor
+        run: snyk monitor --org=core-infrastructure-y30 --project-name=flipper-client_python-3.8 --file=./build/python/setup.py --skip-unresolved=false
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
