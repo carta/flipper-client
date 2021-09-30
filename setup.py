@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 requirements = [
-    "cachetools~=4.1",
+    "cachetools~=4.2.1",
     "python-consul~=1.0",
     "redis>=2.10.6,<4",
     "thrift~=0.13",
@@ -12,7 +12,7 @@ requirements = [
 
 setup(
     name="flipper-client",
-    version="1.2.7",
+    version="1.2.8",
     packages=find_packages(),
     license="Apache License 2.0",
     long_description=open("README.md").read(),
