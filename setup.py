@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 requirements = [
     "cachetools~=4.2.1",
     "python-consul~=1.0",
-    "redis>=2.10.6,<4",
+    "redis>=2.10.6,<5",
     "thrift~=0.13",
     "boto3~=1.9",
     "pyee~=6.0",
@@ -12,7 +12,7 @@ requirements = [
 
 setup(
     name="flipper-client",
-    version="1.2.8",
+    version="1.2.9",
     packages=find_packages(),
     license="Apache License 2.0",
     long_description=open("README.md").read(),
@@ -22,13 +22,13 @@ setup(
         "dev": [
             "six>=1.12",
             "fakeredis~=1.0",
-            "pytest~=3.6",
+            "pytest~=7.1.0",
             "ipython",
             "thrift",
             "setuptools",
             "wheel",
             "ipdb",
-            "black==18.6b4",
+            "black==22.1.0",
             "pre-commit",
             "isort",
             "flake8",
