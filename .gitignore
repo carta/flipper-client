@@ -106,5 +106,8 @@ venv.bak/
 
 .DS_Store
 
-# IDEA
-.idea
+# IDE files
+.vscode
+.idea/
+out/
+*.iml
