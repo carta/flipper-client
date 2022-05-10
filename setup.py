@@ -7,6 +7,7 @@ requirements = [
     "thrift~=0.13",
     "boto3~=1.9",
     "pyee~=6.0",
+    "psycopg~=3.0.10",
 ]
 
 
@@ -36,6 +37,7 @@ setup(
             "moto",
             "bandit",
             "twine",
+            "testing.postgresql",
         ]
     },
     classifiers=["License :: OSI Approved :: Apache Software License"],

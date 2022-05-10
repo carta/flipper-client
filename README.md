@@ -522,6 +522,7 @@ Out of the box, we support the following backends:
 - `ConsulFeatureFlagStore` (Requires a running consul cluster. Provides the lowest latency of all the options)
 - `RedisFeatureFlagStore` (Requires a running redis cluster. Can be combined with `CachedFeatureFlagStore` to reduce average latency.)
 - `ThriftRPCFeatureFlagStore` (Requires a server that implements the `FeatureFlagStore` thrift service)
+- `PostgreSQLFeatureFlagStore` (Requires a running postgreSQL server)
 
 
 ## Usage with in-memory backend
@@ -723,6 +724,21 @@ from flipper import FeatureFlagClient, S3FeatureFlagStore
 s3 = boto3.client('s3')
 
 store = S3FeatureFlagStore(s3, 'my-flipper-bucket')
+
+client = FeatureFlagClient(store)
+```
+
+## Usage with a PostgreSQL backend
+To store flag data in a PostgreSQL database, use the `PostgreSQLFeatureFlagStore`.
+Pass the connection string to the database and a table name for the flag data (default is `feature_flags`).
+
+```python
+from flipper import FeatureFlagClient, PostgreSQLFeatureFlagStore
+
+
+conninfo = "postgresql://user:secret@localhost"
+
+store = PostgreSQLFeatureFlagStore(conninfo, table_name='my-flipper-table')
 
 client = FeatureFlagClient(store)
 ```

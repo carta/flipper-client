@@ -14,6 +14,7 @@
 from .cached import CachedFeatureFlagStore
 from .consul import ConsulFeatureFlagStore
 from .memory import MemoryFeatureFlagStore
+from .postgresql import PostgreSQLFeatureFlagStore
 from .redis import RedisFeatureFlagStore
 from .replicated import ReplicatedFeatureFlagStore
 from .s3 import S3FeatureFlagStore
@@ -23,6 +24,7 @@ __all__ = [
     "CachedFeatureFlagStore",
     "ConsulFeatureFlagStore",
     "MemoryFeatureFlagStore",
+    "PostgreSQLFeatureFlagStore",
     "RedisFeatureFlagStore",
     "ReplicatedFeatureFlagStore",
     "S3FeatureFlagStore",
