@@ -26,12 +26,14 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
         self,
         conninfo: str,
         table_name: str = "feature_flags",
+        run_migrations: bool = True,
     ) -> None:
         self._conninfo = conninfo
         self._table_name = sql.Identifier(table_name)
         self._name_column = sql.Identifier("name")
         self._item_column = sql.Identifier("item")
-        self._run_migrations()
+        if run_migrations:
+            self.run_migrations()
 
     @contextmanager
     def _connection(self) -> Connection:
@@ -41,7 +43,7 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
         finally:
             conn.close()
 
-    def _run_migrations(self) -> None:
+    def run_migrations(self) -> None:
         with self._connection() as conn:
             query = sql.SQL(
                 """CREATE TABLE IF NOT EXISTS {} \

@@ -24,6 +24,16 @@ class BaseTest(unittest.TestCase):
         self._db.stop()
 
 
+class TestRunMigration(unittest.TestCase):
+    def test_run_migration_creates_table(self):
+        db = Postgresql()
+        store = PostgreSQLFeatureFlagStore(db.url(), run_migrations=False)
+
+        store.run_migrations()
+
+        self.assertIsNone(store.get(""))
+
+
 class TestCreate(BaseTest):
     def test_feature_flag_exists_when_created(self):
         feature_name = "test"

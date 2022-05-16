@@ -731,6 +731,7 @@ client = FeatureFlagClient(store)
 ## Usage with a PostgreSQL backend
 To store flag data in a PostgreSQL database, use the `PostgreSQLFeatureFlagStore`.
 Pass the connection string to the database and a table name for the flag data (default is `feature_flags`).
+Optionally, you may choose not to run the database migrations on class instantiation by passing False to the keyword argument `run_migrations`. This can be useful when managing the schema manually or in cases where you want to wait for the postgres server.
 
 ```python
 from flipper import FeatureFlagClient, PostgreSQLFeatureFlagStore
@@ -739,6 +740,10 @@ from flipper import FeatureFlagClient, PostgreSQLFeatureFlagStore
 conninfo = "postgresql://user:secret@localhost"
 
 store = PostgreSQLFeatureFlagStore(conninfo, table_name='my-flipper-table')
+
+## Running migrations manually
+store = PostgreSQLFeatureFlagStore(conninfo, table_name='my-flipper-table', run_migrations=False)
+store.run_migrations()
 
 client = FeatureFlagClient(store)
 ```
