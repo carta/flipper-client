@@ -20,6 +20,17 @@ from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 from .util.date import now
 
+CREATE_TABLE_SQL = sql.SQL(
+    "CREATE TABLE IF NOT EXISTS {} ({} varchar(40) PRIMARY KEY, {} bytea NOT NULL)"
+)
+CREATE_ITEM_SQL = sql.SQL(
+    "INSERT INTO {} ({}, {}) VALUES (%s, %s) ON CONFLICT({}) DO UPDATE SET {} = %s"
+)
+DELETE_ITEM_SQL = sql.SQL("DELETE FROM {} WHERE {} = %s")
+LIST_ITEMS_SQL = sql.SQL("SELECT {} FROM {} LIMIT {} OFFSET {}")
+SELECT_ITEM_SQL = sql.SQL("SELECT {} FROM {} WHERE {} = %s")
+UPDATE_ITEM_SQL = sql.SQL("UPDATE {} SET {} = %s WHERE {} = %s")
+
 
 class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
     def __init__(
@@ -45,16 +56,15 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
 
     def run_migrations(self) -> None:
         with self._connection() as conn:
-            query = sql.SQL(
-                """CREATE TABLE IF NOT EXISTS {} \
-                ({} varchar(40) PRIMARY KEY, {} bytea NOT NULL)"""
-            ).format(self._table_name, self._name_column, self._item_column)
+            query = CREATE_TABLE_SQL.format(
+                self._table_name, self._name_column, self._item_column
+            )
             conn.execute(query)
             conn.commit()
 
     def _update(self, item: FeatureFlagStoreItem) -> None:
         with self._connection() as conn:
-            query = sql.SQL("UPDATE {} SET {} = %s WHERE {} = %s").format(
+            query = UPDATE_ITEM_SQL.format(
                 self._table_name, self._item_column, self._name_column
             )
             conn.execute(query, (item.serialize(), item.feature_name))
@@ -69,21 +79,23 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
         item = FeatureFlagStoreItem(
             feature_name, is_enabled, FeatureFlagStoreMeta(now(), client_data)
         )
-        if self.get(feature_name) is None:
-            with self._connection() as conn:
-                query = sql.SQL("INSERT INTO {} ({}, {}) VALUES (%s, %s)").format(
-                    self._table_name, self._name_column, self._item_column
-                )
-                conn.execute(query, (item.feature_name, item.serialize()))
-                conn.commit()
-        else:
-            self._update(item)
+
+        with self._connection() as conn:
+            query = CREATE_ITEM_SQL.format(
+                self._table_name,
+                self._name_column,
+                self._item_column,
+                self._name_column,
+                self._item_column,
+            )
+            conn.execute(query, (item.feature_name, item.serialize(), item.serialize()))
+            conn.commit()
 
         return item
 
     def get(self, feature_name: str) -> Optional[FeatureFlagStoreItem]:
         with self._connection() as conn:
-            query = sql.SQL("SELECT {} FROM {} WHERE {} = %s").format(
+            query = SELECT_ITEM_SQL.format(
                 self._item_column, self._table_name, self._name_column
             )
             row = conn.execute(query, (feature_name,)).fetchone()
@@ -107,18 +119,12 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
         self, limit: Optional[int] = None, offset: int = 0
     ) -> Iterator[FeatureFlagStoreItem]:
         with self._connection() as conn:
-            if limit is None:
-                query = sql.SQL("SELECT {} FROM {} OFFSET {}").format(
-                    self._item_column, self._table_name, sql.Literal(offset)
-                )
-            else:
-                query = sql.SQL("SELECT {} FROM {} LIMIT {} OFFSET {}").format(
-                    self._item_column,
-                    self._table_name,
-                    sql.Literal(limit),
-                    sql.Literal(offset),
-                )
-
+            query = LIST_ITEMS_SQL.format(
+                self._item_column,
+                self._table_name,
+                sql.SQL("ALL") if limit is None else sql.Literal(limit),
+                sql.Literal(offset),
+            )
             rows = conn.execute(query).fetchall()
 
         for row in rows:
@@ -136,8 +142,6 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
 
     def delete(self, feature_name: str) -> None:
         with self._connection() as conn:
-            query = sql.SQL("DELETE FROM {} WHERE {} = %s").format(
-                self._table_name, self._name_column
-            )
+            query = DELETE_ITEM_SQL.format(self._table_name, self._name_column)
             conn.execute(query, (feature_name,))
             conn.commit()
