@@ -37,12 +37,14 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
         self,
         conninfo: str,
         table_name: str = "feature_flags",
+        name_column: str = "name",
+        item_column: str = "item",
         run_migrations: bool = True,
     ) -> None:
         self._conninfo = conninfo
         self._table_name = sql.Identifier(table_name)
-        self._name_column = sql.Identifier("name")
-        self._item_column = sql.Identifier("item")
+        self._name_column = sql.Identifier(name_column)
+        self._item_column = sql.Identifier(item_column)
         if run_migrations:
             self.run_migrations()
 

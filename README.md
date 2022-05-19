@@ -730,7 +730,8 @@ client = FeatureFlagClient(store)
 
 ## Usage with a PostgreSQL backend
 To store flag data in a PostgreSQL database, use the `PostgreSQLFeatureFlagStore`.
-Pass the connection string to the database and a table name for the flag data (default is `feature_flags`).
+To use, pass the connection string to the database as an argument.
+Optional keyword arguments are: a `table_name `for the flag data (default is `feature_flags`), a `item_column` for the items' column identifier (default is `item`) and a `name_column` for the feature flag names' column identifier (default is `name`).
 Optionally, you may choose not to run the database migrations on class instantiation by passing False to the keyword argument `run_migrations`. This can be useful when managing the schema manually or in cases where you want to wait for the postgres server.
 
 ```python
