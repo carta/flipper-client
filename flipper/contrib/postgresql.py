@@ -14,22 +14,35 @@
 from contextlib import contextmanager
 from typing import Iterator, Optional
 
-from psycopg import Connection, connect, sql
-
 from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
 from .util.date import now
 
-CREATE_TABLE_SQL = sql.SQL(
+POSTGRES_ENABLED = False
+try:
+    from psycopg import Connection, connect, sql
+
+    POSTGRES_ENABLED = True
+except ModuleNotFoundError:
+    pass
+
+CREATE_TABLE_SQL = (
     "CREATE TABLE IF NOT EXISTS {} ({} varchar(40) PRIMARY KEY, {} bytea NOT NULL)"
 )
-CREATE_ITEM_SQL = sql.SQL(
+CREATE_ITEM_SQL = (
     "INSERT INTO {} ({}, {}) VALUES (%s, %s) ON CONFLICT({}) DO UPDATE SET {} = %s"
 )
-DELETE_ITEM_SQL = sql.SQL("DELETE FROM {} WHERE {} = %s")
-LIST_ITEMS_SQL = sql.SQL("SELECT {} FROM {} LIMIT {} OFFSET {}")
-SELECT_ITEM_SQL = sql.SQL("SELECT {} FROM {} WHERE {} = %s")
-UPDATE_ITEM_SQL = sql.SQL("UPDATE {} SET {} = %s WHERE {} = %s")
+DELETE_ITEM_SQL = "DELETE FROM {} WHERE {} = %s"
+LIST_ITEMS_SQL = "SELECT {} FROM {} LIMIT {} OFFSET {}"
+SELECT_ITEM_SQL = "SELECT {} FROM {} WHERE {} = %s"
+UPDATE_ITEM_SQL = "UPDATE {} SET {} = %s WHERE {} = %s"
+
+
+class PostgresNotEnabled(Exception):
+    def __init__(self):
+        super().__init__(
+            "Postgres is not enabled, please install extra dependency [postgres]"
+        )
 
 
 class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
@@ -41,6 +54,8 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
         item_column: str = "item",
         run_migrations: bool = True,
     ) -> None:
+        if not POSTGRES_ENABLED:
+            raise PostgresNotEnabled()
         self._conninfo = conninfo
         self._table_name = sql.Identifier(table_name)
         self._name_column = sql.Identifier(name_column)
@@ -49,7 +64,7 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
             self.run_migrations()
 
     @contextmanager
-    def _connection(self) -> Connection:
+    def _connection(self) -> "Connection":
         conn = connect(self._conninfo)
         try:
             yield conn
@@ -58,7 +73,7 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
 
     def run_migrations(self) -> None:
         with self._connection() as conn:
-            query = CREATE_TABLE_SQL.format(
+            query = sql.SQL(CREATE_TABLE_SQL).format(
                 self._table_name, self._name_column, self._item_column
             )
             conn.execute(query)
@@ -66,7 +81,7 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
 
     def _update(self, item: FeatureFlagStoreItem) -> None:
         with self._connection() as conn:
-            query = UPDATE_ITEM_SQL.format(
+            query = sql.SQL(UPDATE_ITEM_SQL).format(
                 self._table_name, self._item_column, self._name_column
             )
             conn.execute(query, (item.serialize(), item.feature_name))
@@ -83,7 +98,7 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
         )
 
         with self._connection() as conn:
-            query = CREATE_ITEM_SQL.format(
+            query = sql.SQL(CREATE_ITEM_SQL).format(
                 self._table_name,
                 self._name_column,
                 self._item_column,
@@ -97,7 +112,7 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
 
     def get(self, feature_name: str) -> Optional[FeatureFlagStoreItem]:
         with self._connection() as conn:
-            query = SELECT_ITEM_SQL.format(
+            query = sql.SQL(SELECT_ITEM_SQL).format(
                 self._item_column, self._table_name, self._name_column
             )
             row = conn.execute(query, (feature_name,)).fetchone()
@@ -121,7 +136,7 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
         self, limit: Optional[int] = None, offset: int = 0
     ) -> Iterator[FeatureFlagStoreItem]:
         with self._connection() as conn:
-            query = LIST_ITEMS_SQL.format(
+            query = sql.SQL(LIST_ITEMS_SQL).format(
                 self._item_column,
                 self._table_name,
                 sql.SQL("ALL") if limit is None else sql.Literal(limit),
@@ -144,6 +159,6 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
 
     def delete(self, feature_name: str) -> None:
         with self._connection() as conn:
-            query = DELETE_ITEM_SQL.format(self._table_name, self._name_column)
+            query = sql.SQL(DELETE_ITEM_SQL).format(self._table_name, self._name_column)
             conn.execute(query, (feature_name,))
             conn.commit()
