@@ -19,6 +19,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=requirements,
     extras_require={
+        "postgres": ["psycopg~=3.0.10"],
         "dev": [
             "six>=1.12",
             "fakeredis~=1.0",
@@ -36,7 +37,8 @@ setup(
             "moto",
             "bandit",
             "twine",
-        ]
+            "testing.postgresql",
+        ],
     },
     classifiers=["License :: OSI Approved :: Apache Software License"],
 )

@@ -522,6 +522,7 @@ Out of the box, we support the following backends:
 - `ConsulFeatureFlagStore` (Requires a running consul cluster. Provides the lowest latency of all the options)
 - `RedisFeatureFlagStore` (Requires a running redis cluster. Can be combined with `CachedFeatureFlagStore` to reduce average latency.)
 - `ThriftRPCFeatureFlagStore` (Requires a server that implements the `FeatureFlagStore` thrift service)
+- `PostgreSQLFeatureFlagStore` (Requires a running postgreSQL server)
 
 
 ## Usage with in-memory backend
@@ -723,6 +724,27 @@ from flipper import FeatureFlagClient, S3FeatureFlagStore
 s3 = boto3.client('s3')
 
 store = S3FeatureFlagStore(s3, 'my-flipper-bucket')
+
+client = FeatureFlagClient(store)
+```
+
+## Usage with a PostgreSQL backend
+To store flag data in a PostgreSQL database, use the `PostgreSQLFeatureFlagStore`.
+To use, pass the connection string to the database as an argument.
+Optional keyword arguments are: a `table_name `for the flag data (default is `feature_flags`), a `item_column` for the items' column identifier (default is `item`) and a `name_column` for the feature flag names' column identifier (default is `name`).
+Optionally, you may choose not to run the database migrations on class instantiation by passing False to the keyword argument `run_migrations`. This can be useful when managing the schema manually or in cases where you want to wait for the postgres server.
+
+```python
+from flipper import FeatureFlagClient, PostgreSQLFeatureFlagStore
+
+
+conninfo = "postgresql://user:secret@localhost"
+
+store = PostgreSQLFeatureFlagStore(conninfo, table_name='my-flipper-table')
+
+## Running migrations manually
+store = PostgreSQLFeatureFlagStore(conninfo, table_name='my-flipper-table', run_migrations=False)
+store.run_migrations()
 
 client = FeatureFlagClient(store)
 ```
