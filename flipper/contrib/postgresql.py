@@ -119,7 +119,7 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
 
         if not row:
             return None
-        return FeatureFlagStoreItem.deserialize(row[0].tobytes())
+        return FeatureFlagStoreItem.deserialize(bytes(row[0]))
 
     def set(self, feature_name: str, is_enabled: bool) -> None:
         existing = self.get(feature_name)
@@ -145,7 +145,7 @@ class PostgreSQLFeatureFlagStore(AbstractFeatureFlagStore):
             rows = conn.execute(query).fetchall()
 
         for row in rows:
-            yield FeatureFlagStoreItem.deserialize(row[0].tobytes())
+            yield FeatureFlagStoreItem.deserialize(bytes(row[0]))
 
     def set_meta(self, feature_name: str, meta: FeatureFlagStoreMeta) -> None:
         existing = self.get(feature_name)
