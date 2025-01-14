@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 requirements = [
     "cachetools>=4.2.1,<6",
     "python-consul~=1.0",
-    "redis>=2.10.6,<5",
+    "redis>=2.10.6",
     "thrift~=0.13",
     "boto3~=1.9",
     "pyee~=6.0",
@@ -22,7 +22,7 @@ setup(
         "postgres": ["psycopg~=3.0.10"],
         "dev": [
             "six>=1.12",
-            "fakeredis~=1.0",
+            "fakeredis>2",
             "pytest~=7.1.0",
             "ipython",
             "thrift",
@@ -34,7 +34,7 @@ setup(
             "isort",
             "flake8",
             "mypy",
-            "moto",
+            "moto<4.2",
             "bandit",
             "twine",
             "testing.postgresql",
