@@ -20,7 +20,7 @@ def postgresql_db(postgresql):
 def store(postgresql):
     conninfo = (
         f"postgresql://{postgresql.user}:{postgresql.password}@{postgresql.host}"
-        f":{postgresql.port}/{postgresql.dbname}"
+        f":{postgresql.port}/postgres?gssencmode=disable"
     )
     return PostgreSQLFeatureFlagStore(conninfo)
 
@@ -29,7 +29,7 @@ class TestRunMigration:
     def test_run_migration_creates_table(self, postgresql):
         conninfo = (
             f"postgresql://{postgresql.user}:{postgresql.password}"
-            f"@{postgresql.host}:{postgresql.port}/{postgresql.dbname}"
+            f"@{postgresql.host}:{postgresql.port}/postgres?gssencmode=disable"
         )
         store = PostgreSQLFeatureFlagStore(conninfo, run_migrations=False)
         store.run_migrations()
