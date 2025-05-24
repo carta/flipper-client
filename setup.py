@@ -29,7 +29,7 @@ setup(
             "setuptools",
             "wheel",
             "ipdb",
-            "black==22.1.0",
+            "black~=22.3",
             "pre-commit",
             "isort~=6.0",
             "flake8~=7.2",
