@@ -18,12 +18,20 @@ def postgresql_db(postgresql):
 
 @pytest.fixture
 def store(postgresql):
-    return PostgreSQLFeatureFlagStore(postgresql.url())
+    conninfo = (
+        f"postgresql://{postgresql.user}:{postgresql.password}@{postgresql.host}"
+        ":{postgresql.port}/{postgresql.dbname}"
+    )
+    return PostgreSQLFeatureFlagStore(conninfo)
 
 
 class TestRunMigration:
     def test_run_migration_creates_table(self, postgresql):
-        store = PostgreSQLFeatureFlagStore(postgresql.url(), run_migrations=False)
+        conninfo = (
+            f"postgresql://{postgresql.user}:{postgresql.password}"
+            f"@{postgresql.host}:{postgresql.port}/{postgresql.dbname}"
+        )
+        store = PostgreSQLFeatureFlagStore(conninfo, run_migrations=False)
         store.run_migrations()
         assert store.get("") is None
 
