@@ -34,11 +34,17 @@ class Condition:
         return parsed_checks
 
     def check(self, **checks) -> bool:
-        for check_name, check_value in checks.items():
-            checkers = self._checks[check_name]
+        # Ensure all required variables are present in the provided checks
+        required_variables = set(self._checks.keys())
+        provided_variables = set(checks.keys())
 
-            for checker in checkers:
-                if checker.check(check_value) is False:
+        if not required_variables.issubset(provided_variables):
+            return False
+
+        # Verify all conditions are met for the provided variables
+        for variable, value in checks.items():
+            for condition in self._checks.get(variable, []):
+                if not condition.check(value):
                     return False
         return True
 
