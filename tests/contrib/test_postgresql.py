@@ -1,14 +1,14 @@
 from typing import Iterable
 
 import pytest
-from pytest_postgresql.factories import postgresql_noproc
+from pytest_postgresql.factories import postgresql_proc
 
 from flipper import PostgreSQLFeatureFlagStore
 from flipper.contrib.interface import FlagDoesNotExistError
 from flipper.contrib.storage import FeatureFlagStoreMeta
 from flipper.contrib.util.date import now
 
-postgresql = postgresql_noproc(port=None)
+postgresql = postgresql_proc(port=None)
 
 
 @pytest.fixture
