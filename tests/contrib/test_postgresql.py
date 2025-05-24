@@ -8,19 +8,16 @@ from flipper.contrib.interface import FlagDoesNotExistError
 from flipper.contrib.storage import FeatureFlagStoreMeta
 from flipper.contrib.util.date import now
 
-# Create a PostgreSQL fixture
 postgresql = postgresql_noproc(port=None)
 
 
 @pytest.fixture
 def postgresql_db(postgresql):
-    """Return a PostgreSQL database instance."""
     return postgresql
 
 
 @pytest.fixture
 def store(postgresql):
-    """Return a PostgreSQLFeatureFlagStore instance."""
     return PostgreSQLFeatureFlagStore(postgresql.url())
 
 
