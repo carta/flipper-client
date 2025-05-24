@@ -128,10 +128,15 @@ class TestCheck(BaseTest):
 
         self.assertFalse(condition.check(foo=True, baz=False))
 
-    def test_empty_conditions_return_false(self):
+    def test_empty_conditions_check_return_false(self):
         condition = Condition(foo=True)
 
         self.assertFalse(condition.check())
+
+    def test_no_conditions_set_but_conditions_checked_return_true(self):
+        condition = Condition()
+
+        self.assertTrue(condition.check(foo=True))
 
     def test_returns_true_when_all_checks_are_met(self):
         condition = Condition(
