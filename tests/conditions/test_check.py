@@ -10,14 +10,14 @@ from flipper.conditions.check import OPERATOR_DELIMITER, Check
 from flipper.conditions.operators.equality_operator import EqualityOperator
 from flipper.conditions.operators.greater_than_operator import GreaterThanOperator
 from flipper.conditions.operators.greater_than_or_equal_to_operator import (
-    GreaterThanOrEqualToOperator
+    GreaterThanOrEqualToOperator,
 )
 from flipper.conditions.operators.less_than_operator import LessThanOperator
 from flipper.conditions.operators.less_than_or_equal_to_operator import (
-    LessThanOrEqualToOperator
+    LessThanOrEqualToOperator,
 )
 from flipper.conditions.operators.negated_set_membership_operator import (
-    NegatedSetMembershipOperator
+    NegatedSetMembershipOperator,
 )
 from flipper.conditions.operators.negation_operator import NegationOperator
 from flipper.conditions.operators.set_membership_operator import SetMembershipOperator

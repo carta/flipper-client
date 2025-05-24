@@ -13,7 +13,7 @@
 
 from typing import Iterator, Optional
 
-from cachetools import LRUCache, TTLCache
+from cachetools import LRUCache, TTLCache  # type: ignore
 
 from .interface import AbstractFeatureFlagStore
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta

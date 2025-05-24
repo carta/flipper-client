@@ -225,7 +225,7 @@ class TestList(BaseTest):
             self.assertTrue(feature_name in feature_names)
 
     def test_when_batch_size_is_set_to_a_value_smaller_than_number_of_keys_still_returns_everything(  # noqa: E501
-        self
+        self,
     ):
         feature_names = [self.txt() for _ in range(10)]
 

@@ -39,28 +39,28 @@ class TestCheck(unittest.TestCase):
         self.assertFalse(bucketer.check())  # score = 0.32
 
     def test_returns_true_when_conditions_hash_to_value_less_than_percentage(
-        self
+        self,
     ):  # noqa: E501
         percentage = Percentage(value=0.8)
         bucketer = ConsistentHashPercentageBucketer(percentage=percentage)
         self.assertTrue(bucketer.check(foo="bar"))  # score = 0.79
 
     def test_returns_false_when_conditions_hash_to_value_greater_than_percentage(
-        self
+        self,
     ):  # noqa: E501
         percentage = Percentage(value=0.5)
         bucketer = ConsistentHashPercentageBucketer(percentage=percentage)
         self.assertFalse(bucketer.check(foo="bar"))  # score = 0.79
 
     def test_returns_true_when_conditions_hash_to_value_equal_to_percentage(
-        self
+        self,
     ):  # noqa: E501
         percentage = Percentage(value=0.79)
         bucketer = ConsistentHashPercentageBucketer(percentage=percentage)
         self.assertTrue(bucketer.check(foo="bar"))  # score = 0.79
 
     def test_always_returns_false_when_percentage_is_zero_when_including_conditions(
-        self
+        self,
     ):  # noqa: E501
         percentage = Percentage(value=0.0)
         bucketer = ConsistentHashPercentageBucketer(percentage=percentage)
