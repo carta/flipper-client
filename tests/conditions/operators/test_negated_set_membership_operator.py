@@ -5,7 +5,7 @@
 import unittest
 
 from flipper.conditions.operators.negated_set_membership_operator import (
-    NegatedSetMembershipOperator
+    NegatedSetMembershipOperator,
 )
 
 
