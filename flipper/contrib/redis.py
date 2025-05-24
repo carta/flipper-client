@@ -13,7 +13,7 @@
 
 from typing import Iterator, Optional
 
-from redis import Redis
+from redis import Redis  # type: ignore
 
 from .interface import AbstractFeatureFlagStore, FlagDoesNotExistError
 from .storage import FeatureFlagStoreItem, FeatureFlagStoreMeta
