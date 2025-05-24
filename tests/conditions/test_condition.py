@@ -128,6 +128,11 @@ class TestCheck(BaseTest):
 
         self.assertFalse(condition.check(foo=True, baz=False))
 
+    def test_missing_required_conditions(self):
+        condition = Condition(foo=True, bar=True)
+
+        self.assertFalse(condition.check(foo=True))
+
     def test_empty_conditions_check_return_false(self):
         condition = Condition(foo=True)
 
