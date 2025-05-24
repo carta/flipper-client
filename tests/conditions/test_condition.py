@@ -113,6 +113,26 @@ class TestCheck(BaseTest):
 
         self.assertFalse(condition.check(foo=3))
 
+    def test_when_check_different_condition_than_set_then_false(self):
+        condition = Condition(foo__in=[1, 2, 3])
+
+        self.assertFalse(condition.check(bar=4))
+
+    def test_multiple_unrelated_conditions_return_false(self):
+        condition = Condition(foo=True)
+
+        self.assertFalse(condition.check(bar=True, baz=False))
+
+    def test_partial_matching_conditions(self):
+        condition = Condition(foo=True, bar=False)
+
+        self.assertFalse(condition.check(foo=True, baz=False))
+
+    def test_empty_conditions_return_false(self):
+        condition = Condition(foo=True)
+
+        self.assertFalse(condition.check())
+
     def test_returns_true_when_all_checks_are_met(self):
         condition = Condition(
             foo=True,
