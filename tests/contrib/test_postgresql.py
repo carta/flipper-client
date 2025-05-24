@@ -1,5 +1,6 @@
 from typing import Iterable
 
+import psycopg
 import pytest
 from pytest_postgresql.factories import postgresql_proc
 
@@ -16,13 +17,27 @@ def postgresql_db(postgresql):
     return postgresql
 
 
+@pytest.fixture(autouse=True)
+def clean_db(postgresql):
+    conninfo = (
+        f"postgresql://{postgresql.user}:{postgresql.password}@{postgresql.host}"
+        f":{postgresql.port}/postgres?gssencmode=disable"
+    )
+    with psycopg.connect(conninfo) as conn:
+        with conn.cursor() as cur:
+            cur.execute("DROP TABLE IF EXISTS feature_flags;")
+        conn.commit()
+    yield
+
+
 @pytest.fixture
 def store(postgresql):
     conninfo = (
         f"postgresql://{postgresql.user}:{postgresql.password}@{postgresql.host}"
         f":{postgresql.port}/postgres?gssencmode=disable"
     )
-    return PostgreSQLFeatureFlagStore(conninfo)
+    store = PostgreSQLFeatureFlagStore(conninfo)
+    return store
 
 
 class TestRunMigration:
