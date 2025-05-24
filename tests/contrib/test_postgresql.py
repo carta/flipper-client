@@ -20,7 +20,7 @@ def postgresql_db(postgresql):
 def store(postgresql):
     conninfo = (
         f"postgresql://{postgresql.user}:{postgresql.password}@{postgresql.host}"
-        ":{postgresql.port}/{postgresql.dbname}"
+        f":{postgresql.port}/{postgresql.dbname}"
     )
     return PostgreSQLFeatureFlagStore(conninfo)
 
