@@ -895,7 +895,7 @@ This project is actively maintained by the maintainers listed in the MAINTAINERS
 
 ## Contacts
 
-The project maintainers can be reached via email at adam.savitzky@carta.com or luis.montiel@carta.com.
+The project maintainers can be reached via email at luis.montiel@carta.com.
 
 ## Discussion
 

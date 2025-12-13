@@ -9,6 +9,11 @@ jobs:
     steps:
       - checkout
 
+      - run:
+          name: Install PostgreSQL
+          command: |
+            sudo apt-get update && sudo apt-get install -y postgresql postgresql-client
+
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "setup.py" }}

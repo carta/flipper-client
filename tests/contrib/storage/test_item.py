@@ -147,7 +147,7 @@ class TestIsEnabled(BaseTest):
         self.assertTrue(item.is_enabled())
 
     def test_returns_false_when_bucketer_returns_false_and_conditions_not_specified(
-        self
+        self,
     ):  # noqa: E501
         # flag.is_enabled(user_id=2) # False
         bucketer = MagicMock()
@@ -159,7 +159,7 @@ class TestIsEnabled(BaseTest):
         self.assertFalse(item.is_enabled())
 
     def test_returns_true_when_bucketer_returns_false_and_conditions_return_true(
-        self
+        self,
     ):  # noqa: E501
         # flag.is_enabled(user_id=2, is_admin=True) # True
         bucketer = MagicMock()
@@ -171,7 +171,7 @@ class TestIsEnabled(BaseTest):
         self.assertTrue(item.is_enabled(is_admin=True))
 
     def test_returns_true_when_bucketer_returns_true_and_conditions_not_specified(
-        self
+        self,
     ):  # noqa: E501
         # flag.is_enabled(user_id=1) # True
         bucketer = MagicMock()
@@ -183,7 +183,7 @@ class TestIsEnabled(BaseTest):
         self.assertTrue(item.is_enabled())
 
     def test_returns_false_when_bucketer_returns_true_and_conditions_return_false(
-        self
+        self,
     ):  # noqa: E501
         # flag.is_enabled(user_id=1, is_admin=False) # False
         bucketer = MagicMock()

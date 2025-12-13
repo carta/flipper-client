@@ -5,7 +5,7 @@
 import unittest
 
 from flipper.conditions.operators.greater_than_or_equal_to_operator import (
-    GreaterThanOrEqualToOperator
+    GreaterThanOrEqualToOperator,
 )
 
 
