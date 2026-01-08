@@ -27,7 +27,7 @@ on:
 
 jobs:
   claude:
-    uses: carta/.github/.github/workflows/claude-code-assistant.yml@main
+    uses: carta/.github/.github/workflows/claude-code-assistant.yml@msaada/add-comment-fallback-for-reviews
     # secrets: inherit is GitHub's recommended pattern for reusable workflows
     # The reusable workflow can only access secrets that exist in this repo
     # See: https://docs.github.com/en/actions/using-workflows/reusing-workflows#using-inputs-and-secrets-in-a-reusable-workflow
