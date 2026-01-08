@@ -900,3 +900,5 @@ The project maintainers can be reached via email at adam.savitzky@carta.com or l
 ## Discussion
 
 We use github issues for discussing features, bugs, and other project related issues.
+
+<!-- Test comment for Claude workflow validation -->
