@@ -14,8 +14,10 @@ on:
     types: [created]
   pull_request_review_comment:
     types: [created]
-  pull_request_review:
-    types: [submitted]
+  # NOTE: pull_request_review is intentionally excluded. Claude's own review
+  # submissions re-trigger this workflow, creating "skipped" ghost runs that
+  # overwrite the real check status. @claude in review comments is still
+  # supported via pull_request_review_comment above.
   issues:
     types: [opened, assigned]
   workflow_dispatch:
