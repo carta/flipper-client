@@ -111,3 +111,6 @@ venv.bak/
 .idea/
 out/
 *.iml
+
+# uv
+.venv/

@@ -1,1 +1,0 @@
-recursive-include flipper_thrift *.thrift *.py
